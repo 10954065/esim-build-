@@ -1,0 +1,1016 @@
+// International eSIM & SMS verification marketplace — PostgreSQL schema.
+// Conventions:
+// - Identifiers: UUID v4 (non-guessable) except Better Auth tables, which use its own random ids.
+// - Money: Decimal(18,4) with an explicit ISO-4217 currency column beside every amount.
+// - Timestamps: timestamptz, always written in UTC.
+// - Customer-owned resources carry a direct userId for server-side ownership checks.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────────── Enums ─────────────────────────────
+
+enum UserRole {
+  user
+  support
+  finance
+  admin
+}
+
+enum ProductType {
+  ESIM
+  VERIFICATION
+  RENTAL
+}
+
+enum SupplierMode {
+  LIVE
+  SANDBOX
+}
+
+enum DestinationKind {
+  COUNTRY
+  REGION
+  GLOBAL
+}
+
+enum SyncKind {
+  ESIM_DESTINATIONS
+  ESIM_PACKAGES
+  VERIFICATION_COUNTRIES
+  VERIFICATION_SERVICES
+  VERIFICATION_PRICING
+  RENTAL_COUNTRIES
+  RENTAL_PRICING
+}
+
+enum SyncStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+enum OrderStatus {
+  CREATED
+  AWAITING_PAYMENT
+  PAID
+  FULFILLING
+  FULFILLED
+  NEEDS_REVIEW
+  FAILED
+  REFUND_PENDING
+  PARTIALLY_REFUNDED
+  REFUNDED
+  CANCELLED
+}
+
+enum ActorType {
+  SYSTEM
+  CUSTOMER
+  STAFF
+  WEBHOOK
+}
+
+enum PaymentProvider {
+  PAYSTACK
+  SANDBOX
+}
+
+enum PaymentStatus {
+  INITIALIZED
+  PENDING
+  SUCCEEDED
+  FAILED
+  ABANDONED
+}
+
+enum RefundStatus {
+  REQUESTED
+  PENDING
+  COMPLETED
+  FAILED
+  REJECTED
+}
+
+enum FulfilmentStatus {
+  PENDING
+  SUBMITTING
+  AWAITING_SUPPLIER
+  SUCCEEDED
+  UNCERTAIN
+  FAILED
+  NEEDS_REVIEW
+}
+
+enum EsimStatus {
+  PREPARING
+  READY
+  ACTIVE
+  EXPIRED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum VerificationStatus {
+  WAITING
+  RECEIVED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+  REFUNDED
+  FAILED
+}
+
+enum RentalStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  REFUNDED
+}
+
+enum WebhookSource {
+  PAYSTACK
+  SANDBOX_PAYMENT
+  SUPPLIER_1001SMS
+  SUPPLIER_SANDBOX
+}
+
+enum WebhookStatus {
+  RECEIVED
+  PROCESSED
+  IGNORED
+  FAILED
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+  DEAD
+}
+
+enum LedgerAccount {
+  GATEWAY_CLEARING
+  SALES_REVENUE
+  CUSTOMER_REFUNDS
+  GATEWAY_FEES
+  SUPPLIER_COST
+  SUPPLIER_PREPAID
+}
+
+enum LedgerDirection {
+  DEBIT
+  CREDIT
+}
+
+enum EmailStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+enum TicketStatus {
+  OPEN
+  AWAITING_CUSTOMER
+  AWAITING_STAFF
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum TicketCategory {
+  PAYMENT
+  ESIM_INSTALLATION
+  UNSUPPORTED_DEVICE
+  MISSING_SMS
+  NUMBER_EXPIRATION
+  SUPPLIER_FAILURE
+  REFUND_REQUEST
+  ACCOUNT_SECURITY
+  ABUSE_REPORT
+  DATA_DELETION
+  OTHER
+}
+
+// ───────────────────── Authentication (Better Auth) ─────────────────────
+
+model User {
+  id               String    @id
+  name             String
+  email            String    @unique
+  emailVerified    Boolean   @default(false)
+  image            String?
+  role             UserRole  @default(user)
+  banned           Boolean?  @default(false)
+  banReason        String?
+  banExpires       DateTime? @db.Timestamptz(3)
+  twoFactorEnabled Boolean?  @default(false)
+  createdAt        DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime  @updatedAt @db.Timestamptz(3)
+
+  sessions       Session[]
+  accounts       Account[]
+  twoFactors     TwoFactor[]
+  profile        UserProfile?
+  orders         Order[]
+  esims          EsimActivation[]
+  verifications  VerificationActivation[]
+  rentals        PhoneNumberRental[]
+  smsMessages    IncomingSmsMessage[]
+  notifications  Notification[]
+  tickets        SupportTicket[]
+  supportReplies SupportMessage[]
+
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime @db.Timestamptz(3)
+  token          String   @unique
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  impersonatedBy String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model TwoFactor {
+  id          String @id
+  secret      String
+  backupCodes String
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("twoFactor")
+}
+
+/// Better Auth rate-limit storage (auth endpoints).
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+
+  @@map("rateLimit")
+}
+
+/// Application rate limits (purchases, polling, support) — fixed window counters.
+model RateLimitBucket {
+  key         String   @id
+  count       Int
+  windowStart DateTime @db.Timestamptz(3)
+  expiresAt   DateTime @db.Timestamptz(3)
+
+  @@index([expiresAt])
+}
+
+model UserProfile {
+  id                  String    @id @default(uuid()) @db.Uuid
+  userId              String    @unique
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  countryCode         String?   @db.Char(2)
+  acceptedTermsAt     DateTime? @db.Timestamptz(3)
+  acceptedAupAt       DateTime? @db.Timestamptz(3)
+  deletionRequestedAt DateTime? @db.Timestamptz(3)
+  createdAt           DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime  @updatedAt @db.Timestamptz(3)
+}
+
+// ─────────────────────────── Catalogue ───────────────────────────
+
+model Supplier {
+  id              String       @id @default(uuid()) @db.Uuid
+  code            String       @unique
+  name            String
+  mode            SupplierMode
+  isActive        Boolean      @default(true)
+  priceCurrency   String       @db.Char(3)
+  lastHealthAt    DateTime?    @db.Timestamptz(3)
+  lastHealthOk    Boolean?
+  lastHealthError String?
+  createdAt       DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(3)
+
+  balances     SupplierBalanceSnapshot[]
+  syncLogs     CatalogSyncLog[]
+  destinations EsimDestination[]
+  services     Service[]
+  products     Product[]
+  fulfilments  Fulfilment[]
+}
+
+model SupplierBalanceSnapshot {
+  id         String   @id @default(uuid()) @db.Uuid
+  supplierId String   @db.Uuid
+  supplier   Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  balance    Decimal  @db.Decimal(18, 4)
+  currency   String   @db.Char(3)
+  capturedAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([supplierId, capturedAt])
+}
+
+model CatalogSyncLog {
+  id               String     @id @default(uuid()) @db.Uuid
+  supplierId       String     @db.Uuid
+  supplier         Supplier   @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  kind             SyncKind
+  scope            String?
+  status           SyncStatus @default(RUNNING)
+  itemsUpserted    Int        @default(0)
+  itemsDeactivated Int        @default(0)
+  error            String?
+  startedAt        DateTime   @default(now()) @db.Timestamptz(3)
+  finishedAt       DateTime?  @db.Timestamptz(3)
+
+  @@index([supplierId, kind, startedAt])
+}
+
+model Country {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique @db.Char(2)
+  name      String
+  slug      String   @unique
+  phoneCode String?
+  continent String?
+  isEnabled Boolean  @default(true)
+  /// Supplier-confirmed availability (verification numbers / rentals).
+  hasVerification  Boolean   @default(false)
+  hasRentals       Boolean   @default(false)
+  offersSyncedAt   DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  destinations EsimDestination[]
+  products     Product[]
+  pricingRules PricingRule[]
+}
+
+model EsimDestination {
+  id               String          @id @default(uuid()) @db.Uuid
+  supplierId       String          @db.Uuid
+  supplier         Supplier        @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  locationCode     String
+  name             String
+  slug             String          @unique
+  kind             DestinationKind
+  countryId        String?         @db.Uuid
+  country          Country?        @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  packageCount     Int             @default(0)
+  fromCost         Decimal?        @db.Decimal(18, 4)
+  topSpeed         String?
+  isActive         Boolean         @default(true)
+  isEnabled        Boolean         @default(true)
+  packagesSyncedAt DateTime?       @db.Timestamptz(3)
+  lastSyncedAt     DateTime        @default(now()) @db.Timestamptz(3)
+  createdAt        DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime        @updatedAt @db.Timestamptz(3)
+
+  products     Product[]
+  pricingRules PricingRule[]
+
+  @@unique([supplierId, locationCode])
+  @@index([kind, isActive, isEnabled])
+}
+
+model Service {
+  id         String   @id @default(uuid()) @db.Uuid
+  supplierId String   @db.Uuid
+  supplier   Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  slug       String
+  name       String
+  iconUrl    String?
+  popular    Boolean  @default(false)
+  isActive   Boolean  @default(true)
+  isEnabled  Boolean  @default(true)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  products     Product[]
+  pricingRules PricingRule[]
+
+  @@unique([supplierId, slug])
+  @@index([isActive, isEnabled, popular])
+}
+
+/// A purchasable supplier product. eSIM packages are synced per destination; verification
+/// and rental offers are refreshed on demand per country because inventory changes quickly.
+model Product {
+  id                  String           @id @default(uuid()) @db.Uuid
+  type                ProductType
+  supplierId          String           @db.Uuid
+  supplier            Supplier         @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  supplierProductCode String
+  name                String
+  slug                String
+  destinationId       String?          @db.Uuid
+  destination         EsimDestination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+  countryId           String?          @db.Uuid
+  country             Country?         @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  serviceId           String?          @db.Uuid
+  service             Service?         @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+
+  // eSIM attributes (as reported by the supplier)
+  dataVolumeBytes BigInt?
+  dataLabel       String?
+  validityDays    Int?
+  unlimited       Boolean @default(false)
+  pricingUnit     String?
+  speed           String?
+  fupPolicy       String?
+  ipExport        String?
+  /// Capabilities are only true when the supplier explicitly confirms them.
+  includesPhoneNumber Boolean @default(false)
+  includesSms         Boolean @default(false)
+  includesVoice       Boolean @default(false)
+
+  // Verification attributes
+  providerTier   String?
+  operator       String?
+  stockCount     Int?
+  deliverability Int?
+
+  // Rental attributes
+  rentalTerm    String?
+  rentalType    String?
+  durationHours Int?
+
+  wholesaleCost     Decimal  @db.Decimal(18, 4)
+  wholesaleCurrency String   @db.Char(3)
+  isActive          Boolean  @default(true)
+  isVisible         Boolean  @default(true)
+  lastSyncedAt      DateTime @default(now()) @db.Timestamptz(3)
+  createdAt         DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(3)
+
+  orderItems   OrderItem[]
+  pricingRules PricingRule[]
+
+  @@unique([supplierId, type, supplierProductCode])
+  @@index([type, isActive, isVisible])
+  @@index([destinationId, isActive])
+  @@index([countryId, serviceId, type])
+  @@index([slug])
+}
+
+// ─────────────────────────── Pricing ───────────────────────────
+
+/// Margin rule. The most specific active rule wins (product > service+country >
+/// service > destination/country > product type > global); ties break on priority.
+model PricingRule {
+  id            String           @id @default(uuid()) @db.Uuid
+  name          String
+  productType   ProductType?
+  countryId     String?          @db.Uuid
+  country       Country?         @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  destinationId String?          @db.Uuid
+  destination   EsimDestination? @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  serviceId     String?          @db.Uuid
+  service       Service?         @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  productId     String?          @db.Uuid
+  product       Product?         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  markupPercent Decimal          @default(0) @db.Decimal(9, 4)
+  markupFixed   Decimal          @default(0) @db.Decimal(18, 4)
+  minProfit     Decimal?         @db.Decimal(18, 4)
+  /// Currency of markupFixed / minProfit (the customer-facing currency).
+  currency      String           @db.Char(3)
+  priority      Int              @default(0)
+  isActive      Boolean          @default(true)
+  createdById   String?
+  createdAt     DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime         @updatedAt @db.Timestamptz(3)
+
+  @@index([isActive, productType])
+}
+
+/// Exchange rates are entered by finance/admin staff with a stated source. No rate is
+/// hardcoded; if a needed rate is missing or stale, products cannot be priced.
+model ExchangeRate {
+  id            String   @id @default(uuid()) @db.Uuid
+  baseCurrency  String   @db.Char(3)
+  quoteCurrency String   @db.Char(3)
+  rate          Decimal  @db.Decimal(20, 10)
+  source        String
+  effectiveAt   DateTime @default(now()) @db.Timestamptz(3)
+  createdById   String?
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+
+  orders Order[]
+
+  @@index([baseCurrency, quoteCurrency, effectiveAt])
+}
+
+model Promotion {
+  id              String       @id @default(uuid()) @db.Uuid
+  code            String       @unique
+  description     String?
+  percentOff      Decimal?     @db.Decimal(7, 4)
+  amountOff       Decimal?     @db.Decimal(18, 4)
+  currency        String?      @db.Char(3)
+  productType     ProductType?
+  minOrderAmount  Decimal?     @db.Decimal(18, 4)
+  maxRedemptions  Int?
+  redemptionCount Int          @default(0)
+  startsAt        DateTime?    @db.Timestamptz(3)
+  endsAt          DateTime?    @db.Timestamptz(3)
+  isActive        Boolean      @default(true)
+  createdAt       DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(3)
+
+  orders Order[]
+}
+
+model SystemSetting {
+  key         String   @id
+  value       Json
+  updatedById String?
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+}
+
+// ─────────────────────────── Orders ───────────────────────────
+
+model Order {
+  id                String        @id @default(uuid()) @db.Uuid
+  number            String        @unique
+  userId            String
+  user              User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  status            OrderStatus   @default(CREATED)
+  statusReason      String?
+  currency          String        @db.Char(3)
+  subtotal          Decimal       @db.Decimal(18, 4)
+  discountTotal     Decimal       @default(0) @db.Decimal(18, 4)
+  taxTotal          Decimal       @default(0) @db.Decimal(18, 4)
+  total             Decimal       @db.Decimal(18, 4)
+  supplierCostTotal Decimal       @db.Decimal(18, 4)
+  supplierCurrency  String        @db.Char(3)
+  /// Rate used to convert supplier cost into the order currency (null when equal).
+  exchangeRateValue Decimal?      @db.Decimal(20, 10)
+  exchangeRateId    String?       @db.Uuid
+  exchangeRate      ExchangeRate? @relation(fields: [exchangeRateId], references: [id], onDelete: Restrict)
+  promotionId       String?       @db.Uuid
+  promotion         Promotion?    @relation(fields: [promotionId], references: [id], onDelete: Restrict)
+  isSandbox         Boolean       @default(false)
+  /// Client-generated key that prevents a double-submitted checkout creating two orders.
+  idempotencyKey    String        @unique
+  paidAt            DateTime?     @db.Timestamptz(3)
+  fulfilledAt       DateTime?     @db.Timestamptz(3)
+  cancelledAt       DateTime?     @db.Timestamptz(3)
+  expiresAt         DateTime?     @db.Timestamptz(3)
+  createdAt         DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime      @updatedAt @db.Timestamptz(3)
+
+  items         OrderItem[]
+  payments      Payment[]
+  refunds       Refund[]
+  history       OrderStatusHistory[]
+  ledgerEntries LedgerEntry[]
+  tickets       SupportTicket[]
+
+  @@index([userId, createdAt])
+  @@index([status, updatedAt])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id                String      @id @default(uuid()) @db.Uuid
+  orderId           String      @db.Uuid
+  order             Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId         String      @db.Uuid
+  product           Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productType       ProductType
+  description       String
+  quantity          Int         @default(1)
+  unitPrice         Decimal     @db.Decimal(18, 4)
+  total             Decimal     @db.Decimal(18, 4)
+  wholesaleCost     Decimal     @db.Decimal(18, 4)
+  wholesaleCurrency String      @db.Char(3)
+  /// Snapshot of the inputs that produced the price (rule ids, markups, rate).
+  pricingSnapshot   Json
+  /// Supplier order parameters (package code, country, service, provider, term ...).
+  configuration     Json
+  createdAt         DateTime    @default(now()) @db.Timestamptz(3)
+
+  fulfilment   Fulfilment?
+  esims        EsimActivation[]
+  verification VerificationActivation?
+  rental       PhoneNumberRental?
+
+  @@index([orderId])
+}
+
+model OrderStatusHistory {
+  id         String       @id @default(uuid()) @db.Uuid
+  orderId    String       @db.Uuid
+  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromStatus OrderStatus?
+  toStatus   OrderStatus
+  reason     String?
+  actorType  ActorType
+  actorId    String?
+  createdAt  DateTime     @default(now()) @db.Timestamptz(3)
+
+  @@index([orderId, createdAt])
+}
+
+model Payment {
+  id                   String          @id @default(uuid()) @db.Uuid
+  orderId              String          @db.Uuid
+  order                Order           @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  provider             PaymentProvider
+  /// Our reference sent to the gateway.
+  reference            String          @unique
+  gatewayTransactionId String?
+  status               PaymentStatus   @default(INITIALIZED)
+  amount               Decimal         @db.Decimal(18, 4)
+  currency             String          @db.Char(3)
+  /// Amount in the gateway's minor unit as sent (for strict verification).
+  amountMinor          BigInt
+  authorizationUrl     String?
+  channel              String?
+  gatewayFee           Decimal?        @db.Decimal(18, 4)
+  failureReason        String?
+  paidAt               DateTime?       @db.Timestamptz(3)
+  verifiedAt           DateTime?       @db.Timestamptz(3)
+  createdAt            DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime        @updatedAt @db.Timestamptz(3)
+
+  refunds       Refund[]
+  ledgerEntries LedgerEntry[]
+
+  @@index([orderId])
+  @@index([status, createdAt])
+}
+
+model Refund {
+  id              String       @id @default(uuid()) @db.Uuid
+  orderId         String       @db.Uuid
+  order           Order        @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  paymentId       String       @db.Uuid
+  payment         Payment      @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  amount          Decimal      @db.Decimal(18, 4)
+  currency        String       @db.Char(3)
+  status          RefundStatus @default(REQUESTED)
+  reason          String
+  initiatedByType ActorType
+  initiatedById   String?
+  gatewayRefundId String?      @unique
+  failureReason   String?
+  idempotencyKey  String       @unique
+  submittedAt     DateTime?    @db.Timestamptz(3)
+  completedAt     DateTime?    @db.Timestamptz(3)
+  createdAt       DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(3)
+
+  ledgerEntries LedgerEntry[]
+
+  @@index([orderId])
+  @@index([status, createdAt])
+}
+
+model Fulfilment {
+  id               String           @id @default(uuid()) @db.Uuid
+  orderItemId      String           @unique @db.Uuid
+  orderItem        OrderItem        @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  supplierId       String           @db.Uuid
+  supplier         Supplier         @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  status           FulfilmentStatus @default(PENDING)
+  attempts         Int              @default(0)
+  supplierOrderRef String?
+  supplierCost     Decimal?         @db.Decimal(18, 4)
+  lastErrorCode    String?
+  lastError        String?
+  submittedAt      DateTime?        @db.Timestamptz(3)
+  completedAt      DateTime?        @db.Timestamptz(3)
+  createdAt        DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime         @updatedAt @db.Timestamptz(3)
+
+  @@unique([supplierId, supplierOrderRef])
+  @@index([status, updatedAt])
+}
+
+// ─────────────────────── Issued products ───────────────────────
+
+model EsimActivation {
+  id                String     @id @default(uuid()) @db.Uuid
+  orderItemId       String     @db.Uuid
+  orderItem         OrderItem  @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  userId            String
+  user              User       @relation(fields: [userId], references: [id], onDelete: Restrict)
+  supplierId        String     @db.Uuid
+  supplierOrderRef  String
+  supplierProfileId String
+  iccid             String?
+  /// AES-256-GCM encrypted LPA activation string.
+  activationCodeEnc String?
+  /// AES-256-GCM encrypted supplier-hosted QR image URL.
+  qrCodeUrlEnc      String?
+  apn               String?
+  status            EsimStatus @default(PREPARING)
+  supplierStatus    String?
+  totalVolumeBytes  BigInt?
+  usedVolumeBytes   BigInt?
+  activatedAt       DateTime?  @db.Timestamptz(3)
+  expiresAt         DateTime?  @db.Timestamptz(3)
+  lastRefreshedAt   DateTime?  @db.Timestamptz(3)
+  isSandbox         Boolean    @default(false)
+  createdAt         DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime   @updatedAt @db.Timestamptz(3)
+
+  @@unique([supplierId, supplierProfileId])
+  @@index([userId, createdAt])
+  @@index([supplierOrderRef])
+}
+
+model VerificationActivation {
+  id                   String             @id @default(uuid()) @db.Uuid
+  orderItemId          String             @unique @db.Uuid
+  orderItem            OrderItem          @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  userId               String
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Restrict)
+  supplierId           String             @db.Uuid
+  supplierOrderRef     String
+  phoneNumber          String
+  countryCode          String             @db.Char(2)
+  serviceSlug          String
+  serviceName          String
+  operator             String?
+  providerTier         String?
+  status               VerificationStatus @default(WAITING)
+  supplierStatus       String?
+  expiresAt            DateTime           @db.Timestamptz(3)
+  lastCheckedAt        DateTime?          @db.Timestamptz(3)
+  completedAt          DateTime?          @db.Timestamptz(3)
+  cancelledAt          DateTime?          @db.Timestamptz(3)
+  supplierRefundAmount Decimal?           @db.Decimal(18, 4)
+  isSandbox            Boolean            @default(false)
+  createdAt            DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime           @updatedAt @db.Timestamptz(3)
+
+  messages IncomingSmsMessage[]
+
+  @@unique([supplierId, supplierOrderRef])
+  @@index([userId, createdAt])
+  @@index([status, expiresAt])
+}
+
+model PhoneNumberRental {
+  id               String       @id @default(uuid()) @db.Uuid
+  orderItemId      String       @unique @db.Uuid
+  orderItem        OrderItem    @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  supplierId       String       @db.Uuid
+  supplierNumberId String
+  phoneNumber      String
+  countryCode      String       @db.Char(2)
+  rentalType       String
+  serviceSlug      String?
+  serviceName      String?
+  term             String
+  status           RentalStatus @default(ACTIVE)
+  rentedAt         DateTime     @db.Timestamptz(3)
+  expiresAt        DateTime     @db.Timestamptz(3)
+  reminderSentAt   DateTime?    @db.Timestamptz(3)
+  lastCheckedAt    DateTime?    @db.Timestamptz(3)
+  cancelledAt      DateTime?    @db.Timestamptz(3)
+  isSandbox        Boolean      @default(false)
+  createdAt        DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime     @updatedAt @db.Timestamptz(3)
+
+  messages IncomingSmsMessage[]
+
+  @@unique([supplierId, supplierNumberId])
+  @@index([userId, createdAt])
+  @@index([status, expiresAt])
+}
+
+model IncomingSmsMessage {
+  id                String                  @id @default(uuid()) @db.Uuid
+  supplierId        String                  @db.Uuid
+  supplierMessageId String
+  userId            String
+  user              User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  verificationId    String?                 @db.Uuid
+  verification      VerificationActivation? @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+  rentalId          String?                 @db.Uuid
+  rental            PhoneNumberRental?      @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+  sender            String?
+  /// AES-256-GCM encrypted message text.
+  bodyEnc           String
+  /// AES-256-GCM encrypted extracted code, when the supplier provides one.
+  codeEnc           String?
+  receivedAt        DateTime                @db.Timestamptz(3)
+  createdAt         DateTime                @default(now()) @db.Timestamptz(3)
+
+  @@unique([supplierId, supplierMessageId])
+  @@index([verificationId, receivedAt])
+  @@index([rentalId, receivedAt])
+  @@index([userId, receivedAt])
+}
+
+// ─────────────────────── Integration plumbing ───────────────────────
+
+model WebhookEvent {
+  id              String        @id @default(uuid()) @db.Uuid
+  source          WebhookSource
+  externalEventId String
+  eventType       String
+  status          WebhookStatus @default(RECEIVED)
+  /// Redacted payload — SMS text, codes and activation details are never stored here.
+  payload         Json
+  error           String?
+  attempts        Int           @default(0)
+  receivedAt      DateTime      @default(now()) @db.Timestamptz(3)
+  processedAt     DateTime?     @db.Timestamptz(3)
+
+  @@unique([source, externalEventId])
+  @@index([status, receivedAt])
+}
+
+/// Durable background job queue (Postgres, claimed with FOR UPDATE SKIP LOCKED).
+model Job {
+  id          String    @id @default(uuid()) @db.Uuid
+  type        String
+  payload     Json
+  status      JobStatus @default(PENDING)
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(8)
+  runAt       DateTime  @default(now()) @db.Timestamptz(3)
+  lockedAt    DateTime? @db.Timestamptz(3)
+  lockedBy    String?
+  lastError   String?
+  /// Prevents duplicate enqueueing of the same logical job.
+  dedupeKey   String?   @unique
+  completedAt DateTime? @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@index([status, runAt])
+  @@index([type, status])
+}
+
+/// Append-only double-entry ledger. UPDATE and DELETE are blocked by a database trigger.
+model LedgerEntry {
+  id          String          @id @default(uuid()) @db.Uuid
+  journalRef  String
+  account     LedgerAccount
+  direction   LedgerDirection
+  amount      Decimal         @db.Decimal(18, 4)
+  currency    String          @db.Char(3)
+  orderId     String?         @db.Uuid
+  order       Order?          @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  paymentId   String?         @db.Uuid
+  payment     Payment?        @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  refundId    String?         @db.Uuid
+  refund      Refund?         @relation(fields: [refundId], references: [id], onDelete: Restrict)
+  description String
+  createdAt   DateTime        @default(now()) @db.Timestamptz(3)
+
+  @@unique([journalRef, account, direction])
+  @@index([orderId])
+  @@index([account, createdAt])
+}
+
+// ─────────────────────── Communication ───────────────────────
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String
+  link      String?
+  readAt    DateTime? @db.Timestamptz(3)
+  dedupeKey String?   @unique
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@index([userId, readAt, createdAt])
+}
+
+model EmailDelivery {
+  id                String      @id @default(uuid()) @db.Uuid
+  userId            String?
+  toAddress         String
+  template          String
+  subject           String
+  status            EmailStatus @default(QUEUED)
+  provider          String
+  providerMessageId String?
+  attempts          Int         @default(0)
+  lastError         String?
+  /// Rendered body retained only by the development "log" provider for local testing.
+  devPreview        String?
+  dedupeKey         String?     @unique
+  createdAt         DateTime    @default(now()) @db.Timestamptz(3)
+  sentAt            DateTime?   @db.Timestamptz(3)
+
+  @@index([status, createdAt])
+  @@index([toAddress, createdAt])
+}
+
+model SupportTicket {
+  id        String         @id @default(uuid()) @db.Uuid
+  number    String         @unique
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Restrict)
+  orderId   String?        @db.Uuid
+  order     Order?         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  category  TicketCategory
+  priority  TicketPriority @default(NORMAL)
+  status    TicketStatus   @default(OPEN)
+  subject   String
+  closedAt  DateTime?      @db.Timestamptz(3)
+  createdAt DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime       @updatedAt @db.Timestamptz(3)
+
+  messages SupportMessage[]
+
+  @@index([userId, createdAt])
+  @@index([status, priority, updatedAt])
+}
+
+model SupportMessage {
+  id         String        @id @default(uuid()) @db.Uuid
+  ticketId   String        @db.Uuid
+  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User          @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  isStaff    Boolean       @default(false)
+  /// Internal staff notes are never shown to the customer.
+  isInternal Boolean       @default(false)
+  body       String
+  createdAt  DateTime      @default(now()) @db.Timestamptz(3)
+
+  @@index([ticketId, createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String?
+  actorRole  String?
+  action     String
+  entityType String
+  entityId   String?
+  reason     String?
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+}

@@ -1,0 +1,20 @@
+# Local development database only. Production uses a managed PostgreSQL instance.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: esim-marketplace-postgres
+    environment:
+      POSTGRES_USER: esim
+      POSTGRES_PASSWORD: esim_dev_password
+      POSTGRES_DB: esim
+    ports:
+      - "55433:5432"
+    volumes:
+      - esim_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U esim -d esim"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+volumes:
+  esim_pgdata:
