@@ -10,7 +10,7 @@ Legend: ✅ verified/tested · 🟡 implemented, untested against the live servi
 | Item | Status | Notes |
 |---|---|---|
 | API reference reviewed | ✅ | `https://www.1001sms.com/api-docs` read on 2026-10-22 (endpoints, fields, webhook signing). |
-| Adapter implemented (`src/server/providers/supplier/sms1001/`) | 🟡 | Built strictly from the documented request/response shapes. Never called against the live API. |
+| Adapter implemented (`src/server/providers/supplier/sms1001/`) | 🟡 | Built strictly from the documented request/response shapes. Every adapter method is unit-tested against those shapes with a stubbed HTTP layer (`adapter.test.ts`, 19 tests). Never called against the live API. |
 | Webhook signature verification | 🟡 | HMAC-SHA256 over `t.rawBody`, 5-minute tolerance, constant-time compare — unit-tested against the documented algorithm, not against a real delivery. |
 | Live API key | ⛔ | Not provided. Needs a key with scopes `read`, `activate`, `numbers`, `esim`. |
 | Webhook endpoint registration | ⛔ | After deploy: `PUT /webhooks/config` with `url=https://<domain>/api/webhooks/supplier/1001sms` and events `sms.received, esim.allocated, esim.updated, esim.failed, esim.refunded, number.expired, number.cancelled, number.expiring`. Store the returned `secret` in `SMS1001_WEBHOOK_SECRET`. |
@@ -24,7 +24,7 @@ Legend: ✅ verified/tested · 🟡 implemented, untested against the live servi
 
 | Item | Status | Notes |
 |---|---|---|
-| Adapter implemented (`src/server/providers/payment/paystack.ts`) | 🟡 | Initialize → hosted checkout redirect; server-side `GET /transaction/verify/:reference`; `POST /refund`; webhook HMAC-SHA512 of raw body with secret key (`x-paystack-signature`). |
+| Adapter implemented (`src/server/providers/payment/paystack.ts`) | 🟡 | Initialize → hosted checkout redirect; server-side `GET /transaction/verify/:reference`; `POST /refund`; webhook HMAC-SHA512 of raw body with secret key (`x-paystack-signature`). Unit-tested with a stubbed HTTP layer (`paystack.test.ts`, 28 tests: status mapping, minor units, uncertain refunds, signatures). Not yet run against a Paystack account. |
 | Official docs access | 🟡 | paystack.com/docs returned HTTP 403 to automated fetch on 2026-10-22; signature scheme confirmed only via third-party references. Re-verify against official docs before go-live. |
 | Merchant eligibility | ⛔ **Launch blocker** | Paystack's "International payment eligibility" article lists **"Data resellers"** and **"Instant value businesses (airtime sellers …)"** as ineligible for international payments in all countries. Travel eSIMs are data resale. Written approval from Paystack is required before accepting international cards; local GHS acceptance must also be confirmed for this category. |
 | Settlement currency | ⛔ | Configure `PAYMENT_CURRENCY` to a currency enabled on the merchant account (GHS by default for Ghana merchants; USD only if enabled). |
@@ -50,10 +50,13 @@ Legend: ✅ verified/tested · 🟡 implemented, untested against the live servi
 
 | Suite | Result | Scope |
 |---|---|---|
-| Unit (Vitest) | ✅ 80 / 80 | Pricing, money, signatures, 1001SMS mappers/client, sandbox adapter, crypto, env guards, logger, state machine, permissions |
-| Integration (Vitest + Postgres) | ✅ 12 / 12 | Payment confirmation, forged/duplicate webhooks, amount mismatch, supplier failure → refund, SMS ownership, cancel → refund, checkout idempotency, late payment, rentals |
+| Unit (Vitest) | ✅ 179 / 179 | Pricing, money, signatures, 1001SMS client/mappers/**adapter**, **Paystack adapter**, sandbox adapter, crypto, env guards, logger, state machine, permissions, redirect guard, formatting |
+| Integration (Vitest + Postgres) | ✅ 51 / 51 | Money flow; fulfilment failure modes (lost responses reconciled, ambiguous matches, operator errors, retries, manual linking guards, slow eSIM preparation); verification cancellation/expiry/polling; partial, uncertain and rejected refunds; profit report figures; catalogue freshness; retention; settings; rate limits |
 | E2E (Playwright, production build) | ✅ 5 / 5 | eSIM purchase to QR, verification SMS + isolation, declined payment, access control, mobile layout |
+| Coverage (unit + integration, `src/server` + `src/lib`) | ✅ | 85.1% lines · 80.8% statements · 82.3% functions · 70.1% branches; CI fails below 80/80/80/65 |
 
-All three suites use the **sandbox** supplier and gateway. None of them prove the live 1001SMS or Paystack integration.
+All suites use the **sandbox** supplier and gateway (the live adapters are exercised only against
+stubbed HTTP responses shaped like the documentation). None of them prove the live 1001SMS or Paystack integration.
+CI (`.github/workflows/ci.yml`) runs lint, types, all three suites and the coverage thresholds on every push.
 
 _This file is updated at the end of every implementation phase._

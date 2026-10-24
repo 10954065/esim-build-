@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/server/db";
 
 /** Reset every application table (TRUNCATE bypasses the ledger's row-level DELETE trigger). */
@@ -34,6 +35,19 @@ export async function seedPricingAndCatalog(): Promise<void> {
   await syncEsimPackages(spain.id);
   await refreshVerificationOffers("US");
   await refreshRentalOffers("GB");
+}
+
+/** New customer checks out one product and the sandbox payment succeeds (fulfilment is queued, not run). */
+export async function checkoutAndPay(where: Prisma.ProductWhereInput) {
+  const user = await createUser();
+  const product = await db.product.findFirstOrThrow({ where });
+  const { createCheckout } = await import("@/server/orders/checkout");
+  const r = await createCheckout({ userId: user.id, email: user.email, productId: product.id, idempotencyKey: randomUUID() });
+  if (!r.ok) throw new Error(`checkout failed: ${r.error}`);
+  const payment = await db.payment.findFirstOrThrow({ where: { orderId: r.orderId } });
+  const { decideSandboxCharge } = await import("@/server/sandbox/ops");
+  await decideSandboxCharge(payment.reference, "success");
+  return { user, orderId: r.orderId, payment };
 }
 
 export async function drainJobs(rounds = 6): Promise<void> {

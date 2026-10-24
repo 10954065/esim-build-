@@ -18,9 +18,11 @@ so the first live transactions must be supervised (see "Go-live sequence").
 |---|---|
 | TypeScript strict (`pnpm typecheck`) | ✅ no errors |
 | ESLint | ✅ no warnings |
-| Unit tests | ✅ 80 / 80 |
-| Integration tests (real Postgres, sandbox providers) | ✅ 12 / 12 |
+| Unit tests | ✅ 179 / 179 |
+| Integration tests (real Postgres, sandbox providers) | ✅ 51 / 51 |
 | E2E (Playwright, production build, desktop + Pixel 7) | ✅ 5 / 5 |
+| Coverage of server and library code | ✅ 85.1% lines (thresholds enforced in CI) |
+| CI on every push (`.github/workflows/ci.yml`) | ✅ configured |
 | Production build | ✅ |
 | `pnpm audit --prod` | ✅ no known vulnerabilities |
 | Manual checks on a running build | ✅ auth flow, all customer and admin pages, IDOR → 404, auth rate limit → 429, origin check → 403, cron without secret → 401 |

@@ -105,6 +105,25 @@ Each phase is committed and pushed to `main` when its checks pass.
 - DEPLOYMENT.md and OPERATIONS.md (written in Phase 6) cover environment, migrations, post-deploy
   steps, jobs, order states, refunds and incident playbooks.
 
+## Hardening (after Phase 7)
+
+Coverage was measured for the first time (57% of lines) and raised to 85% with tests aimed at the
+riskiest paths. Writing them found and fixed three defects:
+
+1. **Verification refund could be lost.** If a customer's cancellation reached the supplier but the
+   response timed out, the session was rolled back to "waiting"; the next poll saw the supplier's refund
+   and closed the session as refunded **without refunding the customer**. Polling now refunds the
+   customer whenever the supplier has refunded an undelivered number (idempotent per session).
+2. **Manual supplier linking** relied on a database constraint to stop one supplier order being linked
+   to two customer orders (raw error to staff). It now refuses explicitly, and also checks the country
+   of verification activations.
+3. **Profit report** counted demo orders in revenue but not in order counts. Demo data is now included
+   only while the deployment itself runs in sandbox mode, for both money and counts.
+
+Also: Paystack and 1001SMS adapters unit-tested against documented shapes; E2E runs reset rate-limit
+windows (repeated local runs hit the real sign-up limit); coverage thresholds in `vitest.config.mts`;
+GitHub Actions CI. Checks: 179 unit ✅, 51 integration ✅, 5 E2E ✅, typecheck ✅, lint ✅.
+
 ## Next task
 
 None in code. Launch depends on the blockers in PRODUCTION_READINESS.md.

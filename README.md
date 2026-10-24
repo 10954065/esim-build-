@@ -63,6 +63,7 @@ pnpm admin:grant you@example.com admin
 | `pnpm lint` | ESLint |
 | `pnpm test` | Unit tests (no database) |
 | `pnpm test:integration` | Integration tests against a database named `esim_test` |
+| `pnpm test:coverage` | Unit + integration tests with coverage thresholds (80% lines/statements/functions) |
 | `pnpm build && pnpm test:e2e` | Playwright end-to-end tests on port 3100 (sandbox mode) |
 | `pnpm db:migrate` / `db:deploy` / `db:seed` / `db:studio` | Prisma |
 | `pnpm admin:grant <email> <role>` | Grant `user`, `support`, `finance` or `admin` |
