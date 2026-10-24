@@ -20,7 +20,7 @@
 | 4 | Payments (Paystack + sandbox), webhooks, fulfilment jobs, reconciliation, refunds, ledger | ✅ |
 | 5 | Admin dashboard: orders, users, catalogue, pricing, suppliers, payments, refunds, support, analytics, audit, settings | ✅ |
 | 6 | Unit, integration and E2E tests; security review; mobile layout checks | ✅ |
-| 7 | Deployment docs, operations runbook, readiness report | ⏳ |
+| 7 | Deployment docs, operations runbook, readiness report | ✅ |
 
 Each phase is committed and pushed to `main` when its checks pass.
 
@@ -98,6 +98,13 @@ Each phase is committed and pushed to `main` when its checks pass.
 - Docs: SECURITY, OPERATIONS, DEPLOYMENT, README.
 - Checks: typecheck ✅, lint ✅, 80 unit ✅, 12 integration ✅, 5 E2E ✅, `pnpm audit --prod` ✅.
 
+## Phase 7 notes
+
+- `docs/PRODUCTION_READINESS.md`: verdict, evidence, four launch blockers with owners and exact
+  actions, pre-launch checklist, supervised go-live sequence, accepted limitations.
+- DEPLOYMENT.md and OPERATIONS.md (written in Phase 6) cover environment, migrations, post-deploy
+  steps, jobs, order states, refunds and incident playbooks.
+
 ## Next task
 
-Phase 7 — production readiness report (launch checklist, blockers and the exact actions to clear them).
+None in code. Launch depends on the blockers in PRODUCTION_READINESS.md.

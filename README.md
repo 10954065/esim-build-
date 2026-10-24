@@ -101,3 +101,4 @@ docs/               design and operations documents
 | [SECURITY](docs/SECURITY.md) | Controls, rate limits, known gaps |
 | [DEPLOYMENT](docs/DEPLOYMENT.md) | Environment, migrations, Vercel, post-deploy steps |
 | [OPERATIONS](docs/OPERATIONS.md) | Daily checks, jobs, order states, refunds, incidents |
+| [PRODUCTION_READINESS](docs/PRODUCTION_READINESS.md) | Verdict, launch blockers and the exact actions to clear them |
