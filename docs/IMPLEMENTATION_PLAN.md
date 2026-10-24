@@ -17,7 +17,7 @@
 | 1 | Audit & foundation: scaffold, security headers, env validation, logger, field encryption, Prisma schema + initial migration (with ledger immutability trigger), design tokens, docs | ✅ |
 | 2 | Provider layer (1001SMS + sandbox), catalogue sync, pricing engine, public browsing | ✅ |
 | 3 | Auth, customer dashboard, eSIM detail/QR, verification sessions, rentals, notifications | ✅ |
-| 4 | Payments (Paystack + sandbox), webhooks, fulfilment jobs, reconciliation, refunds, ledger | ⏳ |
+| 4 | Payments (Paystack + sandbox), webhooks, fulfilment jobs, reconciliation, refunds, ledger | ✅ |
 | 5 | Admin dashboard: orders, users, catalogue, pricing, suppliers, payments, refunds, support, analytics, audit, settings | ⏳ |
 | 6 | Unit, integration and E2E tests; security review; mobile layout checks | ⏳ |
 | 7 | Deployment docs, operations runbook, readiness report | ⏳ |
@@ -49,7 +49,27 @@ Each phase is committed and pushed to `main` when its checks pass.
 - Verified against a running build: sign-up → verification email → session → dashboard (all pages
   200); foreign order id → 404; `/admin` as customer → 404; 6th bad sign-in → 429; origin check → 403.
 
+## Phase 4 notes
+
+- Order state machine (pure, tested) + `transitionOrder` with conditional updates and history.
+- Payment gateway abstraction: Paystack adapter (initialize / verify / refund / signed webhooks)
+  and a sandbox gateway with its own charge/refund records.
+- Checkout: live supplier re-validation, server pricing, purchase limits, idempotency key,
+  gateway initialisation outside DB transactions; sandbox hosted-page simulator; return page
+  verifies server-side.
+- `confirmPayment`: server-side verify, exact amount/currency match, idempotent SUCCEEDED update,
+  ledger journals, fulfilment jobs; late payments on cancelled orders are refunded.
+- Postgres job queue (SKIP LOCKED, backoff + jitter, DEAD state), recurring scheduler, cron route.
+- Fulfilment: claim-before-call, UNCERTAIN → reconciliation against supplier order lists (never a
+  blind retry), operator errors → review, definite failures → automatic refund; admin retry and
+  verified manual linking.
+- Verification: webhook + polling, encrypted SMS, cancel → supplier-confirmed refund, expiry sweep.
+- Refunds: REQUESTED → PENDING → COMPLETED only on gateway confirmation; uncertain submissions
+  reconciled via the gateway's refund list; never exceeds captured amount.
+- Retention job enforcing `src/lib/retention.ts`.
+- Tests: 75 unit + 12 integration tests (real Postgres, sandbox providers) all passing.
+
 ## Next task
 
-Phase 4 — checkout, payments (Paystack + sandbox), webhooks, job queue, fulfilment and
-reconciliation, verification polling/cancel, refunds, ledger, notifications.
+Phase 5 — admin dashboard (orders, users, catalogue, pricing, suppliers, payments, refunds,
+support, analytics/profit report, audit logs, settings, integrations).

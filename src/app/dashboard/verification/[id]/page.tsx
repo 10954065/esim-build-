@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DemoBadge, StatusBadge } from "@/components/common/status-badge";
 import { AutoRefresh, CopyButton, Countdown } from "@/components/dashboard/client-utils";
+import { VerificationActions } from "@/components/dashboard/verification-actions";
 import { formatDateTime } from "@/lib/format";
 import { flagEmoji } from "@/lib/slug";
 import { requireUser } from "@/server/auth/session";
@@ -16,6 +17,7 @@ export default async function VerificationDetailPage({ params }: { params: Promi
   const v = await getVerification(user.id, id);
   if (!v) notFound();
   const live = (v.status === "WAITING" || v.status === "RECEIVED") && v.expiresAt > new Date();
+  const canCancel = v.status === "WAITING" && v.messages.length === 0 && v.expiresAt > new Date();
 
   return (
     <div className="space-y-6">
@@ -46,6 +48,7 @@ export default async function VerificationDetailPage({ params }: { params: Promi
         </div>
         <div className="flex flex-wrap gap-2">
           <CopyButton value={v.phoneNumber} label="Copy number" />
+          <VerificationActions verificationId={v.id} canCancel={canCancel} live={live} sandbox={v.isSandbox} />
         </div>
       </section>
 

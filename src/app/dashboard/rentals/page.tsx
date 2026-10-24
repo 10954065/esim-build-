@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EmptyState } from "@/components/common/empty-state";
 import { DemoBadge, StatusBadge } from "@/components/common/status-badge";
 import { AutoRefresh, CopyButton } from "@/components/dashboard/client-utils";
+import { RentalDemoSms } from "@/components/dashboard/verification-actions";
 import { Button } from "@/components/ui/button";
 import { formatDateTime, formatTerm } from "@/lib/format";
 import { flagEmoji } from "@/lib/slug";
@@ -37,6 +38,7 @@ export default async function RentalsPage() {
                 </div>
                 <StatusBadge status={r.status} />
                 <CopyButton value={r.phoneNumber} label="Copy" />
+                {r.isSandbox && r.status === "ACTIVE" && <RentalDemoSms rentalId={r.id} />}
               </div>
               {r.messages.length === 0 ? (
                 <p className="px-5 py-6 text-sm text-muted-foreground">No messages yet.</p>
