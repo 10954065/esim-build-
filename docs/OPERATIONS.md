@@ -56,7 +56,8 @@ The order page shows the supplier error and the fulfilment history. Typical caus
 - **Supplier outcome uncertain** (timeout during purchase). First press **Retry fulfilment**: it
   reconciles against the supplier's order list before buying anything new. If the supplier dashboard
   shows an order this system missed, use **Link supplier order**. The system fetches that order from
-  the supplier and checks that it matches (product, time window, not linked elsewhere) before attaching it. There is deliberately no "mark as fulfilled" button.
+  the supplier and attaches it only if it is the purchased product (eSIM package, verification service
+  and country, or rental term) and is not already linked to another order. There is deliberately no "mark as fulfilled" button.
 - **Supplier rejected the order** (out of stock, operator error): issue a full refund.
 
 ## Refunds

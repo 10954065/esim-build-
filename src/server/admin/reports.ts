@@ -31,12 +31,13 @@ export interface ProfitReport {
   byMonth: Array<{ month: string; orders: number; sales: string }>;
 }
 
-async function ledgerSum(account: string, direction: "DEBIT" | "CREDIT", from: Date, to: Date, currency?: string): Promise<string> {
+async function ledgerSum(account: string, direction: "DEBIT" | "CREDIT", from: Date, to: Date, currency: string, sandbox: boolean): Promise<string> {
   const rows = await db.$queryRaw<Array<{ total: string | null }>>`
-    SELECT COALESCE(SUM(amount), 0)::text AS total FROM "LedgerEntry"
+    SELECT COALESCE(SUM(amount), 0)::text AS total FROM "LedgerEntry" e
     WHERE account = ${account}::"LedgerAccount" AND direction = ${direction}::"LedgerDirection"
-      AND "createdAt" >= ${from} AND "createdAt" < ${to}
-      AND (${currency ?? null}::text IS NULL OR currency = ${currency ?? null})
+      AND e."createdAt" >= ${from} AND e."createdAt" < ${to}
+      AND currency = ${currency}
+      AND (${sandbox}::boolean OR NOT EXISTS (SELECT 1 FROM "Order" o WHERE o.id = e."orderId" AND o."isSandbox"))
   `;
   return rows[0]?.total ?? "0";
 }
@@ -45,13 +46,16 @@ export async function profitReport(from: Date, to: Date): Promise<ProfitReport> 
   const env = getEnv();
   const currency = env.PAYMENT_CURRENCY;
   const supplierCurrency = env.SUPPLIER_PRICE_CURRENCY;
+  // Demo orders are reported only while the deployment itself runs in sandbox mode, so demo
+  // money can never be mixed into real revenue, and money and order counts always agree.
+  const sandbox = env.SUPPLIER_MODE === "sandbox";
 
   const [grossSales, refunds, fees, supplierCostGross, supplierCostReversed] = await Promise.all([
-    ledgerSum("SALES_REVENUE", "CREDIT", from, to, currency),
-    ledgerSum("CUSTOMER_REFUNDS", "DEBIT", from, to, currency),
-    ledgerSum("GATEWAY_FEES", "DEBIT", from, to, currency),
-    ledgerSum("SUPPLIER_COST", "DEBIT", from, to, supplierCurrency),
-    ledgerSum("SUPPLIER_COST", "CREDIT", from, to, supplierCurrency),
+    ledgerSum("SALES_REVENUE", "CREDIT", from, to, currency, sandbox),
+    ledgerSum("CUSTOMER_REFUNDS", "DEBIT", from, to, currency, sandbox),
+    ledgerSum("GATEWAY_FEES", "DEBIT", from, to, currency, sandbox),
+    ledgerSum("SUPPLIER_COST", "DEBIT", from, to, supplierCurrency, sandbox),
+    ledgerSum("SUPPLIER_COST", "CREDIT", from, to, supplierCurrency, sandbox),
   ]);
   const supplierCost = dec(supplierCostGross).minus(dec(supplierCostReversed));
 
@@ -63,6 +67,7 @@ export async function profitReport(from: Date, to: Date): Promise<ProfitReport> 
              COUNT(*) FILTER (WHERE o."exchangeRateValue" IS NULL) AS missing
       FROM "Fulfilment" f JOIN "OrderItem" i ON i.id = f."orderItemId" JOIN "Order" o ON o.id = i."orderId"
       WHERE f.status = 'SUCCEEDED' AND f."completedAt" >= ${from} AND f."completedAt" < ${to}
+        AND (o."isSandbox" = false OR ${sandbox}::boolean)
     `;
     supplierCostConverted = rows[0] && Number(rows[0].missing) === 0 ? (rows[0].converted ?? "0") : null;
   }
@@ -75,29 +80,29 @@ export async function profitReport(from: Date, to: Date): Promise<ProfitReport> 
       SELECT COUNT(*) AS paid,
         COUNT(*) FILTER (WHERE status IN ('FULFILLED','PARTIALLY_REFUNDED')) AS fulfilled,
         COUNT(*) FILTER (WHERE status IN ('FAILED','REFUNDED','NEEDS_REVIEW','REFUND_PENDING')) AS failed
-      FROM "Order" WHERE "paidAt" >= ${from} AND "paidAt" < ${to} AND "isSandbox" = false
+      FROM "Order" WHERE "paidAt" >= ${from} AND "paidAt" < ${to} AND ("isSandbox" = false OR ${sandbox}::boolean)
     `,
     db.$queryRaw<Array<{ category: string; orders: bigint; sales: string }>>`
       SELECT i."productType"::text AS category, COUNT(DISTINCT o.id) AS orders, COALESCE(SUM(i.total), 0)::text AS sales
       FROM "Order" o JOIN "OrderItem" i ON i."orderId" = o.id
-      WHERE o."paidAt" >= ${from} AND o."paidAt" < ${to} AND o."isSandbox" = false
+      WHERE o."paidAt" >= ${from} AND o."paidAt" < ${to} AND (o."isSandbox" = false OR ${sandbox}::boolean)
       GROUP BY 1 ORDER BY 3 DESC
     `,
     db.$queryRaw<Array<{ country: string; orders: bigint; sales: string }>>`
       SELECT COALESCE(c.name, d.name, 'Unknown') AS country, COUNT(DISTINCT o.id) AS orders, COALESCE(SUM(i.total), 0)::text AS sales
       FROM "Order" o JOIN "OrderItem" i ON i."orderId" = o.id JOIN "Product" p ON p.id = i."productId"
       LEFT JOIN "Country" c ON c.id = p."countryId" LEFT JOIN "EsimDestination" d ON d.id = p."destinationId"
-      WHERE o."paidAt" >= ${from} AND o."paidAt" < ${to} AND o."isSandbox" = false
+      WHERE o."paidAt" >= ${from} AND o."paidAt" < ${to} AND (o."isSandbox" = false OR ${sandbox}::boolean)
       GROUP BY 1 ORDER BY 3 DESC LIMIT 15
     `,
     db.$queryRaw<Array<{ day: string; orders: bigint; sales: string }>>`
       SELECT to_char(date_trunc('day', "paidAt"), 'YYYY-MM-DD') AS day, COUNT(*) AS orders, COALESCE(SUM(total), 0)::text AS sales
-      FROM "Order" WHERE "paidAt" >= ${from} AND "paidAt" < ${to} AND "isSandbox" = false
+      FROM "Order" WHERE "paidAt" >= ${from} AND "paidAt" < ${to} AND ("isSandbox" = false OR ${sandbox}::boolean)
       GROUP BY 1 ORDER BY 1
     `,
     db.$queryRaw<Array<{ month: string; orders: bigint; sales: string }>>`
       SELECT to_char(date_trunc('month', "paidAt"), 'YYYY-MM') AS month, COUNT(*) AS orders, COALESCE(SUM(total), 0)::text AS sales
-      FROM "Order" WHERE "paidAt" >= ${from} AND "paidAt" < ${to} AND "isSandbox" = false
+      FROM "Order" WHERE "paidAt" >= ${from} AND "paidAt" < ${to} AND ("isSandbox" = false OR ${sandbox}::boolean)
       GROUP BY 1 ORDER BY 1
     `,
   ]);

@@ -9,7 +9,7 @@ import { logger } from "@/server/logger";
 import { notify } from "@/server/notifications";
 import { getSupplierAdapter, isSupplierError } from "@/server/providers/supplier";
 import type { SmsMessageInfo } from "@/server/providers/supplier/types";
-import { requestRefund } from "@/server/refunds/service";
+import { RefundError, requestRefund } from "@/server/refunds/service";
 import { getSetting } from "@/server/settings";
 
 /**
@@ -71,7 +71,7 @@ export async function applySmsWebhook(supplierId: string, product: "activation" 
 
 /** Pull the latest state and messages from the supplier for one session. */
 export async function refreshVerification(verificationId: string): Promise<void> {
-  const v = await db.verificationActivation.findUniqueOrThrow({ where: { id: verificationId } });
+  const v = await db.verificationActivation.findUniqueOrThrow({ where: { id: verificationId }, include: { orderItem: { select: { orderId: true } } } });
   const adapter = getSupplierAdapter();
   const info = await adapter.verification.getActivation(v.supplierOrderRef);
   const added = await storeMessages({ verificationId: v.id, userId: v.userId, supplierId: v.supplierId }, info.messages);
@@ -88,6 +88,24 @@ export async function refreshVerification(verificationId: string): Promise<void>
     data: { status, supplierStatus: info.supplierStatus, lastCheckedAt: new Date(), expiresAt: info.expiresAt, ...(status === "COMPLETED" && !v.completedAt ? { completedAt: new Date() } : {}) },
   });
   if (added > 0 && v.status === "WAITING") await announceSms(v.userId, `/dashboard/verification/${v.id}`, `sms:verification:${v.id}:first`);
+  if (status === "REFUNDED" && v.status !== "REFUNDED") {
+    // The supplier refunded a number that delivered nothing (e.g. a cancellation whose response
+    // was lost). Refund the customer too; the journal and refund are idempotent per session.
+    await reverseSupplierCost(v.id, null);
+    if (await getSetting("verification.autoRefundOnExpiry")) {
+      await refundUndelivered(v.orderItem.orderId, v.id, "The supplier refunded this number before any SMS arrived");
+    }
+  }
+}
+
+async function refundUndelivered(orderId: string, verificationId: string, reason: string): Promise<void> {
+  try {
+    await requestRefund({ orderId, reason, initiatedByType: "SYSTEM", idempotencyKey: `verification-refund:${verificationId}` });
+    kickJobs();
+  } catch (err) {
+    if (!(err instanceof RefundError)) throw err;
+    log.info("no customer refund needed for verification", { verificationId, reason: err.message });
+  }
 }
 
 /** The supplier refunded us for an activation: reverse its recorded cost in the ledger. */
@@ -193,14 +211,7 @@ export async function sweepVerifications(limit = 20): Promise<{ polled: number; 
       if (info.state === "REFUNDED" && noSms) {
         await db.verificationActivation.update({ where: { id: v.id }, data: { status: "REFUNDED", supplierStatus: info.supplierStatus, completedAt: new Date() } });
         await reverseSupplierCost(v.id, null);
-        if (autoRefund) {
-          await requestRefund({
-            orderId: v.orderItem.orderId,
-            reason: "No SMS received before the number expired",
-            initiatedByType: "SYSTEM",
-            idempotencyKey: `verification-refund:${v.id}`,
-          });
-        }
+        if (autoRefund) await refundUndelivered(v.orderItem.orderId, v.id, "No SMS received before the number expired");
         settled++;
       } else if (Date.now() - v.expiresAt.getTime() > EXPIRY_GIVE_UP_MS || !noSms) {
         // Supplier did not refund (or an SMS arrived): close the session without a refund.

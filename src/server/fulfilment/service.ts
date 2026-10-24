@@ -448,6 +448,8 @@ export async function linkSupplierOrder(fulfilmentId: string, supplierRef: strin
   const config = itemConfigurationSchema.parse(item.configuration);
   const adapter = getSupplierAdapter();
   await writeAudit({ actorId: actor.id, actorRole: actor.role, action: "fulfilment.manual_link", entityType: "fulfilment", entityId: f.id, reason, metadata: { supplierRef } });
+  const taken = await db.fulfilment.findFirst({ where: { supplierId: f.supplierId, supplierOrderRef: supplierRef, NOT: { id: f.id } }, select: { id: true } });
+  if (taken) throw new Error("This supplier order is already linked to another order");
   if (config.kind === "ESIM") {
     const order = await adapter.esim.getEsimOrder(supplierRef);
     if (order.packageCode !== config.packageCode) throw new Error("Supplier order does not match the purchased package");
@@ -455,6 +457,7 @@ export async function linkSupplierOrder(fulfilmentId: string, supplierRef: strin
   } else if (config.kind === "VERIFICATION") {
     const a = await adapter.verification.getActivation(supplierRef);
     if (a.serviceSlug && a.serviceSlug !== config.serviceSlug) throw new Error("Supplier activation does not match the purchased service");
+    if (a.countryCode && a.countryCode !== config.countryCode) throw new Error("Supplier activation does not match the purchased country");
     await persistVerification(f, item, a);
   } else {
     const r = await adapter.rentals.getRental(supplierRef);
