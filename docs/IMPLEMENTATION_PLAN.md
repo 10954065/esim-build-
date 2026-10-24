@@ -19,7 +19,7 @@
 | 3 | Auth, customer dashboard, eSIM detail/QR, verification sessions, rentals, notifications | ✅ |
 | 4 | Payments (Paystack + sandbox), webhooks, fulfilment jobs, reconciliation, refunds, ledger | ✅ |
 | 5 | Admin dashboard: orders, users, catalogue, pricing, suppliers, payments, refunds, support, analytics, audit, settings | ✅ |
-| 6 | Unit, integration and E2E tests; security review; mobile layout checks | ⏳ |
+| 6 | Unit, integration and E2E tests; security review; mobile layout checks | ✅ |
 | 7 | Deployment docs, operations runbook, readiness report | ⏳ |
 
 Each phase is committed and pushed to `main` when its checks pass.
@@ -83,6 +83,21 @@ Each phase is committed and pushed to `main` when its checks pass.
 - Integrations: masked configuration, webhook/job/email stats, dead-job retry.
 - Smoke-tested on a production build: all admin pages 200 for admin; 404 for customers.
 
+## Phase 6 notes
+
+- Playwright suite (`e2e/marketplace.spec.ts`) against a production build in sandbox mode on port 3100:
+  1. register → verify email (dev mailbox) → buy an eSIM → order completes → QR code and manual details shown;
+  2. buy a verification number → simulated SMS appears → a second customer gets 404 on that session;
+  3. declined payment → no product created;
+  4. guest redirected to sign-in, customer gets 404 on `/admin`, cron rejects requests without the secret;
+  5. phone viewport (Pixel 7): no horizontal overflow, mobile navigation works.
+- Order detail page processes due jobs after responding, so fulfilment does not wait for the next cron tick.
+- Security review fixes: `/api/cron/jobs` now requires `CRON_SECRET` in every environment except
+  development/test (staging was open before); `shadcn` CLI moved to devDependencies, so
+  `pnpm audit --prod` is clean.
+- Docs: SECURITY, OPERATIONS, DEPLOYMENT, README.
+- Checks: typecheck ✅, lint ✅, 80 unit ✅, 12 integration ✅, 5 E2E ✅, `pnpm audit --prod` ✅.
+
 ## Next task
 
-Phase 6 — E2E tests (Playwright), security review, documentation (SECURITY, OPERATIONS, DEPLOYMENT).
+Phase 7 — production readiness report (launch checklist, blockers and the exact actions to clear them).

@@ -8,6 +8,7 @@ import { formatMoney } from "@/lib/currency";
 import { formatDateTime } from "@/lib/format";
 import { requireUser } from "@/server/auth/session";
 import { getOrder } from "@/server/customer/queries";
+import { kickJobs } from "@/server/jobs/kick";
 
 export const metadata = { title: "Order details" };
 
@@ -17,6 +18,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
   const order = await getOrder(user.id, orderId);
   if (!order) notFound();
   const inProgress = ["AWAITING_PAYMENT", "PAID", "FULFILLING"].includes(order.status);
+  // Process due background jobs after this response (cron remains the guaranteed processor).
+  if (order.status === "PAID" || order.status === "FULFILLING") kickJobs(5);
   const pendingPayment = order.payments.find((p) => p.status === "INITIALIZED" || p.status === "PENDING");
 
   return (

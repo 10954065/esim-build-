@@ -46,4 +46,14 @@ Legend: ✅ verified/tested · 🟡 implemented, untested against the live servi
 | Email + password, verification, reset, sessions, 2FA (TOTP) for staff | ✅ (local) |
 | Google OAuth | Optional — enabled only when `GOOGLE_CLIENT_ID/SECRET` are set; not tested. |
 
+## Test evidence (2026-10-24)
+
+| Suite | Result | Scope |
+|---|---|---|
+| Unit (Vitest) | ✅ 80 / 80 | Pricing, money, signatures, 1001SMS mappers/client, sandbox adapter, crypto, env guards, logger, state machine, permissions |
+| Integration (Vitest + Postgres) | ✅ 12 / 12 | Payment confirmation, forged/duplicate webhooks, amount mismatch, supplier failure → refund, SMS ownership, cancel → refund, checkout idempotency, late payment, rentals |
+| E2E (Playwright, production build) | ✅ 5 / 5 | eSIM purchase to QR, verification SMS + isolation, declined payment, access control, mobile layout |
+
+All three suites use the **sandbox** supplier and gateway. None of them prove the live 1001SMS or Paystack integration.
+
 _This file is updated at the end of every implementation phase._

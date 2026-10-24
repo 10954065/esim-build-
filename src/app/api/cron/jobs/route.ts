@@ -8,8 +8,9 @@ import { scheduleRecurring } from "@/server/jobs/scheduler";
 export const maxDuration = 60;
 
 function authorized(request: Request): boolean {
-  const secret = getEnv().CRON_SECRET;
-  if (!secret) return getEnv().APP_ENV !== "production";
+  const { CRON_SECRET: secret, APP_ENV } = getEnv();
+  // Only local development and tests may run without a secret; staging must set one too.
+  if (!secret) return APP_ENV === "development" || APP_ENV === "test";
   const header = request.headers.get("authorization") ?? "";
   const expected = Buffer.from(`Bearer ${secret}`);
   const given = Buffer.from(header);
