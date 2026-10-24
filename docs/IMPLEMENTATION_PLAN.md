@@ -18,7 +18,7 @@
 | 2 | Provider layer (1001SMS + sandbox), catalogue sync, pricing engine, public browsing | ✅ |
 | 3 | Auth, customer dashboard, eSIM detail/QR, verification sessions, rentals, notifications | ✅ |
 | 4 | Payments (Paystack + sandbox), webhooks, fulfilment jobs, reconciliation, refunds, ledger | ✅ |
-| 5 | Admin dashboard: orders, users, catalogue, pricing, suppliers, payments, refunds, support, analytics, audit, settings | ⏳ |
+| 5 | Admin dashboard: orders, users, catalogue, pricing, suppliers, payments, refunds, support, analytics, audit, settings | ✅ |
 | 6 | Unit, integration and E2E tests; security review; mobile layout checks | ⏳ |
 | 7 | Deployment docs, operations runbook, readiness report | ⏳ |
 
@@ -69,7 +69,20 @@ Each phase is committed and pushed to `main` when its checks pass.
 - Retention job enforcing `src/lib/retention.ts`.
 - Tests: 75 unit + 12 integration tests (real Postgres, sandbox providers) all passing.
 
+## Phase 5 notes
+
+- 18 admin routes behind `requireStaff` + per-page permissions; navigation filtered by role.
+- Order console: fulfilment state and supplier errors, retry, verified manual supplier linking
+  (the supplier order is fetched and matched — no "mark fulfilled" button), staff refunds with
+  idempotency nonce, status history, ledger entries.
+- Users: role changes and suspensions (sign-out everywhere, audited); CLI `pnpm admin:grant`.
+- Catalogue/pricing: visibility toggles, margin rules, staff-entered exchange rates with source,
+  promotions; products show cost, customer price and margin.
+- Profit report from the ledger: gross sales, refunds, supplier cost, gross profit, fees,
+  net contribution (clearly not net profit); by category, country, day, month; success rate.
+- Integrations: masked configuration, webhook/job/email stats, dead-job retry.
+- Smoke-tested on a production build: all admin pages 200 for admin; 404 for customers.
+
 ## Next task
 
-Phase 5 — admin dashboard (orders, users, catalogue, pricing, suppliers, payments, refunds,
-support, analytics/profit report, audit logs, settings, integrations).
+Phase 6 — E2E tests (Playwright), security review, documentation (SECURITY, OPERATIONS, DEPLOYMENT).

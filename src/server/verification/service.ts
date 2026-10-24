@@ -4,6 +4,7 @@ import { db } from "@/server/db";
 import { sendEmail } from "@/server/email";
 import { templates } from "@/server/email/templates";
 import { kickJobs } from "@/server/jobs/kick";
+import { postJournal } from "@/server/ledger";
 import { logger } from "@/server/logger";
 import { notify } from "@/server/notifications";
 import { getSupplierAdapter, isSupplierError } from "@/server/providers/supplier";
@@ -89,6 +90,28 @@ export async function refreshVerification(verificationId: string): Promise<void>
   if (added > 0 && v.status === "WAITING") await announceSms(v.userId, `/dashboard/verification/${v.id}`, `sms:verification:${v.id}:first`);
 }
 
+/** The supplier refunded us for an activation: reverse its recorded cost in the ledger. */
+async function reverseSupplierCost(verificationId: string, amount: string | null): Promise<void> {
+  const v = await db.verificationActivation.findUniqueOrThrow({
+    where: { id: verificationId },
+    include: { orderItem: { include: { fulfilment: true, order: { select: { number: true } } } } },
+  });
+  const cost = amount && Number(amount) > 0 ? amount : v.orderItem.fulfilment?.supplierCost?.toString();
+  if (!cost || Number(cost) <= 0) return;
+  const currency = getSupplierAdapter().priceCurrency;
+  await db.$transaction((tx) =>
+    postJournal(tx, {
+      journalRef: `supplier-refund:${v.id}`,
+      description: `Supplier refund for order ${v.orderItem.order.number}`,
+      orderId: v.orderItem.orderId,
+      lines: [
+        { account: "SUPPLIER_PREPAID", direction: "DEBIT", amount: cost, currency },
+        { account: "SUPPLIER_COST", direction: "CREDIT", amount: cost, currency },
+      ],
+    }),
+  );
+}
+
 export type CancelOutcome = { ok: true; refunded: boolean } | { ok: false; error: string };
 
 /** Customer cancellation: only before any SMS arrives and before expiry; refund follows the supplier. */
@@ -110,6 +133,7 @@ export async function cancelVerification(userId: string, verificationId: string)
       data: { status: refunded ? "REFUNDED" : "CANCELLED", supplierStatus: result.supplierStatus, supplierRefundAmount: result.refundAmount },
     });
     if (refunded) {
+      await reverseSupplierCost(v.id, result.refundAmount);
       await requestRefund({
         orderId: v.orderItem.orderId,
         reason: "Verification cancelled before any SMS was received",
@@ -168,6 +192,7 @@ export async function sweepVerifications(limit = 20): Promise<{ polled: number; 
       const noSms = v._count.messages === 0 && info.messages.length === 0;
       if (info.state === "REFUNDED" && noSms) {
         await db.verificationActivation.update({ where: { id: v.id }, data: { status: "REFUNDED", supplierStatus: info.supplierStatus, completedAt: new Date() } });
+        await reverseSupplierCost(v.id, null);
         if (autoRefund) {
           await requestRefund({
             orderId: v.orderItem.orderId,
