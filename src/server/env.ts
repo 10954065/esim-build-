@@ -48,7 +48,7 @@ export const envSchema = z
     PAYMENT_CURRENCY: z.string().length(3).toUpperCase().default("USD"),
     PAYSTACK_SECRET_KEY: optionalString,
     PAYSTACK_BASE_URL: z.url().default("https://api.paystack.co"),
-    SANDBOX_PAYMENT_SECRET: optionalString,
+    SANDBOX_SIGNING_SECRET: optionalString,
 
     EMAIL_PROVIDER: z.enum(["resend", "log"]).default("log"),
     RESEND_API_KEY: optionalString,
@@ -84,8 +84,8 @@ export const envSchema = z
     if (env.PAYMENT_PROVIDER === "paystack" && !env.PAYSTACK_SECRET_KEY) {
       issue("PAYSTACK_SECRET_KEY", "Required when PAYMENT_PROVIDER=paystack");
     }
-    if (paySandbox && !env.SANDBOX_PAYMENT_SECRET) {
-      issue("SANDBOX_PAYMENT_SECRET", "Required when PAYMENT_PROVIDER=sandbox");
+    if ((paySandbox || supplierSandbox) && !env.SANDBOX_SIGNING_SECRET) {
+      issue("SANDBOX_SIGNING_SECRET", "Required when the sandbox payment provider or sandbox supplier is enabled");
     }
     if (env.EMAIL_PROVIDER === "resend" && !env.RESEND_API_KEY) {
       issue("RESEND_API_KEY", "Required when EMAIL_PROVIDER=resend");

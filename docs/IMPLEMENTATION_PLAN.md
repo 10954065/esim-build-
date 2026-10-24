@@ -24,6 +24,18 @@
 
 Each phase is committed and pushed to `main` when its checks pass.
 
+## Phase 2 notes
+
+- `src/server/providers/supplier/` — provider contracts, 1001SMS adapter (client, schemas, mappers,
+  webhook verifier) and a stateless sandbox adapter.
+- `src/server/pricing/` — decimal-safe money helpers, pure pricing engine, DB pricing session.
+- `src/server/catalog/` — sync (with `CatalogSyncLog`), TTL-based freshness, priced read models.
+- Public pages: `/`, `/esims`, `/esims/[country]`, `/esims/[country]/[plan]`, `/verification`,
+  `/verification/[country]`, `/verification/[country]/[service]`, `/numbers/rentals`.
+- Checks: typecheck ✅, lint ✅, 68 unit tests ✅, production build ✅, smoke test of every public
+  route against the seeded sandbox catalogue ✅.
+
 ## Next task
 
-Phase 2 — implement `src/server/providers/supplier/*` and the catalogue sync service.
+Phase 3 — Better Auth (email/password, verification, reset, 2FA for staff), customer dashboard,
+remaining public content pages.
