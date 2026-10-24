@@ -122,7 +122,13 @@ riskiest paths. Writing them found and fixed three defects:
 
 Also: Paystack and 1001SMS adapters unit-tested against documented shapes; E2E runs reset rate-limit
 windows (repeated local runs hit the real sign-up limit); coverage thresholds in `vitest.config.mts`;
-GitHub Actions CI. Checks: 179 unit ✅, 51 integration ✅, 5 E2E ✅, typecheck ✅, lint ✅.
+GitHub Actions CI (green on first run; actions on current majors).
+
+**Encryption key rotation** (was security gap 5): `DATA_ENCRYPTION_KEYS_PREVIOUS` keeps retired keys
+readable, and `pnpm data:reencrypt` moves stored secrets to the new key. It is resumable and never
+overwrites a row that changed during the run. Procedure in SECURITY.md.
+
+Checks: 185 unit ✅, 53 integration ✅, 5 E2E ✅, typecheck ✅, lint ✅, coverage 85.4% lines.
 
 ## Next task
 

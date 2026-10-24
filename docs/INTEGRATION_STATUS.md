@@ -50,10 +50,10 @@ Legend: ✅ verified/tested · 🟡 implemented, untested against the live servi
 
 | Suite | Result | Scope |
 |---|---|---|
-| Unit (Vitest) | ✅ 179 / 179 | Pricing, money, signatures, 1001SMS client/mappers/**adapter**, **Paystack adapter**, sandbox adapter, crypto, env guards, logger, state machine, permissions, redirect guard, formatting |
-| Integration (Vitest + Postgres) | ✅ 51 / 51 | Money flow; fulfilment failure modes (lost responses reconciled, ambiguous matches, operator errors, retries, manual linking guards, slow eSIM preparation); verification cancellation/expiry/polling; partial, uncertain and rejected refunds; profit report figures; catalogue freshness; retention; settings; rate limits |
+| Unit (Vitest) | ✅ 185 / 185 | Pricing, money, signatures, 1001SMS client/mappers/**adapter**, **Paystack adapter**, sandbox adapter, crypto, env guards, logger, state machine, permissions, redirect guard, formatting |
+| Integration (Vitest + Postgres) | ✅ 53 / 53 | Money flow; fulfilment failure modes (lost responses reconciled, ambiguous matches, operator errors, retries, manual linking guards, slow eSIM preparation); verification cancellation/expiry/polling; partial, uncertain and rejected refunds; profit report figures; catalogue freshness; retention; settings; rate limits |
 | E2E (Playwright, production build) | ✅ 5 / 5 | eSIM purchase to QR, verification SMS + isolation, declined payment, access control, mobile layout |
-| Coverage (unit + integration, `src/server` + `src/lib`) | ✅ | 85.1% lines · 80.8% statements · 82.3% functions · 70.1% branches; CI fails below 80/80/80/65 |
+| Coverage (unit + integration, `src/server` + `src/lib`) | ✅ | 85.4% lines · 81.4% statements · 82.7% functions · 70.6% branches; CI fails below 80/80/80/65 |
 
 All suites use the **sandbox** supplier and gateway (the live adapters are exercised only against
 stubbed HTTP responses shaped like the documentation). None of them prove the live 1001SMS or Paystack integration.

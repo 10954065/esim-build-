@@ -106,7 +106,9 @@ from the provider's point-in-time backup; the ledger and jobs are transactional,
 **Suspected key leak**
 - `PAYSTACK_SECRET_KEY` / `SMS1001_API_KEY`: rotate in the provider dashboard, update the env var, redeploy.
 - `BETTER_AUTH_SECRET`: rotating it signs everyone out.
-- `DATA_ENCRYPTION_KEY`: **do not** simply replace it, or existing ciphertext becomes unreadable. See SECURITY.md, gap 5.
+- `DATA_ENCRYPTION_KEY`: **do not** simply replace it, or existing ciphertext becomes unreadable. Follow
+  SECURITY.md, "Rotating the data encryption key": set the new key, keep the old one in
+  `DATA_ENCRYPTION_KEYS_PREVIOUS`, run `pnpm data:reencrypt` until it reports nothing left, then remove the old key.
 
 ## Monitoring to set up
 

@@ -18,7 +18,8 @@
     "test:all": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "admin:grant": "tsx scripts/grant-role.ts"
+    "admin:grant": "tsx scripts/grant-role.ts",
+    "data:reencrypt": "tsx --conditions=react-server scripts/reencrypt-data.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^6.0.0",

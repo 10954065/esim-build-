@@ -28,6 +28,7 @@ Set these in Vercel → Project → Settings → Environment Variables, per envi
 | `DATABASE_POOL_MAX` | `5` on serverless (connections are per instance) |
 | `BETTER_AUTH_SECRET` | 32 random bytes, base64url |
 | `DATA_ENCRYPTION_KEY` | 32 random bytes, base64. **Back it up offline**: losing it makes activation codes and SMS unreadable |
+| `DATA_ENCRYPTION_KEYS_PREVIOUS` | Empty, except during a key rotation (SECURITY.md, "Rotating the data encryption key") |
 | `SUPPLIER_MODE` | `live` |
 | `SMS1001_API_KEY`, `SMS1001_WEBHOOK_SECRET` | From 1001SMS (secret comes from step 5) |
 | `SUPPLIER_PRICE_CURRENCY` | Currency 1001SMS quotes in (**confirm with them**) |

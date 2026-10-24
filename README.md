@@ -67,6 +67,7 @@ pnpm admin:grant you@example.com admin
 | `pnpm build && pnpm test:e2e` | Playwright end-to-end tests on port 3100 (sandbox mode) |
 | `pnpm db:migrate` / `db:deploy` / `db:seed` / `db:studio` | Prisma |
 | `pnpm admin:grant <email> <role>` | Grant `user`, `support`, `finance` or `admin` |
+| `pnpm data:reencrypt` | After rotating `DATA_ENCRYPTION_KEY`, move stored secrets to the new key |
 
 Integration tests refuse to run unless the database name contains `esim_test` (override with `TEST_DATABASE_URL`).
 Create and migrate it once:

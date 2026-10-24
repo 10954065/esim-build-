@@ -121,9 +121,29 @@ moved to devDependencies; its transitive `body-parser` advisory affects only the
 3. **Paystack webhook verification** was implemented from third-party descriptions, because the official docs
    returned 403 to automated fetches. Re-check it against official documentation and a real test-mode delivery before go-live.
 4. **1001SMS adapter** has not been called against the live API (no key). See `INTEGRATION_STATUS.md`.
-5. **Key rotation** for `DATA_ENCRYPTION_KEY` needs a re-encryption script. The `v1.` prefix leaves room for a second key version; the script is not yet built.
-6. Account deletion requests are recorded for manual handling, not executed automatically
+5. Account deletion requests are recorded for manual handling, not executed automatically
    (financial records must be kept for 7 years).
+
+## Rotating the data encryption key
+
+`DATA_ENCRYPTION_KEY` protects eSIM activation codes, QR URLs and SMS at rest. Rotate it if it may
+have leaked, or on a schedule. There is no downtime: retired keys stay valid for **reading** while
+stored values are moved to the new key.
+
+1. Generate a new key: `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`.
+2. In the host's environment set `DATA_ENCRYPTION_KEY=<new key>` and
+   `DATA_ENCRYPTION_KEYS_PREVIOUS=<old key>` (comma-separate several old keys if needed). Redeploy.
+   New values now use the new key; old values remain readable.
+3. From a trusted machine with the same environment, run `pnpm data:reencrypt`. It re-encrypts every
+   stored value that still uses an old key. It is safe to interrupt and rerun, and never overwrites a row
+   that changed while it ran.
+4. Run it again. When it reports `0 re-encrypted, 0 unreadable`, remove the old key from
+   `DATA_ENCRYPTION_KEYS_PREVIOUS` and redeploy.
+
+If a run reports **unreadable** values, some data was written with a key that is not configured.
+Keep every old key in place and investigate before removing anything. Unreadable values are left
+untouched and logged by row id, never by content. Covered by unit tests and an integration test
+(`tests/integration/key-rotation.test.ts`).
 
 ## Reporting a vulnerability
 

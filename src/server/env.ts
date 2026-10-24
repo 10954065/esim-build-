@@ -32,6 +32,11 @@ export const envSchema = z
     DATA_ENCRYPTION_KEY: z
       .string()
       .refine((v) => Buffer.from(v, "base64").length === 32, "DATA_ENCRYPTION_KEY must be 32 bytes, base64-encoded"),
+    // Retired keys, comma-separated: still accepted for decryption during a key rotation.
+    DATA_ENCRYPTION_KEYS_PREVIOUS: optionalString.refine(
+      (v) => !v || v.split(",").every((k) => !k.trim() || Buffer.from(k.trim(), "base64").length === 32),
+      "Each DATA_ENCRYPTION_KEYS_PREVIOUS entry must be 32 bytes, base64-encoded",
+    ),
 
     GOOGLE_CLIENT_ID: optionalString,
     GOOGLE_CLIENT_SECRET: optionalString,

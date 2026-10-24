@@ -50,4 +50,11 @@ describe("environment guards", () => {
     expect(issues({ BETTER_AUTH_SECRET: "short" })).toContain("BETTER_AUTH_SECRET");
     expect(issues({ DATA_ENCRYPTION_KEY: "abc" })).toContain("DATA_ENCRYPTION_KEY");
   });
+
+  it("accepts retired encryption keys only when each is a valid 32-byte key", () => {
+    const k = () => randomBytes(32).toString("base64");
+    expect(issues({ DATA_ENCRYPTION_KEYS_PREVIOUS: `${k()}, ${k()}` })).toEqual([]);
+    expect(issues({ DATA_ENCRYPTION_KEYS_PREVIOUS: "" })).toEqual([]);
+    expect(issues({ DATA_ENCRYPTION_KEYS_PREVIOUS: `${k()},abc` })).toContain("DATA_ENCRYPTION_KEYS_PREVIOUS");
+  });
 });
