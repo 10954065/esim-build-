@@ -40,7 +40,7 @@ export function ForgotPasswordForm() {
       <Field id="email" label="Email" error={form.formState.errors.email?.message}>
         <Input id="email" type="email" autoComplete="email" {...form.register("email")} />
       </Field>
-      <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+      <Button type="submit" className="h-11 w-full" disabled={form.formState.isSubmitting}>
         {form.formState.isSubmitting && <Loader2 className="animate-spin" />} Send reset link
       </Button>
     </form>
@@ -75,7 +75,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
       <Field id="confirm" label="Confirm new password" error={form.formState.errors.confirm?.message}>
         <Input id="confirm" type="password" autoComplete="new-password" {...form.register("confirm")} />
       </Field>
-      <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+      <Button type="submit" className="h-11 w-full" disabled={form.formState.isSubmitting}>
         {form.formState.isSubmitting && <Loader2 className="animate-spin" />} Update password
       </Button>
       <p className="text-xs text-muted-foreground">For your security, all other sessions will be signed out.</p>

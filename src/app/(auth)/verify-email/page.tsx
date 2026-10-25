@@ -16,9 +16,9 @@ export default async function VerifyEmailPage({ searchParams }: { searchParams: 
 
   return (
     <div className="space-y-6 text-center">
-      <MailCheck className="mx-auto size-10 text-brand" aria-hidden />
+      <MailCheck className="mx-auto size-10 text-primary" aria-hidden />
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold">Confirm your email</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Confirm your email</h1>
         {failed ? (
           <p role="alert" className="text-sm text-destructive">That confirmation link is invalid or has expired. Request a new one below.</p>
         ) : (

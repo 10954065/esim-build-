@@ -23,13 +23,13 @@ export function CheckoutForm({ productId, days, promoCode, payLabel }: { product
         </p>
       )}
       <label className="flex items-start gap-2 text-sm">
-        <input type="checkbox" name="acceptTerms" required className="mt-0.5 size-4" />
-        <span>
-          I have checked device compatibility (for eSIMs) and agree to the <Link href="/terms" className="underline">terms</Link>,{" "}
-          <Link href="/refund-policy" className="underline">refund policy</Link> and <Link href="/acceptable-use" className="underline">acceptable use policy</Link>.
+        <input type="checkbox" name="acceptTerms" required className="mt-0.5 size-4 shrink-0 accent-primary" />
+        <span className="text-muted-foreground">
+          I have checked device compatibility (for eSIMs) and agree to the <Link href="/terms" className="font-medium text-primary underline underline-offset-2">terms</Link>,{" "}
+          <Link href="/refund-policy" className="font-medium text-primary underline underline-offset-2">refund policy</Link> and <Link href="/acceptable-use" className="font-medium text-primary underline underline-offset-2">acceptable use policy</Link>.
         </span>
       </label>
-      <Button type="submit" size="lg" className="w-full" disabled={pending}>
+      <Button type="submit" size="lg" className="h-12 w-full text-base" disabled={pending}>
         {pending ? <Loader2 className="animate-spin" /> : <Lock />} {payLabel}
       </Button>
       <p className="text-center text-xs text-muted-foreground">You will complete payment on the payment provider&apos;s secure page.</p>

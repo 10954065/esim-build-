@@ -6,6 +6,7 @@ import { formatMoney } from "@/lib/currency";
 import { formatDateTime } from "@/lib/format";
 import { requireUser } from "@/server/auth/session";
 import { listPayments } from "@/server/customer/queries";
+import { PageHeader } from "@/components/common/page-header";
 
 export const metadata = { title: "Transactions" };
 
@@ -14,13 +15,13 @@ export default async function TransactionsPage() {
   const payments = await listPayments(user.id);
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Transactions</h1>
+      <PageHeader eyebrow="Payments" title="Transactions" description="Every payment attempt and its verified status." />
       {payments.length === 0 ? (
         <EmptyState icon={CreditCard} title="No transactions yet" />
       ) : (
-        <div className="relative overflow-x-auto rounded-xl border bg-card">
+        <div className="surface relative overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <thead className="border-b bg-muted text-left text-xs tracking-[0.06em] text-muted-foreground uppercase">
               <tr>
                 <th scope="col" className="px-4 py-3 font-medium">Date</th>
                 <th scope="col" className="px-4 py-3 font-medium">Reference</th>
@@ -36,7 +37,7 @@ export default async function TransactionsPage() {
                   <td className="px-4 py-3 text-muted-foreground">{formatDateTime(p.paidAt ?? p.createdAt)}</td>
                   <td className="px-4 py-3 font-mono text-xs">{p.reference}</td>
                   <td className="px-4 py-3">
-                    <Link href={`/dashboard/orders/${p.order.id}`} className="font-mono text-xs underline">{p.order.number}</Link> <DemoBadge show={p.order.isSandbox} />
+                    <Link href={`/dashboard/orders/${p.order.id}`} className="font-mono text-xs font-medium text-primary hover:underline">{p.order.number}</Link> <DemoBadge show={p.order.isSandbox} />
                   </td>
                   <td className="px-4 py-3">{p.provider === "SANDBOX" ? "Test gateway" : (p.channel ?? "Paystack")}</td>
                   <td className="px-4 py-3"><StatusBadge status={p.status} /></td>

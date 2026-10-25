@@ -29,7 +29,7 @@ export default async function AdminTicket({ params, searchParams }: { params: Pr
       <ActionNotice sp={sp} />
       <ol className="space-y-3">
         {t.messages.map((m) => (
-          <li key={m.id} className={cn("rounded-xl border p-4", m.isInternal ? "border-warning/40 bg-warning-soft" : m.isStaff ? "bg-brand-soft/40" : "bg-card")}>
+          <li key={m.id} className={cn("rounded-xl border p-4", m.isInternal ? "border-warning/40 bg-warning-soft" : m.isStaff ? "border-primary/15 bg-accent" : "bg-card")}>
             <div className="mb-1 flex justify-between text-xs text-muted-foreground">
               <span>{m.isInternal ? "Internal note" : m.isStaff ? "Staff" : "Customer"} · {m.author.name}</span>
               <span>{formatDateTime(m.createdAt)}</span>

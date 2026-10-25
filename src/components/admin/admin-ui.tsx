@@ -8,7 +8,7 @@ export function AdminHeader({ title, description, actions }: { title: string; de
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-semibold">{title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
         {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -18,10 +18,10 @@ export function AdminHeader({ title, description, actions }: { title: string; de
 
 export function Filters({ action, q, status, statuses, extra }: { action: string; q?: string; status?: string; statuses?: string[]; extra?: ReactNode }) {
   return (
-    <form method="get" action={action} className="mb-4 flex flex-wrap items-center gap-2">
-      <input name="q" defaultValue={q} placeholder="Search…" maxLength={100} className="h-9 w-64 rounded-md border bg-background px-3 text-sm" />
+    <form method="get" action={action} className="surface mb-4 flex flex-wrap items-center gap-2 p-3">
+      <input name="q" defaultValue={q} placeholder="Search…" maxLength={100} type="search" className="h-9 w-full rounded-lg border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:w-64" />
       {statuses && (
-        <select name="status" defaultValue={status ?? ""} className="h-9 rounded-md border bg-background px-2 text-sm">
+        <select name="status" defaultValue={status ?? ""} className="h-9 rounded-lg border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
           <option value="">All statuses</option>
           {statuses.map((s) => (
             <option key={s} value={s}>{s}</option>
@@ -29,26 +29,26 @@ export function Filters({ action, q, status, statuses, extra }: { action: string
         </select>
       )}
       {extra}
-      <button type="submit" className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground">Filter</button>
+      <button type="submit" className="h-9 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90">Filter</button>
     </form>
   );
 }
 
 export function Table({ head, children, empty }: { head: string[]; children: ReactNode; empty?: boolean }) {
   return (
-    <div className="relative overflow-x-auto rounded-xl border bg-card">
+    <div className="surface relative overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+        <thead className="border-b bg-muted text-left text-xs tracking-[0.06em] text-muted-foreground uppercase">
           <tr>
             {head.map((h) => (
-              <th key={h} scope="col" className="whitespace-nowrap px-3 py-2.5 font-medium">{h}</th>
+              <th key={h} scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">{h}</th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y">
+        <tbody className="divide-y [&>tr]:transition-colors [&>tr:hover]:bg-accent/40">
           {empty ? (
             <tr>
-              <td colSpan={head.length} className="px-3 py-10 text-center text-muted-foreground">Nothing to show.</td>
+              <td colSpan={head.length} className="px-4 py-12 text-center text-muted-foreground">Nothing to show.</td>
             </tr>
           ) : (
             children
@@ -60,7 +60,7 @@ export function Table({ head, children, empty }: { head: string[]; children: Rea
 }
 
 export function Td({ children, className, mono }: { children: ReactNode; className?: string; mono?: boolean }) {
-  return <td className={cn("whitespace-nowrap px-3 py-2.5", mono && "font-mono text-xs", className)}>{children}</td>;
+  return <td className={cn("px-4 py-3 whitespace-nowrap", mono && "font-mono text-xs", className)}>{children}</td>;
 }
 
 export function Pager({ page, totalPages, base, params }: { page: number; totalPages: number; base: string; params?: Record<string, string | undefined> }) {
@@ -73,9 +73,9 @@ export function Pager({ page, totalPages, base, params }: { page: number; totalP
   };
   return (
     <nav aria-label="Pagination" className="mt-4 flex items-center justify-between text-sm">
-      {page > 1 ? <Link href={href(page - 1)} className="underline">Previous</Link> : <span />}
+      {page > 1 ? <Link href={href(page - 1)} className="rounded-lg border bg-card px-3 py-1.5 font-medium shadow-xs hover:bg-muted">Previous</Link> : <span />}
       <span className="text-muted-foreground">Page {page} of {totalPages}</span>
-      {page < totalPages ? <Link href={href(page + 1)} className="underline">Next</Link> : <span />}
+      {page < totalPages ? <Link href={href(page + 1)} className="rounded-lg border bg-card px-3 py-1.5 font-medium shadow-xs hover:bg-muted">Next</Link> : <span />}
     </nav>
   );
 }
@@ -83,25 +83,25 @@ export function Pager({ page, totalPages, base, params }: { page: number; totalP
 export function Stat({ label, value, href, tone = "neutral" }: { label: string; value: ReactNode; href?: string; tone?: "neutral" | "warning" | "danger" }) {
   const body = (
     <>
-      <dd className={cn("text-2xl font-semibold tabular-nums", tone === "warning" && "text-warning", tone === "danger" && "text-destructive")}>{value}</dd>
-      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className={cn("text-3xl font-bold tabular-nums", tone === "warning" && "text-warning", tone === "danger" && "text-destructive")}>{value}</dd>
+      <dt className="mt-1 text-xs font-semibold tracking-[0.06em] text-muted-foreground uppercase">{label}</dt>
     </>
   );
   return href ? (
-    <Link href={href} className="rounded-xl border bg-card p-4 hover:border-foreground/20">{body}</Link>
+    <Link href={href} className="surface-interactive flex flex-col-reverse p-5">{body}</Link>
   ) : (
-    <div className="rounded-xl border bg-card p-4">{body}</div>
+    <div className="surface flex flex-col-reverse p-5">{body}</div>
   );
 }
 
 export function Panel({ title, children, actions }: { title: string; children: ReactNode; actions?: ReactNode }) {
   return (
-    <section className="rounded-xl border bg-card">
-      <div className="flex items-center justify-between border-b px-4 py-3">
+    <section className="surface overflow-hidden">
+      <div className="flex items-center justify-between gap-3 border-b px-5 py-4">
         <h2 className="font-semibold">{title}</h2>
         {actions}
       </div>
-      <div className="p-4">{children}</div>
+      <div className="p-5">{children}</div>
     </section>
   );
 }
@@ -113,8 +113,8 @@ export function ReasonForm({ action, hidden, label, destructive, placeholder }: 
       {Object.entries(hidden).map(([k, v]) => (
         <input key={k} type="hidden" name={k} value={v} />
       ))}
-      <input name="reason" required minLength={5} maxLength={300} placeholder={placeholder ?? "Reason (required, audited)"} className="h-8 w-64 rounded-md border bg-background px-2 text-sm" />
-      <button type="submit" className={cn("h-8 rounded-md px-3 text-sm font-medium", destructive ? "bg-destructive/10 text-destructive hover:bg-destructive/20" : "bg-primary text-primary-foreground")}>
+      <input name="reason" required minLength={5} maxLength={300} placeholder={placeholder ?? "Reason (required, audited)"} className="h-8 w-64 rounded-lg border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50" />
+      <button type="submit" className={cn("h-8 rounded-lg px-3 text-sm font-semibold", destructive ? "bg-destructive/10 text-destructive hover:bg-destructive/20" : "bg-primary text-primary-foreground")}>
         {label}
       </button>
     </form>

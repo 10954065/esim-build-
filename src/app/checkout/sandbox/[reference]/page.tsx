@@ -19,23 +19,32 @@ export default async function SandboxPaymentPage({ params }: { params: Promise<{
   if (!payment) notFound();
 
   return (
-    <div className="mx-auto max-w-md space-y-6 rounded-2xl border-2 border-dashed border-warning/50 bg-card p-8">
+    <div className="surface mx-auto max-w-md space-y-6 border-2 border-dashed border-warning/50 p-8">
       <div className="flex items-center gap-2 text-warning">
-        <FlaskConical className="size-5" aria-hidden />
-        <p className="text-sm font-semibold uppercase tracking-wide">Test payment gateway</p>
+        <span className="grid size-8 place-items-center rounded-lg bg-warning-soft">
+          <FlaskConical className="size-4" aria-hidden />
+        </span>
+        <p className="text-sm font-semibold tracking-wide uppercase">Test payment gateway</p>
       </div>
       <div>
-        <h1 className="text-2xl font-semibold">{formatMoney(payment.amount.toString(), payment.currency)}</h1>
-        <p className="text-sm text-muted-foreground">Order {payment.order.number} · reference {payment.reference}</p>
+        <p className="text-xs font-medium text-muted-foreground">Amount</p>
+        <h1 className="text-3xl font-bold tabular-nums">{formatMoney(payment.amount.toString(), payment.currency)}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Order <span className="font-mono">{payment.order.number}</span> · reference <span className="font-mono break-all">{payment.reference}</span>
+        </p>
       </div>
-      <p className="text-sm text-muted-foreground">
+      <p className="rounded-xl bg-muted p-3 text-sm text-muted-foreground">
         This simulates a payment provider. No money is charged and no real product will be issued. Choose an outcome to test.
       </p>
       {payment.status === "INITIALIZED" || payment.status === "PENDING" ? (
         <form action={sandboxPayAction} className="grid gap-2">
           <input type="hidden" name="reference" value={payment.reference} />
-          <Button type="submit" name="outcome" value="success" size="lg">Simulate successful payment</Button>
-          <Button type="submit" name="outcome" value="failure" size="lg" variant="outline">Simulate declined payment</Button>
+          <Button type="submit" name="outcome" value="success" size="lg" className="h-11">
+            Simulate successful payment
+          </Button>
+          <Button type="submit" name="outcome" value="failure" size="lg" variant="outline" className="h-11">
+            Simulate declined payment
+          </Button>
         </form>
       ) : (
         <p className="text-sm">This test payment has already been completed ({payment.status.toLowerCase()}).</p>

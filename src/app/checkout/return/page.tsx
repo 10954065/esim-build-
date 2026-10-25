@@ -28,17 +28,16 @@ export default async function CheckoutReturnPage({ searchParams }: { searchParam
   const paid = outcome === "paid" || outcome === "already_paid";
   const failed = outcome === "failed" || outcome === "abandoned";
 
+  const tone = paid ? "bg-success-soft text-success" : failed ? "bg-destructive/10 text-destructive" : "bg-warning-soft text-warning";
+  const Icon = paid ? CheckCircle2 : failed ? XCircle : Clock;
+
   return (
-    <div className="mx-auto max-w-lg space-y-4 rounded-2xl border bg-card p-8 text-center">
+    <div className="surface mx-auto max-w-lg space-y-4 p-8 text-center shadow-raised">
       <AutoRefresh active={!paid && !failed} seconds={4} />
-      {paid ? (
-        <CheckCircle2 className="mx-auto size-10 text-success" aria-hidden />
-      ) : failed ? (
-        <XCircle className="mx-auto size-10 text-destructive" aria-hidden />
-      ) : (
-        <Clock className="mx-auto size-10 text-warning" aria-hidden />
-      )}
-      <h1 className="text-xl font-semibold">
+      <span className={`mx-auto grid size-16 place-items-center rounded-full ${tone}`}>
+        <Icon className="size-8" aria-hidden />
+      </span>
+      <h1 className="text-2xl font-bold tracking-tight">
         {paid ? "Payment confirmed" : failed ? "Payment was not completed" : outcome === "mismatch" ? "Payment under review" : "Confirming your payment…"}
       </h1>
       <p className="text-sm text-muted-foreground">
@@ -50,9 +49,16 @@ export default async function CheckoutReturnPage({ searchParams }: { searchParam
               ? "The amount we received does not match your order. Our team will review it and contact you."
               : "This usually takes a few seconds. This page updates automatically."}
       </p>
-      <Button asChild>
-        <Link href={`/dashboard/orders/${payment.orderId}`}>View order</Link>
-      </Button>
+      <div className="flex flex-wrap justify-center gap-3 pt-2">
+        <Button asChild className="h-10 px-5">
+          <Link href={`/dashboard/orders/${payment.orderId}`}>View order</Link>
+        </Button>
+        {failed && (
+          <Button asChild variant="outline" className="h-10 px-5">
+            <Link href="/esims">Back to the store</Link>
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

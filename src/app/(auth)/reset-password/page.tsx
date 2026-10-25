@@ -10,7 +10,7 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
   const invalid = !token || sp.error === "INVALID_TOKEN";
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Choose a new password</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Choose a new password</h1>
       {invalid ? (
         <div className="space-y-3">
           <p role="alert" className="rounded-lg bg-destructive/5 px-3 py-2 text-sm text-destructive">This reset link is invalid or has expired.</p>

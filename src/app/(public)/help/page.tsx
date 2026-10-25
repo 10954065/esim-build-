@@ -1,7 +1,8 @@
 import { BookOpen, CreditCard, MessageSquareText, PhoneCall, Smartphone, UserRound } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Container, PageHeader } from "@/components/common/page-header";
+import { Container } from "@/components/common/page-header";
+import { ContentHeader } from "@/components/common/prose";
 
 export const metadata: Metadata = { title: "Help centre", description: "Guides for travel eSIMs, verification numbers, rentals, payments and refunds.", alternates: { canonical: "/help" } };
 
@@ -46,22 +47,24 @@ const TOPICS = [
 
 export default function HelpPage() {
   return (
-    <Container className="py-12">
-      <PageHeader eyebrow="Help centre" title="How can we help?" description="Short guides to the products we sell and how orders, payments and refunds work." />
-      <div className="mt-10 grid gap-4 md:grid-cols-2">
-        {TOPICS.map((t) => (
-          <section key={t.title} className="rounded-2xl border bg-card p-6">
-            <t.icon className="size-5 text-brand" aria-hidden />
-            <h2 className="mt-3 text-lg font-semibold">{t.title}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t.body}</p>
-            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-              {t.links.map((l) => (
-                <Link key={l.href} href={l.href} className="font-medium underline underline-offset-2">{l.label}</Link>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
-    </Container>
+    <>
+      <ContentHeader width="wide" eyebrow="Help centre" title="How can we help?" description="Short guides to the products we sell and how orders, payments and refunds work." />
+      <Container className="py-10">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {TOPICS.map((t) => (
+            <section key={t.title} className="surface p-6">
+              <span className="grid size-10 place-items-center rounded-xl bg-accent text-primary"><t.icon className="size-5" aria-hidden /></span>
+              <h2 className="mt-3 text-lg font-semibold">{t.title}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t.body}</p>
+              <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                {t.links.map((l) => (
+                  <Link key={l.href} href={l.href} className="font-semibold text-primary hover:underline">{l.label}</Link>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </Container>
+    </>
   );
 }

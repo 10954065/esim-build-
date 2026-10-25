@@ -21,10 +21,10 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">Sign in</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Sign in</h1>
         <p className="text-sm text-muted-foreground">
           New here?{" "}
-          <Link href="/register" className="font-medium text-foreground underline underline-offset-2">Create an account</Link>
+          <Link href="/register" className="font-semibold text-primary hover:underline">Create an account</Link>
         </p>
       </div>
       {sp.reset === "1" && <p className="rounded-lg bg-success-soft px-3 py-2 text-sm">Password updated. Sign in with your new password.</p>}

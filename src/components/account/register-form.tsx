@@ -86,7 +86,7 @@ export function RegisterForm() {
         </label>
         {e.acceptTerms && <p role="alert" className="text-xs font-medium text-destructive">{e.acceptTerms.message}</p>}
       </div>
-      <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+      <Button type="submit" className="h-11 w-full" disabled={form.formState.isSubmitting}>
         {form.formState.isSubmitting && <Loader2 className="animate-spin" />} Create account
       </Button>
     </form>

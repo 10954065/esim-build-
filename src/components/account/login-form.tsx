@@ -76,7 +76,7 @@ export function LoginForm({ next }: { next?: string }) {
         <Field id="code" label="Authentication code" error={totpForm.formState.errors.code?.message}>
           <Input id="code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} autoFocus {...totpForm.register("code")} />
         </Field>
-        <Button type="submit" className="w-full" disabled={totpForm.formState.isSubmitting}>
+        <Button type="submit" className="h-11 w-full" disabled={totpForm.formState.isSubmitting}>
           {totpForm.formState.isSubmitting && <Loader2 className="animate-spin" />} Verify
         </Button>
       </form>
@@ -105,7 +105,7 @@ export function LoginForm({ next }: { next?: string }) {
           Forgot password?
         </Link>
       </div>
-      <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+      <Button type="submit" className="h-11 w-full" disabled={form.formState.isSubmitting}>
         {form.formState.isSubmitting && <Loader2 className="animate-spin" />} Sign in
       </Button>
     </form>

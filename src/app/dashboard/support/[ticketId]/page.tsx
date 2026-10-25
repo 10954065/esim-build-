@@ -18,11 +18,11 @@ export default async function TicketPage({ params }: { params: Promise<{ ticketI
     <div className="max-w-3xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-xs text-muted-foreground">{ticket.number}</p>
-          <h1 className="mt-1 text-2xl font-semibold">{ticket.subject}</h1>
+          <p className="font-mono text-xs font-semibold text-primary">{ticket.number}</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{ticket.subject}</h1>
           {ticket.order && (
             <p className="text-sm text-muted-foreground">
-              Order <Link href={`/dashboard/orders/${ticket.order.id}`} className="font-mono underline">{ticket.order.number}</Link>
+              Order <Link href={`/dashboard/orders/${ticket.order.id}`} className="font-mono text-foreground hover:text-primary hover:underline">{ticket.order.number}</Link>
             </p>
           )}
         </div>
@@ -30,7 +30,7 @@ export default async function TicketPage({ params }: { params: Promise<{ ticketI
       </div>
       <ol className="space-y-3">
         {ticket.messages.map((m) => (
-          <li key={m.id} className={cn("rounded-xl border p-4", m.isStaff ? "bg-brand-soft/40" : "bg-card")}>
+          <li key={m.id} className={cn("rounded-2xl border p-4 shadow-card", m.isStaff ? "border-primary/15 bg-accent" : "bg-card")}>
             <div className="mb-2 flex justify-between text-xs text-muted-foreground">
               <span className="font-medium text-foreground">{m.isStaff ? "Support team" : "You"}</span>
               <time dateTime={m.createdAt.toISOString()}>{formatDateTime(m.createdAt)}</time>

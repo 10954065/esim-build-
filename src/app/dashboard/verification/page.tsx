@@ -7,6 +7,7 @@ import { formatDateTime, maskPhone } from "@/lib/format";
 import { Flag } from "@/components/common/flag";
 import { requireUser } from "@/server/auth/session";
 import { listVerifications } from "@/server/customer/queries";
+import { PageHeader } from "@/components/common/page-header";
 
 export const metadata = { title: "Verification numbers" };
 
@@ -15,17 +16,17 @@ export default async function VerificationListPage() {
   const items = await listVerifications(user.id);
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Verification numbers</h1>
+      <PageHeader eyebrow="SMS verification" title="Verification numbers" description="Temporary numbers you bought and the codes they received." actions={<Button asChild className="h-10 px-4"><Link href="/verification">Get a number</Link></Button>} />
       {items.length === 0 ? (
         <EmptyState icon={MessageSquareText} title="No verification numbers yet" description="Numbers you buy for SMS verification and their messages appear here." action={<Button asChild size="sm"><Link href="/verification">Get a number</Link></Button>} />
       ) : (
-        <ul className="grid gap-3">
+        <ul className="grid grid-cols-1 gap-3">
           {items.map((v) => (
             <li key={v.id}>
-              <Link href={`/dashboard/verification/${v.id}`} className="flex items-center gap-4 rounded-xl border bg-card p-4 hover:border-foreground/20">
+              <Link href={`/dashboard/verification/${v.id}`} className="surface-interactive flex items-center gap-4 p-4">
                 <Flag code={v.countryCode} size="lg" />
                 <div className="min-w-0 flex-1">
-                  <p className="flex items-center gap-2 font-medium">{v.serviceName} <DemoBadge show={v.isSandbox} /></p>
+                  <p className="flex items-center gap-2 font-semibold">{v.serviceName} <DemoBadge show={v.isSandbox} /></p>
                   <p className="text-xs text-muted-foreground">
                     <span className="font-mono">{maskPhone(v.phoneNumber)}</span> · {v._count.messages} message{v._count.messages === 1 ? "" : "s"} · {formatDateTime(v.createdAt)}
                   </p>

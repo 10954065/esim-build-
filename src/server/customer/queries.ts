@@ -78,6 +78,7 @@ export async function getOrder(userId: string, orderId: string) {
     include: {
       items: {
         include: {
+          product: itemSummarySelect.product,
           fulfilment: { select: { status: true, updatedAt: true } },
           esims: { select: { id: true, status: true } },
           verification: { select: { id: true, status: true } },
@@ -102,7 +103,7 @@ export async function listEsims(userId: string) {
       createdAt: true,
       expiresAt: true,
       isSandbox: true,
-      orderItem: { select: { description: true, order: { select: { number: true } } } },
+      orderItem: { select: { ...itemSummarySelect, order: { select: { number: true } } } },
     },
   });
 }
@@ -117,7 +118,7 @@ export async function getEsim(userId: string, id: string) {
         select: {
           description: true,
           configuration: true,
-          product: { select: { dataLabel: true, validityDays: true, speed: true, fupPolicy: true, pricingUnit: true, destination: { select: { name: true, slug: true } } } },
+          product: { select: { dataLabel: true, validityDays: true, speed: true, fupPolicy: true, pricingUnit: true, destination: { select: { name: true, slug: true, kind: true, country: { select: { code: true } } } } } },
           order: { select: { id: true, number: true } },
         },
       },

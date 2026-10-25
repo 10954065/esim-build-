@@ -23,7 +23,7 @@ const log = logger.child({ component: "checkout" });
 
 const productInclude = {
   supplier: true,
-  destination: true,
+  destination: { include: { country: true } },
   country: true,
   service: true,
 } satisfies Prisma.ProductInclude;
@@ -35,6 +35,8 @@ export interface CheckoutQuote {
   productType: ProductRow["type"];
   title: string;
   subtitle: string;
+  /** Flag to show next to the title (regional/global eSIMs have no single country). */
+  flag: { code: string | null; kind: "COUNTRY" | "REGION" | "GLOBAL" };
   perDay: boolean;
   quantity: number;
   currency: string;
@@ -57,6 +59,11 @@ function describe(p: ProductRow): { title: string; subtitle: string } {
   if (p.type === "ESIM") return { title: p.name, subtitle: `${p.destination?.name ?? "Travel"} eSIM · data only` };
   if (p.type === "VERIFICATION") return { title: `${p.service?.name ?? "Service"} verification number`, subtitle: `${p.country?.name ?? ""} · one-time activation` };
   return { title: p.name, subtitle: `${p.country?.name ?? ""} · rental, never auto-renews` };
+}
+
+function flagOf(p: ProductRow): CheckoutQuote["flag"] {
+  if (p.destination) return { code: p.destination.country?.code ?? null, kind: p.destination.kind };
+  return { code: p.country?.code ?? null, kind: "COUNTRY" };
 }
 
 /** Re-check availability and cost with the supplier; updates the stored product. */
@@ -155,6 +162,7 @@ export async function quoteProduct(input: { productId: string; days?: number; pr
       productType: product.type,
       title,
       subtitle,
+      flag: flagOf(product),
       perDay,
       quantity,
       currency: session.currency,

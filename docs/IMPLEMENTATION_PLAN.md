@@ -150,6 +150,25 @@ segmented tabs, dark active filter chips, uppercase eyebrows, breadcrumbs and st
 - Checks: 360 px overflow audit of every public page (fixed grid min-content blow-out and an escaping
   `sr-only` table header), typecheck ✅, lint ✅, 185 unit ✅, 53 integration ✅, 5 E2E ✅.
 
+**Second pass (remaining pages):**
+
+- eSIM install page: flag header, "Scan to install" QR card, numbered iPhone/Android steps, manual details
+  rows with copy buttons, plan spec tiles. My eSIMs is a flag card grid.
+- Order detail: progress tracker (placed → paid → delivering → delivered, shown only for statuses on that
+  path), items with flags, timeline, sticky summary and payments column.
+- Checkout: secure-checkout header, flag on the order line (`CheckoutQuote.flag`), design inputs, raised
+  order summary; return and sandbox gateway pages restyled.
+- Sign-in/registration: form card beside an ink panel with real flags and three statements the product
+  actually guarantees (encryption at rest, server-verified payments, automatic refunds).
+- Verification inbox: number card with countdown, large code chips. Remaining dashboard pages use
+  `PageHeader` and surface cards; empty states use the accent icon.
+- Guides and policies: `ContentHeader` band with breadcrumbs and the article in a card; help, FAQ and contact
+  use the same band.
+- Admin: ink sidebar (always distinguishable from the customer dashboard), white top bar with role, demo and
+  2FA warnings, collapsible menu on phones; shared admin components restyled, so all 18 pages follow.
+- Checks: screenshots of every changed page at 1280 px and 360 px (no horizontal overflow), typecheck ✅,
+  lint ✅, 185 unit ✅, 53 integration ✅, 5 E2E ✅.
+
 ## Next task
 
 None in code. Launch depends on the blockers in PRODUCTION_READINESS.md.
