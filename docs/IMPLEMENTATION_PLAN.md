@@ -189,6 +189,11 @@ Fixed when it was introduced:
 
 Checks: 185 unit ✅, 8 E2E (including 3 accessibility) ✅, typecheck ✅, lint ✅.
 
+Keyboard (`e2e/keyboard.spec.ts`): the first Tab stop on every page is a visible "Skip to main content" link,
+and a customer can buy an eSIM, open it and reveal the activation details with Tab, Space and Enter only;
+every focus stop on the way must show a focus indicator. This found that tab panels (install steps, product
+finder) took focus without any visible ring; they now show one. Checks: 10 E2E ✅.
+
 ## Next task
 
 None in code. Launch depends on the blockers in PRODUCTION_READINESS.md.

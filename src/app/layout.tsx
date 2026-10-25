@@ -37,6 +37,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${inter.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
+        <a
+          href="#main"
+          className="sr-only rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-float focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-100 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        >
+          Skip to main content
+        </a>
         <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
         <Toaster richColors closeButton position="top-center" />
       </body>
