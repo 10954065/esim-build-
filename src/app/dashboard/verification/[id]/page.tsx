@@ -5,7 +5,7 @@ import { DemoBadge, StatusBadge } from "@/components/common/status-badge";
 import { AutoRefresh, CopyButton, Countdown } from "@/components/dashboard/client-utils";
 import { VerificationActions } from "@/components/dashboard/verification-actions";
 import { formatDateTime } from "@/lib/format";
-import { flagEmoji } from "@/lib/slug";
+import { Flag } from "@/components/common/flag";
 import { requireUser } from "@/server/auth/session";
 import { getVerification } from "@/server/customer/queries";
 
@@ -28,7 +28,7 @@ export default async function VerificationDetailPage({ params }: { params: Promi
             <Link href={`/dashboard/orders/${v.orderItem.order.id}`} className="font-mono underline-offset-2 hover:underline">{v.orderItem.order.number}</Link>
           </p>
           <h1 className="mt-1 flex items-center gap-2 text-2xl font-semibold">
-            {v.serviceName} · {flagEmoji(v.countryCode)} {v.countryCode} <DemoBadge show={v.isSandbox} />
+            {v.serviceName} · <Flag code={v.countryCode} /> {v.countryCode} <DemoBadge show={v.isSandbox} />
           </h1>
         </div>
         <StatusBadge status={v.status} className="text-sm" />

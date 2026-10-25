@@ -36,7 +36,7 @@ export function Filters({ action, q, status, statuses, extra }: { action: string
 
 export function Table({ head, children, empty }: { head: string[]; children: ReactNode; empty?: boolean }) {
   return (
-    <div className="overflow-x-auto rounded-xl border bg-card">
+    <div className="relative overflow-x-auto rounded-xl border bg-card">
       <table className="w-full text-sm">
         <thead className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
           <tr>

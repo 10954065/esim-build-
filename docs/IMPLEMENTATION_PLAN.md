@@ -130,6 +130,26 @@ overwrites a row that changed during the run. Procedure in SECURITY.md.
 
 Checks: 185 unit ✅, 53 integration ✅, 5 E2E ✅, typecheck ✅, lint ✅, coverage 85.4% lines.
 
+## UI redesign (Stitch "Precision Global Transit" design)
+
+The storefront and customer dashboard now follow the GlobeLink Stitch design's pattern and theme:
+Inter type, midnight ink `#101828`, action blue `#3867F6`, mint/amber/red status pills with dots,
+slate canvas with white hairline-bordered cards and navy-tinted shadows (`shadow-card/raised/float/modal`),
+segmented tabs, dark active filter chips, uppercase eyebrows, breadcrumbs and sticky order summaries.
+
+- **Flags:** every country shows its SVG flag (`country-flag-icons`, MIT). Flags are prebuilt as static,
+  immutable-cached files at `/flags/<iso>.svg` and rendered by `src/components/common/flag.tsx`; regional
+  and global destinations show a globe/map icon. Emoji flags (which Windows renders as letters) are gone.
+- **Pages:** home (hero, product finder with flag quick-picks, product lines, top destinations, how it works,
+  trust, FAQ, CTA), eSIM catalogue, destination (plan list + before-you-buy), plan (spec tiles, install
+  walkthrough, order summary), verification steps 1–3 (country picker, service inventory, route table),
+  rentals, dashboard shell (sidebar), overview (stat cards, orders table with flags) and orders.
+- **Honesty:** the design's invented figures (latency, success rates, "200+ nations", wallet, top-ups,
+  compliance badges) were not copied; stats shown are live catalogue counts, and delivery rates are labelled
+  as supplier-reported.
+- Checks: 360 px overflow audit of every public page (fixed grid min-content blow-out and an escaping
+  `sr-only` table header), typecheck ✅, lint ✅, 185 unit ✅, 53 integration ✅, 5 E2E ✅.
+
 ## Next task
 
 None in code. Launch depends on the blockers in PRODUCTION_READINESS.md.

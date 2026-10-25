@@ -7,9 +7,15 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-heading: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-canvas: var(--canvas);
+  --color-mint: var(--mint);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-soft: var(--brand-soft);
@@ -55,88 +61,111 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Palette: warm-neutral canvas, deep ink primary, a single teal accent used sparingly. */
+/* Elevation from the Precision Global Transit design: hairline borders plus soft navy-tinted shadows. */
+@theme {
+  --shadow-card: 0 1px 3px 0 rgb(16 24 40 / 0.06), 0 1px 2px -1px rgb(16 24 40 / 0.04);
+  --shadow-raised: 0 4px 6px -1px rgb(16 24 40 / 0.08), 0 2px 4px -2px rgb(16 24 40 / 0.04);
+  --shadow-float: 0 10px 15px -3px rgb(16 24 40 / 0.08), 0 4px 6px -4px rgb(16 24 40 / 0.03);
+  --shadow-modal: 0 20px 25px -5px rgb(16 24 40 / 0.1), 0 8px 10px -6px rgb(16 24 40 / 0.04);
+}
+
+/*
+ * Palette (Precision Global Transit): slate canvas, white cards on hairline borders, midnight ink
+ * for structure, action blue for every interactive path, mint for live/confirmed states.
+ */
 :root {
-  --background: oklch(0.987 0.003 95);
-  --foreground: oklch(0.2 0.03 262);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.03 262);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.03 262);
-  --primary: oklch(0.27 0.06 262);
-  --primary-foreground: oklch(0.985 0.002 95);
-  --secondary: oklch(0.955 0.006 262);
-  --secondary-foreground: oklch(0.27 0.06 262);
-  --muted: oklch(0.96 0.004 95);
-  --muted-foreground: oklch(0.5 0.02 262);
-  --accent: oklch(0.955 0.012 190);
-  --accent-foreground: oklch(0.32 0.06 200);
-  --destructive: oklch(0.577 0.215 27);
-  --border: oklch(0.91 0.006 262);
-  --input: oklch(0.89 0.008 262);
-  --ring: oklch(0.6 0.1 200);
-  --brand: oklch(0.6 0.11 192);
-  --brand-foreground: oklch(0.99 0 0);
-  --brand-soft: oklch(0.95 0.03 192);
-  --success: oklch(0.55 0.13 155);
-  --success-soft: oklch(0.95 0.04 155);
-  --warning: oklch(0.64 0.15 65);
-  --warning-soft: oklch(0.96 0.05 80);
-  --chart-1: oklch(0.6 0.11 192);
-  --chart-2: oklch(0.27 0.06 262);
-  --chart-3: oklch(0.7 0.12 65);
-  --chart-4: oklch(0.55 0.13 155);
-  --chart-5: oklch(0.6 0.15 300);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.975 0.004 95);
-  --sidebar-foreground: oklch(0.2 0.03 262);
-  --sidebar-primary: oklch(0.27 0.06 262);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.94 0.008 262);
-  --sidebar-accent-foreground: oklch(0.2 0.03 262);
-  --sidebar-border: oklch(0.91 0.006 262);
-  --sidebar-ring: oklch(0.6 0.1 200);
+  --canvas: #f8fafc;
+  --background: #f8fafc;
+  --foreground: #101828;
+  --ink: #101828;
+  --ink-foreground: #ffffff;
+  --card: #ffffff;
+  --card-foreground: #101828;
+  --popover: #ffffff;
+  --popover-foreground: #101828;
+  --primary: #3867f6;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f4f7;
+  --secondary-foreground: #101828;
+  --muted: #f2f4f7;
+  --muted-foreground: #667085;
+  --accent: #f0f3ff;
+  --accent-foreground: #1e40af;
+  --destructive: #d92d20;
+  --border: #eaecf0;
+  --input: #d0d5dd;
+  --ring: #3867f6;
+  --brand: #3867f6;
+  --brand-foreground: #ffffff;
+  --brand-soft: #eef2ff;
+  --mint: #34d399;
+  --success: #067647;
+  --success-soft: #ecfdf3;
+  --warning: #b45309;
+  --warning-soft: #fffbeb;
+  --info: #1e40af;
+  --info-soft: #eff6ff;
+  --chart-1: #3867f6;
+  --chart-2: #101828;
+  --chart-3: #f59e0b;
+  --chart-4: #34d399;
+  --chart-5: #7a5af8;
+  --radius: 0.5rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #101828;
+  --sidebar-primary: #3867f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef2ff;
+  --sidebar-accent-foreground: #1f41b8;
+  --sidebar-border: #eaecf0;
+  --sidebar-ring: #3867f6;
 }
 
 .dark {
-  --background: oklch(0.17 0.02 262);
-  --foreground: oklch(0.96 0.005 95);
-  --card: oklch(0.21 0.025 262);
-  --card-foreground: oklch(0.96 0.005 95);
-  --popover: oklch(0.21 0.025 262);
-  --popover-foreground: oklch(0.96 0.005 95);
-  --primary: oklch(0.93 0.01 262);
-  --primary-foreground: oklch(0.22 0.04 262);
-  --secondary: oklch(0.27 0.03 262);
-  --secondary-foreground: oklch(0.96 0.005 95);
-  --muted: oklch(0.26 0.025 262);
-  --muted-foreground: oklch(0.72 0.02 262);
-  --accent: oklch(0.3 0.04 200);
-  --accent-foreground: oklch(0.92 0.03 190);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.65 0.1 200);
-  --brand: oklch(0.72 0.11 190);
-  --brand-foreground: oklch(0.18 0.03 262);
-  --brand-soft: oklch(0.3 0.05 192);
-  --success: oklch(0.72 0.14 155);
-  --success-soft: oklch(0.3 0.05 155);
-  --warning: oklch(0.78 0.14 75);
-  --warning-soft: oklch(0.32 0.05 75);
-  --chart-1: oklch(0.72 0.11 190);
-  --chart-2: oklch(0.85 0.03 262);
-  --chart-3: oklch(0.78 0.14 75);
-  --chart-4: oklch(0.72 0.14 155);
-  --chart-5: oklch(0.7 0.15 300);
-  --sidebar: oklch(0.2 0.025 262);
-  --sidebar-foreground: oklch(0.96 0.005 95);
-  --sidebar-primary: oklch(0.72 0.11 190);
-  --sidebar-primary-foreground: oklch(0.18 0.03 262);
-  --sidebar-accent: oklch(0.27 0.03 262);
-  --sidebar-accent-foreground: oklch(0.96 0.005 95);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.65 0.1 200);
+  --canvas: #0b1120;
+  --background: #0b1120;
+  --foreground: #f2f4f7;
+  --ink: #f2f4f7;
+  --ink-foreground: #101828;
+  --card: #111827;
+  --card-foreground: #f2f4f7;
+  --popover: #111827;
+  --popover-foreground: #f2f4f7;
+  --primary: #5b82f8;
+  --primary-foreground: #ffffff;
+  --secondary: #1d2939;
+  --secondary-foreground: #f2f4f7;
+  --muted: #1d2939;
+  --muted-foreground: #98a2b3;
+  --accent: #1a2550;
+  --accent-foreground: #c7d4ff;
+  --destructive: #f97066;
+  --border: rgb(255 255 255 / 0.08);
+  --input: rgb(255 255 255 / 0.14);
+  --ring: #5b82f8;
+  --brand: #7b9bff;
+  --brand-foreground: #0b1120;
+  --brand-soft: #1a2550;
+  --mint: #34d399;
+  --success: #47cd89;
+  --success-soft: rgb(52 211 153 / 0.12);
+  --warning: #fdb022;
+  --warning-soft: rgb(245 158 11 / 0.12);
+  --info: #9db4ff;
+  --info-soft: rgb(56 103 246 / 0.15);
+  --chart-1: #7b9bff;
+  --chart-2: #f2f4f7;
+  --chart-3: #fdb022;
+  --chart-4: #34d399;
+  --chart-5: #9e77ed;
+  --sidebar: #111827;
+  --sidebar-foreground: #f2f4f7;
+  --sidebar-primary: #7b9bff;
+  --sidebar-primary-foreground: #0b1120;
+  --sidebar-accent: #1a2550;
+  --sidebar-accent-foreground: #c7d4ff;
+  --sidebar-border: rgb(255 255 255 / 0.08);
+  --sidebar-ring: #5b82f8;
 }
 
 @layer base {
@@ -145,6 +174,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Inter: single-storey l and disambiguated digits for codes and numbers. */
+    font-feature-settings: "cv05" 1, "cv11" 1;
   }
   html {
     @apply font-sans;
@@ -155,6 +186,21 @@
   h3 {
     @apply tracking-tight text-balance;
   }
+}
+
+/* Small uppercase section label ("IMMEDIATE COVERAGE"), as used across the design. */
+@utility eyebrow {
+  @apply text-xs font-semibold tracking-[0.08em] text-primary uppercase;
+}
+
+/* Hairline-bordered white card at rest (design elevation level 1). */
+@utility surface {
+  @apply rounded-2xl border bg-card shadow-card;
+}
+
+/* Card that lifts to elevation level 2 on hover. */
+@utility surface-interactive {
+  @apply rounded-2xl border bg-card shadow-card transition-[box-shadow,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-input hover:shadow-raised;
 }
 
 @media (prefers-reduced-motion: reduce) {

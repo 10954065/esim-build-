@@ -33,14 +33,14 @@ export function CapabilityBadges({ includesPhoneNumber, includesSms, includesVoi
 
 export function DataOnlyNotice() {
   return (
-    <div className="flex gap-3 rounded-xl border bg-card p-4 text-sm">
-      <MessageSquareOff className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden />
+    <div className="flex gap-3 rounded-2xl border border-primary/15 bg-accent p-5 text-sm">
+      <MessageSquareOff className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
       <div className="space-y-1">
-        <p className="font-medium">These are data-only eSIMs</p>
+        <p className="font-semibold text-foreground">These are data-only eSIMs</p>
         <p className="text-muted-foreground">
           They give you mobile internet abroad but do not include an ordinary phone number, so they cannot receive SMS
           verification codes. If you need a number for verification, use a{" "}
-          <Link href="/verification" className="font-medium text-foreground underline underline-offset-2">
+          <Link href="/verification" className="font-medium text-primary underline underline-offset-2">
             verification number
           </Link>{" "}
           instead.
@@ -53,7 +53,7 @@ export function DataOnlyNotice() {
 export function SpeedBadge({ speed }: { speed: string | null }) {
   if (!speed) return null;
   return (
-    <span className="inline-flex items-center gap-1 rounded-md bg-muted px-1.5 py-0.5 font-mono text-[11px] font-medium text-muted-foreground">
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[11px] font-medium text-accent-foreground">
       <Signal className="size-3" aria-hidden />
       {speed}
     </span>

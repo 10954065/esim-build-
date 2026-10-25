@@ -18,7 +18,7 @@ export default async function TransactionsPage() {
       {payments.length === 0 ? (
         <EmptyState icon={CreditCard} title="No transactions yet" />
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card">
+        <div className="relative overflow-x-auto rounded-xl border bg-card">
           <table className="w-full text-sm">
             <thead className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>

@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/common/empty-state";
 import { DemoBadge, StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { formatDateTime, maskPhone } from "@/lib/format";
-import { flagEmoji } from "@/lib/slug";
+import { Flag } from "@/components/common/flag";
 import { requireUser } from "@/server/auth/session";
 import { listVerifications } from "@/server/customer/queries";
 
@@ -23,7 +23,7 @@ export default async function VerificationListPage() {
           {items.map((v) => (
             <li key={v.id}>
               <Link href={`/dashboard/verification/${v.id}`} className="flex items-center gap-4 rounded-xl border bg-card p-4 hover:border-foreground/20">
-                <span className="text-2xl" aria-hidden>{flagEmoji(v.countryCode)}</span>
+                <Flag code={v.countryCode} size="lg" />
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-2 font-medium">{v.serviceName} <DemoBadge show={v.isSandbox} /></p>
                   <p className="text-xs text-muted-foreground">

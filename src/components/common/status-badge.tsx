@@ -4,10 +4,19 @@ type Tone = "neutral" | "info" | "success" | "warning" | "danger";
 
 const TONES: Record<Tone, string> = {
   neutral: "bg-muted text-muted-foreground",
-  info: "bg-brand-soft text-brand",
+  info: "bg-info-soft text-info",
   success: "bg-success-soft text-success",
   warning: "bg-warning-soft text-warning",
   danger: "bg-destructive/10 text-destructive",
+};
+
+/** Status dot colours from the design (mint = live/confirmed, amber = pending). */
+const DOTS: Record<Tone, string> = {
+  neutral: "bg-muted-foreground/50",
+  info: "bg-primary",
+  success: "bg-mint",
+  warning: "bg-[#f59e0b]",
+  danger: "bg-destructive",
 };
 
 const LABELS: Record<string, [string, Tone]> = {
@@ -55,7 +64,8 @@ export function statusLabel(status: string): string {
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
   const [label, tone] = LABELS[status] ?? [statusLabel(status), "neutral" as Tone];
   return (
-    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap", TONES[tone], className)}>
+    <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap", TONES[tone], className)}>
+      <span className={cn("size-1.5 shrink-0 rounded-full", DOTS[tone])} aria-hidden />
       {label}
     </span>
   );

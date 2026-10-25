@@ -1,6 +1,7 @@
-import { CalendarDays, Gauge } from "lucide-react";
+import { ArrowRight, CalendarDays, Signal } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { formatMoney } from "@/lib/currency";
 import { formatValidity } from "@/lib/format";
 import { Price, type PriceValue } from "./price";
 
@@ -9,6 +10,8 @@ export interface PlanCardData {
   slug: string;
   name: string;
   dataLabel: string | null;
+  /** Bytes as a decimal string; used for the price-per-GB hint. */
+  dataVolumeBytes?: string | null;
   validityDays: number | null;
   unlimited: boolean;
   pricingUnit: string | null;
@@ -17,34 +20,50 @@ export interface PlanCardData {
   price: PriceValue | null;
 }
 
+const GB = 1024 ** 3;
+
+function perGb(plan: PlanCardData): string | null {
+  if (!plan.price || plan.unlimited || plan.pricingUnit === "per_day" || !plan.dataVolumeBytes) return null;
+  const gb = Number(plan.dataVolumeBytes) / GB;
+  if (!(gb >= 1)) return null;
+  return `${formatMoney(Number(plan.price.amount) / gb, plan.price.currency)} / GB`;
+}
+
+/** One selectable data bundle, laid out like the design's bundle list. */
 export function PlanCard({ plan, destinationSlug }: { plan: PlanCardData; destinationSlug: string }) {
   const perDay = plan.pricingUnit === "per_day";
+  const unitPrice = perGb(plan);
   return (
-    <article className="flex flex-col rounded-xl border bg-card p-5 transition-shadow hover:shadow-md">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-2xl font-semibold tracking-tight">{plan.dataLabel ?? "Data plan"}</p>
-          <p className="mt-0.5 text-sm text-muted-foreground">{plan.name}</p>
+    <article className="group flex flex-col gap-4 rounded-xl border bg-card p-4 transition-[border-color,box-shadow] hover:border-primary/40 hover:shadow-raised sm:flex-row sm:items-center sm:gap-6 sm:p-5">
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-xl font-bold tracking-tight">{plan.dataLabel ?? "Data plan"}</p>
+          <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            <CalendarDays className="size-3" aria-hidden />
+            {perDay ? "Day pass · 1–365 days" : formatValidity(plan.validityDays)}
+          </span>
+          {plan.speed && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
+              <Signal className="size-3" aria-hidden />
+              {plan.speed}
+            </span>
+          )}
+          {plan.unlimited && (
+            <span className="rounded-full bg-success-soft px-2 py-0.5 text-xs font-medium text-success">Unlimited</span>
+          )}
         </div>
-        {perDay && <span className="rounded-full bg-brand-soft px-2 py-0.5 text-xs font-medium text-brand">Day pass</span>}
+        <p className="mt-1 truncate text-sm text-muted-foreground">{plan.name}</p>
+        {plan.fupPolicy && <p className="mt-1 text-xs text-muted-foreground">After allowance: {plan.fupPolicy}</p>}
       </div>
-      <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
-        <div className="flex items-center gap-2">
-          <CalendarDays className="size-4 text-muted-foreground" aria-hidden />
-          <dt className="sr-only">Validity</dt>
-          <dd>{perDay ? "Choose 1–365 days" : formatValidity(plan.validityDays)}</dd>
+      <div className="flex items-center justify-between gap-4 sm:justify-end">
+        <div className="text-left sm:text-right">
+          <Price value={plan.price} suffix={perDay ? "/day" : undefined} className="text-xl text-foreground" />
+          {unitPrice && <p className="text-xs text-muted-foreground tabular-nums">{unitPrice}</p>}
         </div>
-        <div className="flex items-center gap-2">
-          <Gauge className="size-4 text-muted-foreground" aria-hidden />
-          <dt className="sr-only">Network</dt>
-          <dd>{plan.speed ?? "—"}</dd>
-        </div>
-      </dl>
-      {plan.fupPolicy && <p className="mt-3 text-xs text-muted-foreground">After allowance: {plan.fupPolicy}</p>}
-      <div className="mt-auto flex items-end justify-between gap-3 pt-6">
-        <Price value={plan.price} suffix={perDay ? "/day" : undefined} className="text-xl" />
-        <Button asChild variant={plan.price ? "default" : "secondary"} size="sm">
-          <Link href={`/esims/${destinationSlug}/${plan.slug}`}>View plan</Link>
+        <Button asChild variant={plan.price ? "default" : "secondary"} className="h-10 px-4">
+          <Link href={`/esims/${destinationSlug}/${plan.slug}`}>
+            View plan <ArrowRight className="hidden sm:block" aria-hidden />
+          </Link>
         </Button>
       </div>
     </article>

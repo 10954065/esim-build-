@@ -14,6 +14,18 @@ export function isUuid(value: string): boolean {
   return uuid.safeParse(value).success;
 }
 
+/** Order line fields for lists, including where the product is for (to show its flag). */
+const itemSummarySelect = {
+  description: true,
+  productType: true,
+  product: {
+    select: {
+      country: { select: { code: true } },
+      destination: { select: { kind: true, country: { select: { code: true } } } },
+    },
+  },
+} as const;
+
 export async function getDashboardSummary(userId: string) {
   const now = new Date();
   const [totalOrders, activeEsims, pendingOrders, activeVerifications, activeRentals, recentOrders, notifications] = await Promise.all([
@@ -26,7 +38,7 @@ export async function getDashboardSummary(userId: string) {
       where: { userId, status: { not: "CREATED" } },
       orderBy: { createdAt: "desc" },
       take: 5,
-      select: { id: true, number: true, status: true, total: true, currency: true, createdAt: true, isSandbox: true, items: { select: { description: true }, take: 1 } },
+      select: { id: true, number: true, status: true, total: true, currency: true, createdAt: true, isSandbox: true, items: { select: itemSummarySelect, take: 1 } },
     }),
     db.notification.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 6 }),
   ]);
@@ -51,7 +63,7 @@ export async function listOrders(userId: string, page = 1) {
         currency: true,
         createdAt: true,
         isSandbox: true,
-        items: { select: { description: true, productType: true } },
+        items: { select: itemSummarySelect },
       },
     }),
     db.order.count({ where }),

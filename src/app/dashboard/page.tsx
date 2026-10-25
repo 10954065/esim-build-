@@ -1,9 +1,8 @@
-import { Bell, Clock, MessageSquareText, Package, PhoneCall, Smartphone } from "lucide-react";
+import { ArrowRight, Bell, Clock, MessageSquareText, Package, PhoneCall, Plus, Smartphone } from "lucide-react";
 import Link from "next/link";
-import { DemoBadge, StatusBadge } from "@/components/common/status-badge";
+import { OrdersTable } from "@/components/dashboard/orders-table";
 import { Button } from "@/components/ui/button";
-import { formatMoney } from "@/lib/currency";
-import { formatDate, formatRelative } from "@/lib/format";
+import { formatRelative } from "@/lib/format";
 import { requireUser } from "@/server/auth/session";
 import { getDashboardSummary } from "@/server/customer/queries";
 
@@ -13,81 +12,91 @@ export default async function DashboardHome() {
   const user = await requireUser("/dashboard");
   const s = await getDashboardSummary(user.id);
   const stats = [
-    { label: "Total orders", value: s.totalOrders, icon: Package, href: "/dashboard/orders" },
-    { label: "Active eSIMs", value: s.activeEsims, icon: Smartphone, href: "/dashboard/esims" },
-    { label: "Orders in progress", value: s.pendingOrders, icon: Clock, href: "/dashboard/orders" },
-    { label: "Active verifications", value: s.activeVerifications, icon: MessageSquareText, href: "/dashboard/verification" },
-    { label: "Active rentals", value: s.activeRentals, icon: PhoneCall, href: "/dashboard/rentals" },
+    { label: "Active eSIMs", value: s.activeEsims, hint: "Ready or in use", icon: Smartphone, href: "/dashboard/esims" },
+    { label: "SMS sessions", value: s.activeVerifications, hint: "Waiting or received", icon: MessageSquareText, href: "/dashboard/verification" },
+    { label: "Rentals", value: s.activeRentals, hint: "Active numbers", icon: PhoneCall, href: "/dashboard/rentals" },
+    { label: "In progress", value: s.pendingOrders, hint: `${s.totalOrders} order${s.totalOrders === 1 ? "" : "s"} in total`, icon: Clock, href: "/dashboard/orders" },
   ];
 
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Hi {user.name.split(" ")[0]}</h1>
-          <p className="text-sm text-muted-foreground">Your orders, eSIMs and numbers in one place.</p>
+          <p className="eyebrow">Account overview</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight">Welcome back, {user.name.split(" ")[0]}</h1>
+          <p className="mt-1 text-muted-foreground">Your orders, eSIMs and numbers in one place.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button asChild size="sm"><Link href="/esims">Buy an eSIM</Link></Button>
-          <Button asChild size="sm" variant="outline"><Link href="/verification">Get a number</Link></Button>
+          <Button asChild className="h-10 px-4">
+            <Link href="/esims">
+              <Plus /> Buy an eSIM
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="h-10 bg-accent px-4 text-primary hover:bg-accent/70">
+            <Link href="/verification">
+              <MessageSquareText /> Get a number
+            </Link>
+          </Button>
         </div>
       </div>
 
-      <dl className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+      <dl className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {stats.map((st) => (
-          <Link key={st.label} href={st.href} className="rounded-xl border bg-card p-4 transition-colors hover:border-foreground/20">
-            <st.icon className="size-4 text-muted-foreground" aria-hidden />
-            <dd className="mt-3 text-2xl font-semibold tabular-nums">{st.value}</dd>
-            <dt className="text-xs text-muted-foreground">{st.label}</dt>
+          <Link key={st.label} href={st.href} className="surface-interactive group p-5">
+            <div className="flex items-start justify-between">
+              <dt className="text-xs font-semibold tracking-[0.06em] text-muted-foreground uppercase">{st.label}</dt>
+              <span className="grid size-9 place-items-center rounded-lg bg-accent text-primary">
+                <st.icon className="size-4" aria-hidden />
+              </span>
+            </div>
+            <dd className="mt-3 text-3xl font-bold tabular-nums">{st.value}</dd>
+            <p className="mt-1 text-xs text-muted-foreground">{st.hint}</p>
           </Link>
         ))}
       </dl>
 
-      <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
-        <section aria-labelledby="recent-orders" className="rounded-xl border bg-card">
-          <div className="flex items-center justify-between border-b px-5 py-3">
-            <h2 id="recent-orders" className="font-semibold">Recent orders</h2>
-            <Link href="/dashboard/orders" className="text-sm text-muted-foreground hover:text-foreground">View all</Link>
+      <div className="grid grid-cols-1 gap-6 2xl:grid-cols-[1fr_320px]">
+        <section aria-labelledby="recent-orders" className="surface overflow-hidden">
+          <div className="flex items-center justify-between border-b px-5 py-4">
+            <div>
+              <h2 id="recent-orders" className="font-semibold">
+                Recent orders
+              </h2>
+              <p className="text-xs text-muted-foreground">Your latest purchases and their delivery status.</p>
+            </div>
+            <Link href="/dashboard/orders" className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+              View all <ArrowRight className="size-4" aria-hidden />
+            </Link>
           </div>
           {s.recentOrders.length === 0 ? (
-            <p className="px-5 py-10 text-center text-sm text-muted-foreground">No orders yet. Your purchases will appear here.</p>
+            <div className="px-5 py-12 text-center">
+              <Package className="mx-auto size-8 text-muted-foreground" aria-hidden />
+              <p className="mt-3 text-sm text-muted-foreground">No orders yet. Your purchases will appear here.</p>
+            </div>
           ) : (
-            <ul className="divide-y">
-              {s.recentOrders.map((o) => (
-                <li key={o.id}>
-                  <Link href={`/dashboard/orders/${o.id}`} className="flex items-center gap-4 px-5 py-3 hover:bg-muted/40">
-                    <div className="min-w-0 flex-1">
-                      <p className="flex items-center gap-2 truncate text-sm font-medium">
-                        {o.items[0]?.description ?? "Order"} <DemoBadge show={o.isSandbox} />
-                      </p>
-                      <p className="text-xs text-muted-foreground">{o.number} · {formatDate(o.createdAt)}</p>
-                    </div>
-                    <StatusBadge status={o.status} />
-                    <span className="w-20 text-right text-sm tabular-nums">{formatMoney(o.total.toString(), o.currency)}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <OrdersTable orders={s.recentOrders} />
           )}
         </section>
 
-        <section aria-labelledby="notifications" className="rounded-xl border bg-card">
-          <div className="flex items-center gap-2 border-b px-5 py-3">
-            <Bell className="size-4 text-muted-foreground" aria-hidden />
-            <h2 id="notifications" className="font-semibold">Notifications</h2>
+        <section aria-labelledby="notifications" className="surface overflow-hidden">
+          <div className="flex items-center gap-2 border-b px-5 py-4">
+            <Bell className="size-4 text-primary" aria-hidden />
+            <h2 id="notifications" className="font-semibold">
+              Notifications
+            </h2>
           </div>
           {s.notifications.length === 0 ? (
-            <p className="px-5 py-10 text-center text-sm text-muted-foreground">You are all caught up.</p>
+            <p className="px-5 py-12 text-center text-sm text-muted-foreground">You are all caught up.</p>
           ) : (
             <ul className="divide-y">
               {s.notifications.map((n) => (
-                <li key={n.id} className="px-5 py-3">
+                <li key={n.id} className="px-5 py-3.5">
                   {n.link ? (
-                    <Link href={n.link} className="block hover:underline">
-                      <p className="text-sm font-medium">{n.title}</p>
+                    <Link href={n.link} className="text-sm font-semibold hover:text-primary">
+                      {n.title}
                     </Link>
                   ) : (
-                    <p className="text-sm font-medium">{n.title}</p>
+                    <p className="text-sm font-semibold">{n.title}</p>
                   )}
                   <p className="text-xs text-muted-foreground">{n.body}</p>
                   <p className="mt-1 text-[11px] text-muted-foreground">{formatRelative(n.createdAt)}</p>

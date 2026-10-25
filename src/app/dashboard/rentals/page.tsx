@@ -6,7 +6,7 @@ import { AutoRefresh, CopyButton } from "@/components/dashboard/client-utils";
 import { RentalDemoSms } from "@/components/dashboard/verification-actions";
 import { Button } from "@/components/ui/button";
 import { formatDateTime, formatTerm } from "@/lib/format";
-import { flagEmoji } from "@/lib/slug";
+import { Flag } from "@/components/common/flag";
 import { requireUser } from "@/server/auth/session";
 import { listRentals } from "@/server/customer/queries";
 
@@ -28,7 +28,7 @@ export default async function RentalsPage() {
           {rentals.map((r) => (
             <section key={r.id} className="rounded-2xl border bg-card">
               <div className="flex flex-wrap items-center gap-4 border-b px-5 py-4">
-                <span className="text-2xl" aria-hidden>{flagEmoji(r.countryCode)}</span>
+                <Flag code={r.countryCode} size="lg" />
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-2 font-mono text-lg font-semibold">{r.phoneNumber} <DemoBadge show={r.isSandbox} /></p>
                   <p className="text-xs text-muted-foreground">

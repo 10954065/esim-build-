@@ -1,13 +1,14 @@
-import { PackageX } from "lucide-react";
+import { Check, Clock, PackageX, QrCode, Settings, Smartphone, Wifi } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DataOnlyNotice } from "@/components/catalog/capabilities";
 import { PlanCard } from "@/components/catalog/plan-card";
+import { Breadcrumbs } from "@/components/common/breadcrumbs";
 import { EmptyState } from "@/components/common/empty-state";
-import { Container, PageHeader } from "@/components/common/page-header";
+import { Flag } from "@/components/common/flag";
+import { Container } from "@/components/common/page-header";
 import { formatRelative } from "@/lib/format";
-import { flagEmoji } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import { getEsimDestination } from "@/server/catalog/queries";
 import { dec } from "@/server/pricing/money";
@@ -31,6 +32,15 @@ const SORTS = [
   { value: "validity", label: "Longest validity" },
 ] as const;
 
+const KIND_LABEL = { COUNTRY: "Country plan", REGION: "Regional plan", GLOBAL: "Global plan" } as const;
+
+const INSTALL_PREVIEW = [
+  { icon: Wifi, text: "Connect to Wi-Fi before you travel." },
+  { icon: Settings, text: "Open Settings › Mobile/Cellular › Add eSIM." },
+  { icon: QrCode, text: "Scan the QR code from your dashboard." },
+  { icon: Smartphone, text: "On arrival, turn on data roaming for the eSIM line." },
+];
+
 export default async function DestinationPage({
   params,
   searchParams,
@@ -51,70 +61,125 @@ export default async function DestinationPage({
     if (!b.price) return -1;
     return dec(a.price.amount).cmp(dec(b.price.amount));
   });
+  const speeds = [...new Set(plans.map((p) => p.speed).filter(Boolean))];
 
   return (
-    <Container className="py-12">
-      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
-        <Link href="/esims" className="hover:text-foreground">
-          Travel eSIMs
-        </Link>{" "}
-        <span aria-hidden>/</span> <span className="text-foreground">{destination.name}</span>
-      </nav>
-      <PageHeader
-        eyebrow={destination.kind === "COUNTRY" ? "Country plan" : destination.kind === "GLOBAL" ? "Global plan" : "Regional plan"}
-        title={
-          <span className="flex items-center gap-3">
-            <span aria-hidden>{destination.kind === "COUNTRY" ? flagEmoji(destination.country?.code) : "🌐"}</span>
-            {destination.name} eSIM
-          </span>
-        }
-        description={`${plans.length} data plan${plans.length === 1 ? "" : "s"} available. Prices updated ${formatRelative(destination.packagesSyncedAt)}.`}
-      />
+    <>
+      <section className="border-b bg-linear-to-b from-accent/70 to-background">
+        <Container className="py-10">
+          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Travel eSIMs", href: "/esims" }, { label: destination.name }]} />
+          <div className="mt-6 flex items-center gap-3">
+            <Flag code={destination.country?.code} kind={destination.kind} size="lg" />
+            <span className="eyebrow">{KIND_LABEL[destination.kind]}</span>
+          </div>
+          <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">{destination.name} eSIM</h1>
+          <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
+            {plans.length} prepaid data plan{plans.length === 1 ? "" : "s"} for {destination.name}, delivered as a QR code to your
+            dashboard after payment.
+          </p>
+          <ul className="mt-6 flex flex-wrap gap-2 text-xs font-medium">
+            <li className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1.5 shadow-card">
+              <QrCode className="size-3.5 text-primary" aria-hidden /> QR code delivery
+            </li>
+            {speeds.length > 0 && (
+              <li className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1.5 shadow-card">
+                <Wifi className="size-3.5 text-primary" aria-hidden /> {speeds.join(" · ")}
+              </li>
+            )}
+            <li className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1.5 shadow-card">
+              <Smartphone className="size-3.5 text-primary" aria-hidden /> Data only · no phone number
+            </li>
+            <li className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1.5 shadow-card">
+              <Clock className="size-3.5 text-primary" aria-hidden /> Prices updated {formatRelative(destination.packagesSyncedAt)}
+            </li>
+          </ul>
+        </Container>
+      </section>
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-        <nav aria-label="Sort plans" className="flex flex-wrap gap-1.5">
-          {SORTS.map((s) => (
-            <Link
-              key={s.value}
-              href={`/esims/${destination.slug}?sort=${s.value}`}
-              aria-current={sort === s.value ? "true" : undefined}
-              className={cn(
-                "rounded-full border px-3.5 py-1.5 text-sm",
-                sort === s.value ? "border-primary bg-primary text-primary-foreground" : "hover:bg-muted",
-              )}
-            >
-              {s.label}
+      <Container className="grid grid-cols-1 gap-8 py-10 lg:grid-cols-[1fr_360px]">
+        <section aria-labelledby="plans" className="surface p-5 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 id="plans" className="text-xl font-semibold">
+                Select a data plan
+              </h2>
+              <p className="text-sm text-muted-foreground">Final price shown before checkout. No roaming charges from us.</p>
+            </div>
+            <nav aria-label="Sort plans" className="flex gap-1 rounded-[10px] bg-muted p-1">
+              {SORTS.map((s) => (
+                <Link
+                  key={s.value}
+                  href={`/esims/${destination.slug}?sort=${s.value}`}
+                  aria-current={sort === s.value ? "true" : undefined}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors sm:text-sm",
+                    sort === s.value ? "bg-card text-foreground shadow-card" : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {s.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          {sorted.length === 0 ? (
+            <EmptyState
+              className="mt-6"
+              icon={PackageX}
+              title="No plans available for this destination right now"
+              description="Inventory changes frequently. Try again later or choose a regional plan."
+              action={
+                <Link href="/esims?kind=REGION" className="text-sm font-medium text-primary underline">
+                  See regional plans
+                </Link>
+              }
+            />
+          ) : (
+            <div className="mt-5 space-y-3">
+              {sorted.map((plan) => (
+                <PlanCard key={plan.id} plan={plan} destinationSlug={destination.slug} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+          <div className="surface p-5">
+            <h2 className="font-semibold">Before you buy</h2>
+            <ul className="mt-3 space-y-2.5 text-sm text-muted-foreground">
+              {[
+                "Your phone must support eSIM and be carrier-unlocked.",
+                "Most eSIM profiles can be installed only once — keep it after installing.",
+                "Validity may start at installation or first use, depending on the network.",
+              ].map((t) => (
+                <li key={t} className="flex gap-2">
+                  <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <Link href="/device-compatibility" className="mt-4 inline-flex text-sm font-semibold text-primary hover:underline">
+              Check your device is eSIM-compatible
             </Link>
-          ))}
-        </nav>
-        <Link href="/device-compatibility" className="text-sm font-medium underline underline-offset-2">
-          Check your device is eSIM-compatible
-        </Link>
-      </div>
+          </div>
+          <div className="surface p-5">
+            <p className="eyebrow">Setup preview</p>
+            <h2 className="mt-1 font-semibold">Installing takes a few minutes</h2>
+            <ol className="mt-4 space-y-3">
+              {INSTALL_PREVIEW.map((step, i) => (
+                <li key={step.text} className="flex gap-3 text-sm">
+                  <span className="grid size-6 shrink-0 place-items-center rounded-md bg-accent text-xs font-bold text-primary">{i + 1}</span>
+                  <span className="text-muted-foreground">{step.text}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </aside>
+      </Container>
 
-      {sorted.length === 0 ? (
-        <EmptyState
-          className="mt-8"
-          icon={PackageX}
-          title="No plans available for this destination right now"
-          description="Inventory changes frequently. Try again later or choose a regional plan."
-          action={
-            <Link href="/esims?kind=REGION" className="text-sm font-medium underline">
-              See regional plans
-            </Link>
-          }
-        />
-      ) : (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sorted.map((plan) => (
-            <PlanCard key={plan.id} plan={plan} destinationSlug={destination.slug} />
-          ))}
-        </div>
-      )}
-
-      <div className="mt-10">
+      <Container>
         <DataOnlyNotice />
-      </div>
-    </Container>
+      </Container>
+    </>
   );
 }

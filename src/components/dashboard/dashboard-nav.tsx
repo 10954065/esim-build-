@@ -31,10 +31,10 @@ const NAV = [
   { href: "/dashboard/security", label: "Security", icon: Shield },
 ];
 
-export function DashboardNav() {
+export function DashboardNav({ className }: { className?: string }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="Dashboard" className="-mx-4 flex gap-1 overflow-x-auto px-4 pb-2 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0">
+    <nav aria-label="Dashboard" className={cn("flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible", className)}>
       {NAV.map((item) => {
         const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
         return (
@@ -43,8 +43,8 @@ export function DashboardNav() {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
-              active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              "flex shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors lg:py-2.5",
+              active ? "bg-accent text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
             <item.icon className="size-4" aria-hidden />
