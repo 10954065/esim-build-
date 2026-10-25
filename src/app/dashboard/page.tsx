@@ -40,20 +40,22 @@ export default async function DashboardHome() {
         </div>
       </div>
 
-      <dl className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      <ul aria-label="Account summary" className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {stats.map((st) => (
-          <Link key={st.label} href={st.href} className="surface-interactive group p-5">
-            <div className="flex items-start justify-between">
-              <dt className="text-xs font-semibold tracking-[0.06em] text-muted-foreground uppercase">{st.label}</dt>
-              <span className="grid size-9 place-items-center rounded-lg bg-accent text-primary">
-                <st.icon className="size-4" aria-hidden />
+          <li key={st.label}>
+            <Link href={st.href} className="surface-interactive group block h-full p-5">
+              <span className="flex items-start justify-between">
+                <span className="text-xs font-semibold tracking-[0.06em] text-muted-foreground uppercase">{st.label}</span>
+                <span className="grid size-9 place-items-center rounded-lg bg-accent text-primary">
+                  <st.icon className="size-4" aria-hidden />
+                </span>
               </span>
-            </div>
-            <dd className="mt-3 text-3xl font-bold tabular-nums">{st.value}</dd>
-            <p className="mt-1 text-xs text-muted-foreground">{st.hint}</p>
-          </Link>
+              <span className="mt-3 block text-3xl font-bold tabular-nums">{st.value}</span>
+              <span className="mt-1 block text-xs text-muted-foreground">{st.hint}</span>
+            </Link>
+          </li>
         ))}
-      </dl>
+      </ul>
 
       <div className="grid grid-cols-1 gap-6 2xl:grid-cols-[1fr_320px]">
         <section aria-labelledby="recent-orders" className="surface overflow-hidden">

@@ -25,8 +25,8 @@ export default async function AdminOrders({ searchParams }: { searchParams: Sear
         {data.items.map((o) => (
           <tr key={o.id} className="hover:bg-muted/30">
             <Td mono><Link href={`/admin/orders/${o.id}`} className="underline">{o.number}</Link> <DemoBadge show={o.isSandbox} /></Td>
-            <Td>{o.user.email}</Td>
-            <Td className="max-w-xs truncate">{o.items.map((i) => i.description).join(", ")}</Td>
+            <Td><span title={o.user.email} className="block max-w-44 truncate">{o.user.email}</span></Td>
+            <Td><span title={o.items.map((i) => i.description).join(", ")} className="block max-w-44 truncate">{o.items.map((i) => i.description).join(", ")}</span></Td>
             <Td><StatusBadge status={o.status} /></Td>
             <Td className="tabular-nums">{formatMoney(o.total.toString(), o.currency)}</Td>
             <Td className="text-muted-foreground">{formatDateTime(o.createdAt)}</Td>

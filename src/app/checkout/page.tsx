@@ -136,10 +136,10 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                 <dt className="text-base font-semibold">Total to pay</dt>
                 <dd className="text-2xl font-bold tabular-nums">{money(q.total)}</dd>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Charged in {q.currency}. The price was just confirmed with our supplier and will not change after you continue.
-              </p>
             </dl>
+            <p className="-mt-3 text-xs text-muted-foreground">
+              Charged in {q.currency}. The price was just confirmed with our supplier and will not change after you continue.
+            </p>
             <CheckoutForm productId={q.productId} days={q.perDay ? q.quantity : undefined} promoCode={q.promotionId ? promo : undefined} payLabel={`Pay ${money(q.total)}`} />
             <div className="flex gap-2 rounded-xl bg-muted p-3 text-xs text-muted-foreground">
               <ShieldCheck className="size-4 shrink-0 text-success" aria-hidden />

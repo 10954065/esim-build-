@@ -60,20 +60,20 @@ export default async function AdminPricing({ searchParams }: { searchParams: Sea
           {manage && (
             <form action={createPricingRuleAction} className="mt-4 grid gap-2 rounded-lg border border-dashed p-3 md:grid-cols-4">
               {back}
-              <input name="name" required placeholder="Rule name" className={input} />
-              <select name="productType" className={input} defaultValue="">
+              <input name="name" required placeholder="Rule name" aria-label="Rule name" className={input} />
+              <select name="productType" aria-label="Product type" className={input} defaultValue="">
                 <option value="">Any product type</option>
                 <option value="ESIM">eSIM</option>
                 <option value="VERIFICATION">Verification</option>
                 <option value="RENTAL">Rental</option>
               </select>
-              <select name="countryId" className={input} defaultValue=""><option value="">Any country</option>{countries.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
-              <select name="destinationId" className={input} defaultValue=""><option value="">Any eSIM destination</option>{destinations.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
-              <select name="serviceId" className={input} defaultValue=""><option value="">Any service</option>{services.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
-              <input name="markupPercent" placeholder="Markup % (e.g. 25)" className={input} />
-              <input name="markupFixed" placeholder={`Fixed markup (${env.PAYMENT_CURRENCY})`} className={input} />
-              <input name="minProfit" placeholder={`Min profit (${env.PAYMENT_CURRENCY})`} className={input} />
-              <input name="priority" placeholder="Priority (0)" className={input} />
+              <select name="countryId" aria-label="Country" className={input} defaultValue=""><option value="">Any country</option>{countries.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
+              <select name="destinationId" aria-label="eSIM destination" className={input} defaultValue=""><option value="">Any eSIM destination</option>{destinations.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
+              <select name="serviceId" aria-label="Service" className={input} defaultValue=""><option value="">Any service</option>{services.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
+              <input name="markupPercent" placeholder="Markup % (e.g. 25)" aria-label="Markup % (e.g. 25)" className={input} />
+              <input name="markupFixed" placeholder={`Fixed markup (${env.PAYMENT_CURRENCY})`} aria-label={`Fixed markup (${env.PAYMENT_CURRENCY})`} className={input} />
+              <input name="minProfit" placeholder={`Min profit (${env.PAYMENT_CURRENCY})`} aria-label={`Min profit (${env.PAYMENT_CURRENCY})`} className={input} />
+              <input name="priority" placeholder="Priority (0)" aria-label="Priority (0)" className={input} />
               <input type="hidden" name="currency" value={env.PAYMENT_CURRENCY} />
               <button className="h-8 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground">Add rule</button>
             </form>
@@ -97,10 +97,10 @@ export default async function AdminPricing({ searchParams }: { searchParams: Sea
           {manage && (
             <form action={createExchangeRateAction} className="mt-4 flex flex-wrap gap-2">
               {back}
-              <input name="base" defaultValue={env.SUPPLIER_PRICE_CURRENCY} maxLength={3} className={`${input} w-20`} />
-              <input name="quote" defaultValue={env.PAYMENT_CURRENCY} maxLength={3} className={`${input} w-20`} />
-              <input name="rate" required placeholder="Rate" className={`${input} w-32`} />
-              <input name="source" required placeholder="Source (e.g. bank rate 2026-10-24)" className={`${input} w-72`} />
+              <input name="base" aria-label="Base currency" defaultValue={env.SUPPLIER_PRICE_CURRENCY} maxLength={3} className={`${input} w-20`} />
+              <input name="quote" aria-label="Quote currency" defaultValue={env.PAYMENT_CURRENCY} maxLength={3} className={`${input} w-20`} />
+              <input name="rate" required placeholder="Rate" aria-label="Rate" className={`${input} w-32`} />
+              <input name="source" required placeholder="Source (e.g. bank rate 2026-10-24)" aria-label="Source (e.g. bank rate 2026-10-24)" className={`${input} w-72`} />
               <button className="h-8 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground">Record rate</button>
             </form>
           )}
@@ -131,13 +131,13 @@ export default async function AdminPricing({ searchParams }: { searchParams: Sea
           {manage && (
             <form action={createPromotionAction} className="mt-4 flex flex-wrap gap-2">
               {back}
-              <input name="code" required placeholder="CODE" className={`${input} w-32 uppercase`} />
-              <input name="percentOff" placeholder="% off" className={`${input} w-20`} />
-              <input name="amountOff" placeholder="or amount off" className={`${input} w-28`} />
+              <input name="code" required placeholder="CODE" aria-label="CODE" className={`${input} w-32 uppercase`} />
+              <input name="percentOff" placeholder="% off" aria-label="% off" className={`${input} w-20`} />
+              <input name="amountOff" placeholder="or amount off" aria-label="or amount off" className={`${input} w-28`} />
               <input type="hidden" name="currency" value={env.PAYMENT_CURRENCY} />
-              <input name="maxRedemptions" placeholder="Max uses" className={`${input} w-24`} />
-              <input name="endsAt" type="date" className={input} />
-              <input name="description" placeholder="Internal description" className={`${input} w-56`} />
+              <input name="maxRedemptions" placeholder="Max uses" aria-label="Max uses" className={`${input} w-24`} />
+              <input name="endsAt" type="date" aria-label="Ends on" className={input} />
+              <input name="description" placeholder="Internal description" aria-label="Internal description" className={`${input} w-56`} />
               <button className="h-8 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground">Create promotion</button>
             </form>
           )}

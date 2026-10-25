@@ -26,7 +26,7 @@ export default async function AdminProducts({ searchParams }: { searchParams: Se
         action="/admin/products"
         q={q}
         extra={
-          <select name="type" defaultValue={type ?? ""} className="h-9 rounded-md border bg-background px-2 text-sm">
+          <select name="type" aria-label="Product type" defaultValue={type ?? ""} className="h-9 rounded-md border bg-background px-2 text-sm">
             <option value="">All types</option>
             <option value="ESIM">eSIM</option>
             <option value="VERIFICATION">Verification</option>

@@ -381,7 +381,7 @@ export default async function HomePage() {
       <section className="bg-primary py-16 text-primary-foreground">
         <Container className="text-center">
           <h2 className="text-3xl font-bold tracking-[-0.02em]">Land connected</h2>
-          <p className="mx-auto mt-3 max-w-xl text-primary-foreground/80">
+          <p className="mx-auto mt-3 max-w-xl text-primary-foreground">
             Find a data plan for your destination, see the full price, and install it before you fly.
           </p>
           <Button asChild variant="secondary" className="mt-8 h-11 bg-card px-6 text-foreground hover:bg-card/90">

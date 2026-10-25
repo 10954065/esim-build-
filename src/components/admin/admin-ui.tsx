@@ -19,9 +19,9 @@ export function AdminHeader({ title, description, actions }: { title: string; de
 export function Filters({ action, q, status, statuses, extra }: { action: string; q?: string; status?: string; statuses?: string[]; extra?: ReactNode }) {
   return (
     <form method="get" action={action} className="surface mb-4 flex flex-wrap items-center gap-2 p-3">
-      <input name="q" defaultValue={q} placeholder="Search…" maxLength={100} type="search" className="h-9 w-full rounded-lg border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:w-64" />
+      <input name="q" defaultValue={q} placeholder="Search…" aria-label="Search" maxLength={100} type="search" className="h-9 w-full rounded-lg border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:w-64" />
       {statuses && (
-        <select name="status" defaultValue={status ?? ""} className="h-9 rounded-lg border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
+        <select name="status" aria-label="Filter by status" defaultValue={status ?? ""} className="h-9 rounded-lg border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
           <option value="">All statuses</option>
           {statuses.map((s) => (
             <option key={s} value={s}>{s}</option>
@@ -36,7 +36,7 @@ export function Filters({ action, q, status, statuses, extra }: { action: string
 
 export function Table({ head, children, empty }: { head: string[]; children: ReactNode; empty?: boolean }) {
   return (
-    <div className="surface relative overflow-x-auto">
+    <div role="region" aria-label="Results" tabIndex={0} className="surface relative overflow-x-auto outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
       <table className="w-full text-sm">
         <thead className="border-b bg-muted text-left text-xs tracking-[0.06em] text-muted-foreground uppercase">
           <tr>
@@ -81,16 +81,22 @@ export function Pager({ page, totalPages, base, params }: { page: number; totalP
 }
 
 export function Stat({ label, value, href, tone = "neutral" }: { label: string; value: ReactNode; href?: string; tone?: "neutral" | "warning" | "danger" }) {
-  const body = (
-    <>
-      <dd className={cn("text-3xl font-bold tabular-nums", tone === "warning" && "text-warning", tone === "danger" && "text-destructive")}>{value}</dd>
-      <dt className="mt-1 text-xs font-semibold tracking-[0.06em] text-muted-foreground uppercase">{label}</dt>
-    </>
-  );
-  return href ? (
-    <Link href={href} className="surface-interactive flex flex-col-reverse p-5">{body}</Link>
-  ) : (
-    <div className="surface flex flex-col-reverse p-5">{body}</div>
+  const valueClass = cn("mt-1 text-3xl font-bold tabular-nums", tone === "warning" && "text-warning", tone === "danger" && "text-destructive");
+  // dt/dd must be direct children of a div inside the <dl>; a linked card uses a stretched link on the value.
+  return (
+    <div className={cn("relative p-5", href ? "surface-interactive focus-within:ring-[3px] focus-within:ring-ring/50" : "surface")}>
+      <dt className="text-xs font-semibold tracking-[0.06em] text-muted-foreground uppercase">{label}</dt>
+      <dd className={valueClass}>
+        {href ? (
+          <Link href={href} className="outline-none after:absolute after:inset-0 after:rounded-2xl">
+            {value}
+            <span className="sr-only">, open {label.toLowerCase()}</span>
+          </Link>
+        ) : (
+          value
+        )}
+      </dd>
+    </div>
   );
 }
 
@@ -113,7 +119,7 @@ export function ReasonForm({ action, hidden, label, destructive, placeholder }: 
       {Object.entries(hidden).map(([k, v]) => (
         <input key={k} type="hidden" name={k} value={v} />
       ))}
-      <input name="reason" required minLength={5} maxLength={300} placeholder={placeholder ?? "Reason (required, audited)"} className="h-8 w-64 rounded-lg border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50" />
+      <input name="reason" required minLength={5} maxLength={300} placeholder={placeholder ?? "Reason (required, audited)"} aria-label={placeholder ?? "Reason (required, audited)"} className="h-8 w-64 rounded-lg border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50" />
       <button type="submit" className={cn("h-8 rounded-lg px-3 text-sm font-semibold", destructive ? "bg-destructive/10 text-destructive hover:bg-destructive/20" : "bg-primary text-primary-foreground")}>
         {label}
       </button>

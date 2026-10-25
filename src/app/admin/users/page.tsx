@@ -38,17 +38,17 @@ export default async function AdminUsers({ searchParams }: { searchParams: Searc
                     <form action={setUserRoleAction} className="flex gap-1">
                       <input type="hidden" name="userId" value={u.id} />
                       <input type="hidden" name="back" value="/admin/users" />
-                      <select name="role" defaultValue={u.role} className="h-7 rounded border bg-background text-xs">
+                      <select name="role" aria-label={`Role for ${u.email}`} defaultValue={u.role} className="h-7 rounded border bg-background text-xs">
                         {["user", "support", "finance", "admin"].map((r) => <option key={r}>{r}</option>)}
                       </select>
-                      <input name="reason" required minLength={5} placeholder="Reason" className="h-7 w-28 rounded border bg-background px-1 text-xs" />
+                      <input name="reason" required minLength={5} placeholder="Reason" aria-label="Reason (required, audited)" className="h-7 w-28 rounded border bg-background px-1 text-xs" />
                       <button className="h-7 rounded border px-2 text-xs">Set role</button>
                     </form>
                     <form action={setUserBanAction} className="flex gap-1">
                       <input type="hidden" name="userId" value={u.id} />
                       <input type="hidden" name="ban" value={u.banned ? "false" : "true"} />
                       <input type="hidden" name="back" value="/admin/users" />
-                      <input name="reason" required minLength={5} placeholder="Reason" className="h-7 w-28 rounded border bg-background px-1 text-xs" />
+                      <input name="reason" required minLength={5} placeholder="Reason" aria-label="Reason (required, audited)" className="h-7 w-28 rounded border bg-background px-1 text-xs" />
                       <button className="h-7 rounded border px-2 text-xs">{u.banned ? "Reinstate" : "Suspend"}</button>
                     </form>
                   </div>

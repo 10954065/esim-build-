@@ -59,12 +59,12 @@ function Steps({ steps }: { steps: ReactNode[] }) {
 
 function DetailRow({ label, value, small }: { label: string; value: string; small?: boolean }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border bg-card px-3 py-2.5">
-      <div className="min-w-0">
-        <dt className="text-xs text-muted-foreground">{label}</dt>
-        <dd className={small ? "font-mono text-xs break-all" : "font-mono break-all"}>{value}</dd>
-      </div>
-      <CopyButton value={value} />
+    <div className="rounded-xl border bg-card px-3 py-2.5">
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="flex flex-wrap items-center justify-between gap-2">
+        <span className={small ? "min-w-0 font-mono text-xs break-all" : "min-w-0 font-mono break-all"}>{value}</span>
+        <CopyButton value={value} />
+      </dd>
     </div>
   );
 }

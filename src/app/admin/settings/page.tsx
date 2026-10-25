@@ -29,12 +29,12 @@ export default async function AdminSettings({ searchParams }: { searchParams: Se
                   <input type="hidden" name="key" value={key} />
                   <input type="hidden" name="back" value="/admin/settings" />
                   {typeof def === "boolean" ? (
-                    <select name="value" defaultValue={String(value)} className="h-8 rounded-md border bg-background px-2 text-sm">
+                    <select name="value" aria-label={SETTINGS[key].label} defaultValue={String(value)} className="h-8 rounded-md border bg-background px-2 text-sm">
                       <option value="true">On</option>
                       <option value="false">Off</option>
                     </select>
                   ) : (
-                    <input name="value" defaultValue={String(value)} type={typeof def === "number" ? "number" : "text"} maxLength={280} className="h-8 w-80 rounded-md border bg-background px-2 text-sm" />
+                    <input name="value" aria-label={SETTINGS[key].label} defaultValue={String(value)} type={typeof def === "number" ? "number" : "text"} maxLength={280} className="h-8 w-80 rounded-md border bg-background px-2 text-sm" />
                   )}
                   <button className="h-8 rounded-md border px-3 text-sm">Save</button>
                 </form>

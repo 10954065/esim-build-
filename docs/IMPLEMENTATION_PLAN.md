@@ -133,7 +133,7 @@ Checks: 185 unit ✅, 53 integration ✅, 5 E2E ✅, typecheck ✅, lint ✅, co
 ## UI redesign (Stitch "Precision Global Transit" design)
 
 The storefront and customer dashboard now follow the GlobeLink Stitch design's pattern and theme:
-Inter type, midnight ink `#101828`, action blue `#3867F6`, mint/amber/red status pills with dots,
+Inter type, midnight ink `#101828`, action blue `#3867F6` (later `#2F5FF0`, see Accessibility), mint/amber/red status pills with dots,
 slate canvas with white hairline-bordered cards and navy-tinted shadows (`shadow-card/raised/float/modal`),
 segmented tabs, dark active filter chips, uppercase eyebrows, breadcrumbs and sticky order summaries.
 
@@ -168,6 +168,26 @@ segmented tabs, dark active filter chips, uppercase eyebrows, breadcrumbs and st
   2FA warnings, collapsible menu on phones; shared admin components restyled, so all 18 pages follow.
 - Checks: screenshots of every changed page at 1280 px and 360 px (no horizontal overflow), typecheck ✅,
   lint ✅, 185 unit ✅, 53 integration ✅, 5 E2E ✅.
+
+## Accessibility
+
+`e2e/accessibility.spec.ts` runs axe-core (WCAG 2.1 A/AA rules) on every public page, checkout, the
+dashboard (including an order and an installed eSIM) and all 18 admin pages; it runs in CI with the other E2E
+tests. Automated rules catch roughly a third of WCAG issues; keyboard and screen-reader passes are still manual.
+
+Fixed when it was introduced:
+
+- Contrast: action blue `#3867F6` → `#2F5FF0` (blue text on the pale-blue tint was 4.27:1; now 4.72:1, and
+  white on blue buttons improves to 5.23:1). Secondary text `#667085` → `#5F6B7F`. Red `#D92D20` → `#B42318`
+  (red status pills were 4.15:1). Admin sidebar section labels and the home CTA text were raised.
+- Invalid description lists on the dashboard stat cards, checkout summary and eSIM manual details; admin
+  stat cards now use a stretched link inside `dd`.
+- Every unlabelled select and input in admin (filters, pricing, settings, users, products) has a name;
+  placeholder-only inputs also get one, since placeholders vanish while typing.
+- Scrollable admin tables are keyboard-focusable regions. The orders table caps customer and item columns so
+  it fits a 1280 px screen without sideways scrolling.
+
+Checks: 185 unit ✅, 8 E2E (including 3 accessibility) ✅, typecheck ✅, lint ✅.
 
 ## Next task
 

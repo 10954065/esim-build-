@@ -36,7 +36,7 @@ const SECTIONS: Array<{ title: string; items: Array<{ href: string; label: strin
 
 const TONES = {
   dark: {
-    heading: "text-white/45",
+    heading: "text-white/55",
     active: "bg-white/10 font-semibold text-white",
     idle: "text-white/65 hover:bg-white/5 hover:text-white",
   },
