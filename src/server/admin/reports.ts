@@ -27,7 +27,7 @@ export interface ProfitReport {
   fulfilledOrders: number;
   failedOrders: number;
   byCategory: Array<{ category: string; orders: number; sales: string }>;
-  byCountry: Array<{ country: string; orders: number; sales: string }>;
+  byCountry: Array<{ country: string; code: string | null; kind: "COUNTRY" | "REGION" | "GLOBAL"; orders: number; sales: string }>;
   byDay: Array<{ day: string; orders: number; sales: string }>;
   byMonth: Array<{ month: string; orders: number; sales: string }>;
 }
@@ -89,20 +89,24 @@ export async function profitReport(from: Date, to: Date): Promise<ProfitReport> 
       WHERE o."paidAt" >= ${from} AND o."paidAt" < ${to} AND (o."isSandbox" = false OR ${sandbox}::boolean)
       GROUP BY 1 ORDER BY 3 DESC
     `,
-    db.$queryRaw<Array<{ country: string; orders: bigint; sales: string }>>`
-      SELECT COALESCE(c.name, d.name, 'Unknown') AS country, COUNT(DISTINCT o.id) AS orders, COALESCE(SUM(i.total), 0)::text AS sales
+    db.$queryRaw<Array<{ country: string; code: string | null; kind: "COUNTRY" | "REGION" | "GLOBAL"; orders: bigint; sales: string }>>`
+      SELECT COALESCE(c.name, d.name, 'Unknown') AS country, COALESCE(c.code, dc.code) AS code,
+             COALESCE(d.kind::text, 'COUNTRY') AS kind,
+             COUNT(DISTINCT o.id) AS orders, COALESCE(SUM(i.total), 0)::text AS sales
       FROM "Order" o JOIN "OrderItem" i ON i."orderId" = o.id JOIN "Product" p ON p.id = i."productId"
       LEFT JOIN "Country" c ON c.id = p."countryId" LEFT JOIN "EsimDestination" d ON d.id = p."destinationId"
+      LEFT JOIN "Country" dc ON dc.id = d."countryId"
       WHERE o."paidAt" >= ${from} AND o."paidAt" < ${to} AND (o."isSandbox" = false OR ${sandbox}::boolean)
-      GROUP BY 1 ORDER BY 3 DESC LIMIT 15
+      GROUP BY 1, 2, 3 ORDER BY 5 DESC LIMIT 15
     `,
+    // Days and months are UTC, matching fillDailySeries and the overview charts.
     db.$queryRaw<Array<{ day: string; orders: bigint; sales: string }>>`
-      SELECT to_char(date_trunc('day', "paidAt"), 'YYYY-MM-DD') AS day, COUNT(*) AS orders, COALESCE(SUM(total), 0)::text AS sales
+      SELECT to_char(date_trunc('day', "paidAt" AT TIME ZONE 'UTC'), 'YYYY-MM-DD') AS day, COUNT(*) AS orders, COALESCE(SUM(total), 0)::text AS sales
       FROM "Order" WHERE "paidAt" >= ${from} AND "paidAt" < ${to} AND ("isSandbox" = false OR ${sandbox}::boolean)
       GROUP BY 1 ORDER BY 1
     `,
     db.$queryRaw<Array<{ month: string; orders: bigint; sales: string }>>`
-      SELECT to_char(date_trunc('month', "paidAt"), 'YYYY-MM') AS month, COUNT(*) AS orders, COALESCE(SUM(total), 0)::text AS sales
+      SELECT to_char(date_trunc('month', "paidAt" AT TIME ZONE 'UTC'), 'YYYY-MM') AS month, COUNT(*) AS orders, COALESCE(SUM(total), 0)::text AS sales
       FROM "Order" WHERE "paidAt" >= ${from} AND "paidAt" < ${to} AND ("isSandbox" = false OR ${sandbox}::boolean)
       GROUP BY 1 ORDER BY 1
     `,
@@ -126,7 +130,7 @@ export async function profitReport(from: Date, to: Date): Promise<ProfitReport> 
     fulfilledOrders: c ? n(c.fulfilled) : 0,
     failedOrders: c ? n(c.failed) : 0,
     byCategory: byCategory.map((r) => ({ category: r.category, orders: n(r.orders), sales: r.sales })),
-    byCountry: byCountry.map((r) => ({ country: r.country, orders: n(r.orders), sales: r.sales })),
+    byCountry: byCountry.map((r) => ({ country: r.country, code: r.code, kind: r.kind, orders: n(r.orders), sales: r.sales })),
     byDay: byDay.map((r) => ({ day: r.day, orders: n(r.orders), sales: r.sales })),
     byMonth: byMonth.map((r) => ({ month: r.month, orders: n(r.orders), sales: r.sales })),
   };

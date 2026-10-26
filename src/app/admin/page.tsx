@@ -1,9 +1,9 @@
 import { AlertTriangle, ArrowUpRight, Cable, Mail, PackageSearch, Server, Workflow } from "lucide-react";
 import Link from "next/link";
 import { AdminHeader, Panel } from "@/components/admin/admin-ui";
-import { Sparkline } from "@/components/admin/sparkline";
+import { BarChart, type BarPoint } from "@/components/admin/bar-chart";
 import { formatMoney } from "@/lib/currency";
-import { formatRelative } from "@/lib/format";
+import { formatDayKey, formatRelative } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { requireStaff } from "@/server/auth/session";
 import { adminOverview } from "@/server/admin/queries";
@@ -25,6 +25,10 @@ export default async function AdminHome() {
   const [o, t] = await Promise.all([adminOverview(), adminTrends(TREND_DAYS)]);
   const balance = o.supplier?.balances[0];
   const today = t.series.at(-1);
+  const first = t.series[0];
+  const range = first && today ? `${formatDayKey(first.day, { short: true })} to ${formatDayKey(today.day, { short: true })}` : "";
+  const orderPoints: BarPoint[] = t.series.map((p) => ({ key: p.day, label: formatDayKey(p.day, { short: true }), value: p.orders, display: plural(p.orders, "order") }));
+  const salesPoints: BarPoint[] = t.series.map((p) => ({ key: p.day, label: formatDayKey(p.day, { short: true }), value: p.sales, display: formatMoney(p.sales.toFixed(2), t.currency) }));
 
   const health: Array<{ icon: typeof Server; label: string; value: string; state: Health; href: string }> = [
     {
@@ -82,7 +86,7 @@ export default async function AdminHome() {
               <span className="font-semibold text-foreground tabular-nums">{o.todayOrders}</span>
             </p>
           </div>
-          <Sparkline values={t.series.map((p) => p.orders)} className="mt-auto h-20 pt-4" />
+          <BarChart points={orderPoints} summary={`Paid orders per day, ${range}.`} className="mt-auto h-28 px-5 pt-5 pb-4" />
         </section>
 
         <section aria-labelledby="kpi-sales" className="surface flex flex-col overflow-hidden">
@@ -96,7 +100,7 @@ export default async function AdminHome() {
               {t.includesDemo && <span className="ml-2 rounded-full bg-warning-soft px-2 py-0.5 text-xs font-medium text-warning">Includes demo orders</span>}
             </p>
           </div>
-          <Sparkline values={t.series.map((p) => p.sales)} className="mt-auto h-20 pt-4 text-mint" />
+          <BarChart points={salesPoints} tone="mint" summary={`Sales per day, ${range}.`} className="mt-auto h-28 px-5 pt-5 pb-4" />
         </section>
 
         <section aria-labelledby="attention" className="relative isolate overflow-hidden rounded-2xl bg-ink p-5 text-ink-foreground shadow-raised">
@@ -154,7 +158,7 @@ export default async function AdminHome() {
               </div>
               <div>
                 <dt className="text-xs text-muted-foreground">Checked</dt>
-                <dd className="font-medium">{formatRelative(o.supplier.lastHealthAt)}</dd>
+                <dd className="font-medium">{o.supplier.lastHealthAt ? formatRelative(o.supplier.lastHealthAt) : "Never"}</dd>
               </div>
             </dl>
           ) : (

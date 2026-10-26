@@ -68,6 +68,11 @@ describe("report keys", () => {
     expect(formatMonthKey("2026-10")).toBe("October 2026");
   });
 
+  it("has short forms for chart axes", () => {
+    expect(formatDayKey("2026-10-24", { short: true })).toBe("24 Oct");
+    expect(formatMonthKey("2026-10", { short: true })).toBe("Oct 2026");
+  });
+
   it("turns machine keys into words", () => {
     expect(humanizeKey("fulfil-order-item")).toBe("fulfil order item");
     expect(humanizeKey("verification.poll_messages")).toBe("verification poll messages");

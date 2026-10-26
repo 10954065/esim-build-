@@ -34,9 +34,54 @@ export function Filters({ action, q, status, statuses, extra }: { action: string
   );
 }
 
-export function Table({ head, children, empty }: { head: string[]; children: ReactNode; empty?: boolean }) {
+/** Status filter as links with live counts; the current choice is marked for screen readers. */
+export function StatusChips({ base, current, counts, total, labelFor, params }: {
+  base: string;
+  current?: string;
+  counts: Array<{ status: string; count: number; urgent?: boolean }>;
+  total: number;
+  labelFor: (status: string) => string;
+  params?: Record<string, string | undefined>;
+}) {
+  const href = (status?: string) => {
+    const q = new URLSearchParams(Object.entries({ ...params, status }).filter((e): e is [string, string] => Boolean(e[1])));
+    const s = q.toString();
+    return s ? `${base}?${s}` : base;
+  };
+  const chips = [{ status: undefined as string | undefined, label: "All", count: total, urgent: false }, ...counts.map((c) => ({ ...c, label: labelFor(c.status), urgent: c.urgent ?? false }))];
   return (
-    <div role="region" aria-label="Results" tabIndex={0} className="surface relative overflow-x-auto outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
+    <nav aria-label="Filter by status" className="mb-4 flex flex-wrap gap-2">
+      {chips.map((c) => {
+        const active = (c.status ?? "") === (current ?? "");
+        return (
+          <Link
+            key={c.label}
+            href={href(c.status)}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+              active ? "border-ink bg-ink text-ink-foreground" : "bg-card text-foreground hover:border-primary/40 hover:bg-accent",
+            )}
+          >
+            {c.label}
+            <span
+              className={cn(
+                "rounded-full px-1.5 text-xs font-semibold tabular-nums",
+                active ? "bg-white/15 text-white" : c.urgent && c.count > 0 ? "bg-warning-soft text-warning" : "bg-muted text-muted-foreground",
+              )}
+            >
+              {c.count}
+            </span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function Table({ head, children, empty, label = "Results" }: { head: string[]; children: ReactNode; empty?: boolean; label?: string }) {
+  return (
+    <div role="region" aria-label={label} tabIndex={0} className="surface relative overflow-x-auto outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
       <table className="w-full text-sm">
         <thead className="border-b bg-muted text-left text-xs tracking-[0.06em] text-muted-foreground uppercase">
           <tr>

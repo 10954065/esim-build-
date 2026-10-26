@@ -219,6 +219,24 @@ supplier codes. A crawl of the visible text of every public, dashboard and admin
 
 Checks: 189 unit ✅, 54 integration ✅, 10 E2E including accessibility and keyboard ✅, coverage 85.7% lines.
 
+## Dashboards: charts, chips and eSIM passes
+
+- Profit report (`/admin/analytics`): KPI tiles (net sales, gross profit, net contribution in ink, fulfilment rate),
+  a sales per day column chart over the chosen range (per month above 120 days) with hover figures and the best day,
+  a "where the money goes" bar splitting gross sales into refunds, supplier costs, fees and contribution
+  (`profitBreakdown`, drawn only when every part is known and contribution is not negative), ranked bars for
+  top destinations (with flags) and products, and the exact tables behind a disclosure. Report days and months
+  are grouped in UTC, matching the overview.
+- Admin overview: the sparklines became dated column charts with hover values (`BarChart`); the supplier panel
+  says "Never" for an unchecked supplier.
+- Admin chrome: icons in the sidebar, the role shown once in the header ("Administrator").
+- Orders list: status chips with live counts (`orderStatusCounts`), "Needs review" highlighted when it holds orders.
+- Customer overview: the customer's current eSIMs as boarding passes (Install now on the stub when ready),
+  empty tiles become next steps ("Get a verification number"), notifications as a timeline.
+- No usage meters: data usage is not stored and the supplier API has not been confirmed to provide it.
+
+Checks: 198 unit ✅, 54 integration ✅, 10 E2E including accessibility and keyboard ✅.
+
 ## Next task
 
 None in code. Launch depends on the blockers in PRODUCTION_READINESS.md.

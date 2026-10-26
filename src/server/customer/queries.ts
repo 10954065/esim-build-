@@ -42,7 +42,13 @@ export async function getDashboardSummary(userId: string) {
     }),
     db.notification.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 6 }),
   ]);
-  return { totalOrders, activeEsims, pendingOrders, activeVerifications, activeRentals, recentOrders, notifications };
+  const currentEsims = await db.esimActivation.findMany({
+    where: { userId, status: { in: ["PREPARING", "READY", "ACTIVE"] } },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+    select: { id: true, status: true, expiresAt: true, createdAt: true, isSandbox: true, orderItem: { select: itemSummarySelect } },
+  });
+  return { totalOrders, activeEsims, pendingOrders, activeVerifications, activeRentals, recentOrders, notifications, currentEsims };
 }
 
 const PAGE_SIZE = 20;

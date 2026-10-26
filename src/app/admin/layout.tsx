@@ -9,6 +9,8 @@ import { getEnv } from "@/server/env";
 export const dynamic = "force-dynamic";
 export const metadata = { title: { default: "Admin", template: "%s · Admin" }, robots: { index: false, follow: false } };
 
+const ROLE_LABEL: Record<string, string> = { admin: "Administrator", support: "Support", finance: "Finance" };
+
 export default async function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const user = await requireStaff();
   const env = getEnv();
@@ -36,7 +38,7 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
             <div className="lg:hidden">
               <Logo />
             </div>
-            <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-semibold tracking-wide text-ink-foreground uppercase">Admin · {user.role}</span>
+            <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-semibold tracking-wide text-ink-foreground uppercase">{ROLE_LABEL[user.role] ?? user.role}</span>
             {demo && <span className="rounded-full bg-warning-soft px-2.5 py-0.5 text-xs font-semibold text-warning">Demo mode</span>}
             {!user.twoFactorEnabled && (
               <Link href="/dashboard/security" className="inline-flex items-center gap-1 text-xs font-medium text-destructive hover:underline">

@@ -40,6 +40,13 @@ export async function adminOverview() {
   return { review, failedJobs, pendingRefunds, openTickets, todayOrders, failedWebhooks, uncertain, supplier, failedEmails };
 }
 
+/** Orders per status for the list's filter chips (unpaid carts excluded, as in the list). */
+export async function orderStatusCounts(): Promise<{ total: number; byStatus: Array<{ status: OrderStatus; count: number }> }> {
+  const rows = await db.order.groupBy({ by: ["status"], where: { status: { not: "CREATED" } }, _count: { _all: true } });
+  const byStatus = rows.map((r) => ({ status: r.status, count: r._count._all }));
+  return { total: byStatus.reduce((n, r) => n + r.count, 0), byStatus };
+}
+
 export async function listOrders(params: ListParams) {
   const q = params.q?.trim();
   const where: Prisma.OrderWhereInput = {

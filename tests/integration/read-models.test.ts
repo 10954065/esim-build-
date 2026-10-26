@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { adminOverview, getOrderForStaff, integrationsStatus, listAuditLogs, listOrders, listPayments, listProducts, listRefunds, listUsers, pages } from "@/server/admin/queries";
+import { adminOverview, getOrderForStaff, integrationsStatus, listAuditLogs, listOrders, listPayments, listProducts, listRefunds, listUsers, orderStatusCounts, pages } from "@/server/admin/queries";
 import { adminTrends, profitReport } from "@/server/admin/reports";
 import {
   getEsimDestination,
@@ -122,7 +122,7 @@ describe("profit report, staff and customer read models", () => {
     expect(Number(r.grossProfit)).toBeCloseTo(okTotal - cost, 4);
     expect(Number(r.netContribution)).toBeCloseTo(okTotal - cost - Number(r.gatewayFees), 4);
     expect(r.byCategory).toEqual([{ category: "ESIM", orders: 2, sales: expect.any(String) }]);
-    expect(r.byCountry[0]?.country).toBe("Spain");
+    expect(r.byCountry[0]).toMatchObject({ country: "Spain", code: "ES", kind: "COUNTRY", orders: 2 });
     expect(r.byDay).toHaveLength(1);
     expect(r.byMonth).toHaveLength(1);
   });
@@ -153,6 +153,9 @@ describe("profit report, staff and customer read models", () => {
     expect((await listOrders({ q: fulfilled.payment.reference })).total).toBe(1);
     expect((await listOrders({ status: "REFUNDED" })).items.map((o) => o.id)).toEqual([refunded.orderId]);
     expect((await listOrders({ status: "NOT_A_STATUS" })).total).toBe(2);
+    const counts = await orderStatusCounts();
+    expect(counts.total).toBe(2);
+    expect(counts.byStatus).toEqual(expect.arrayContaining([{ status: "FULFILLED", count: 1 }, { status: "REFUNDED", count: 1 }]));
     expect((await getOrderForStaff(order.id))?.id).toBe(order.id);
 
     expect((await listUsers({ q: fulfilled.user.email })).total).toBe(1);
@@ -172,7 +175,10 @@ describe("profit report, staff and customer read models", () => {
     expect((await listCustomerOrders(fulfilled.user.id)).items.map((o) => o.id)).toEqual([fulfilled.orderId]);
     expect(await listEsims(fulfilled.user.id)).toHaveLength(1);
     expect(await listEsims(refunded.user.id)).toHaveLength(0);
-    await expect(getDashboardSummary(fulfilled.user.id)).resolves.toBeTruthy();
+    const summary = await getDashboardSummary(fulfilled.user.id);
+    expect(summary.currentEsims).toHaveLength(1);
+    expect(summary.currentEsims[0]?.orderItem.product.destination?.country?.code).toBe("ES");
+    expect((await getDashboardSummary(refunded.user.id)).currentEsims).toHaveLength(0);
     expect(isUuid(fulfilled.orderId)).toBe(true);
     expect(isUuid("1 OR 1=1")).toBe(false);
   });

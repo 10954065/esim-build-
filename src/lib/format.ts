@@ -45,13 +45,14 @@ export function maskPhone(phone: string): string {
 }
 
 /** "2026-10-24" (a UTC report day) as "24 Oct 2026". */
-export function formatDayKey(day: string): string {
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`));
+export function formatDayKey(day: string, { short = false } = {}): string {
+  const year = short ? undefined : "numeric";
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year, timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`));
 }
 
-/** "2026-10" (a UTC report month) as "October 2026". */
-export function formatMonthKey(month: string): string {
-  return new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${month}-01T00:00:00Z`));
+/** "2026-10" (a UTC report month) as "October 2026", or "Oct 2026" when short. */
+export function formatMonthKey(month: string, { short = false } = {}): string {
+  return new Intl.DateTimeFormat("en-GB", { month: short ? "short" : "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${month}-01T00:00:00Z`));
 }
 
 /** Machine keys such as job types ("fulfil-order-item") as words for staff screens. */

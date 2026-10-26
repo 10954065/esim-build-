@@ -277,7 +277,8 @@
 /* Boarding pass: a card with notches cut where the stub's perforation meets the edge. */
 @utility ticket {
   --notch: 10px;
-  --stub: 7.5rem;
+  /* Pages narrow the stub on small screens by setting --ticket-stub. */
+  --stub: var(--ticket-stub, 7.5rem);
   @apply relative rounded-2xl border bg-card;
   mask:
     radial-gradient(circle var(--notch) at calc(100% - var(--stub)) 0, #0000 98%, #000) top / 100% 51% no-repeat,
