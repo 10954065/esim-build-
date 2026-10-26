@@ -44,8 +44,8 @@ export default async function AdminOrderDetail({ params, searchParams }: { param
                     <dl className="grid grid-cols-2 gap-2 text-xs">
                       <div><dt className="text-muted-foreground">Fulfilment</dt><dd><StatusBadge status={f.status} /></dd></div>
                       <div><dt className="text-muted-foreground">Attempts</dt><dd>{f.attempts}</dd></div>
-                      <div><dt className="text-muted-foreground">Supplier ref</dt><dd className="font-mono">{f.supplierOrderRef ?? "—"}</dd></div>
-                      <div><dt className="text-muted-foreground">Supplier error</dt><dd>{f.lastError ?? "—"}</dd></div>
+                      <div><dt className="text-muted-foreground">Supplier ref</dt><dd className="font-mono">{f.supplierOrderRef ?? "None"}</dd></div>
+                      <div><dt className="text-muted-foreground">Supplier error</dt><dd>{f.lastError ?? "None"}</dd></div>
                     </dl>
                   ) : (
                     <p className="text-xs text-muted-foreground">Not started (order not paid).</p>
@@ -74,7 +74,7 @@ export default async function AdminOrderDetail({ params, searchParams }: { param
               <div key={p.id} className="flex flex-wrap justify-between gap-2 rounded-lg border p-3">
                 <div>
                   <p className="font-mono text-xs">{p.reference}</p>
-                  <p className="text-xs text-muted-foreground">{p.provider} · gateway txn {p.gatewayTransactionId ?? "—"} · {p.channel ?? ""}</p>
+                  <p className="text-xs text-muted-foreground">{p.provider} · gateway txn {p.gatewayTransactionId ?? "none"} · {p.channel ?? ""}</p>
                 </div>
                 <div className="text-right">
                   <p className="tabular-nums">{formatMoney(p.amount.toString(), p.currency)}</p>
@@ -114,7 +114,7 @@ export default async function AdminOrderDetail({ params, searchParams }: { param
           <ol className="space-y-2 text-sm">
             {order.history.map((h) => (
               <li key={h.id} className="flex justify-between gap-3">
-                <span><strong>{h.toStatus}</strong> {h.reason ? `— ${h.reason}` : ""} <span className="text-xs text-muted-foreground">({h.actorType})</span></span>
+                <span><strong>{h.toStatus}</strong> {h.reason ? `: ${h.reason}` : ""} <span className="text-xs text-muted-foreground">({h.actorType})</span></span>
                 <span className="whitespace-nowrap text-xs text-muted-foreground">{formatDateTime(h.createdAt)}</span>
               </li>
             ))}

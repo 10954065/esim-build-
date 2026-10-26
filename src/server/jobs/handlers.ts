@@ -24,7 +24,7 @@ function num(payload: Record<string, unknown>, key: string, fallback: number): n
   return typeof v === "number" && Number.isFinite(v) ? v : fallback;
 }
 
-/** Re-enqueue refunds stuck in REQUESTED (e.g. the submit job died) — never resubmits PENDING ones. */
+/** Re-enqueue refunds stuck in REQUESTED (e.g. the submit job died), never resubmits PENDING ones. */
 async function sweepRefunds(): Promise<number> {
   const stuck = await db.refund.findMany({
     where: { status: "REQUESTED", submittedAt: null, createdAt: { lt: new Date(Date.now() - 10 * 60 * 1000) } },

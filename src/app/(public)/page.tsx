@@ -7,8 +7,8 @@ import {
   Lock,
   MessageSquareText,
   PhoneCall,
-  QrCode,
   RotateCcw,
+  Search,
   Smartphone,
 } from "lucide-react";
 import Link from "next/link";
@@ -16,6 +16,8 @@ import { DestinationCard } from "@/components/catalog/destination-card";
 import { ServiceInitial } from "@/components/catalog/service-card";
 import { Flag } from "@/components/common/flag";
 import { Container } from "@/components/common/page-header";
+import { DepartureBoard } from "@/components/home/departure-board";
+import { FlagMarquee } from "@/components/home/flag-marquee";
 import { ProductFinder } from "@/components/home/product-finder";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -36,7 +38,7 @@ const PRODUCTS = [
   },
   {
     icon: MessageSquareText,
-    tag: "One-time code",
+    tag: "Single code",
     title: "SMS verification",
     body: "A temporary number that receives one SMS code from a supported service, for a limited time.",
     points: ["Choose the country and the service", "Code appears in your dashboard", "Refunded when no SMS arrives and the supplier refunds"],
@@ -49,7 +51,7 @@ const PRODUCTS = [
     tag: "Days to months",
     title: "Number rentals",
     body: "Keep a number for a fixed term to receive SMS over a longer period.",
-    points: ["All-services or service-specific numbers", "Expiry reminders before the term ends", "Never renewed automatically"],
+    points: ["Numbers for all services or for one service", "Expiry reminders before the term ends", "Never renewed automatically"],
     notice: "SMS only. Voice calls are not included.",
     cta: { href: "/numbers/rentals", label: "Compare rental terms" },
     showServices: false,
@@ -59,7 +61,7 @@ const PRODUCTS = [
 const STEPS = {
   esim: [
     { title: "Choose a plan", body: "Pick a destination and a data allowance. You see the final price and currency before paying." },
-    { title: "Pay securely", body: "Your payment is verified server-side with the payment provider before anything is ordered." },
+    { title: "Pay securely", body: "Your payment is verified on our server with the payment provider before anything is ordered." },
     { title: "Scan and go", body: "Your QR code and install steps appear in your dashboard. Install over Wi-Fi before you travel." },
   ],
   sms: [
@@ -68,7 +70,7 @@ const STEPS = {
     { title: "Read your code", body: "Request the code in the service's app; the SMS shows in your dashboard, visible only to you." },
   ],
   rental: [
-    { title: "Pick a term", body: "Compare all-services and service-specific numbers by country, term and price." },
+    { title: "Pick a term", body: "Compare numbers for all services and for one service by country, term and price." },
     { title: "Pay once", body: "There is no subscription: rentals are never renewed automatically." },
     { title: "Receive SMS", body: "Messages arrive in your dashboard for the whole term, with a reminder before it ends." },
   ],
@@ -82,7 +84,7 @@ const STEP_TABS = [
 
 const TRUST = [
   { icon: Lock, title: "Private by default", body: "eSIM activation codes and SMS messages are encrypted at rest and visible only to you when signed in." },
-  { icon: CreditCard, title: "Verified payments", body: "Orders are fulfilled only after signed, server-side payment confirmation — never on a browser redirect alone." },
+  { icon: CreditCard, title: "Verified payments", body: "Orders are fulfilled only after a signed payment confirmation checked on our server, never on a browser redirect alone." },
   { icon: RotateCcw, title: "Clear refund rules", body: "Failed deliveries are refunded to your original payment method. Refunds are confirmed with the payment provider." },
   { icon: LifeBuoy, title: "Real support", body: "Open a ticket from your dashboard about any order. Every ticket is linked to the order it concerns." },
 ];
@@ -98,102 +100,83 @@ export default async function HomePage() {
     .filter((d) => d.fromPrice)
     .sort((a, b) => (a.kind === b.kind ? dec(a.fromPrice!.amount).cmp(dec(b.fromPrice!.amount)) : a.kind === "COUNTRY" ? -1 : 1))
     .slice(0, 8);
-  const preview = featured.find((d) => d.kind === "COUNTRY") ?? featured[0];
-  const previewService = services[0];
+  const board = featured.slice(0, 6).map((d) => ({
+    href: `/esims/${d.slug}`,
+    name: d.name,
+    code: d.countryCode,
+    kind: d.kind,
+    packageCount: d.packageCount,
+    topSpeed: d.topSpeed,
+    fromPrice: d.fromPrice,
+  }));
+  const marquee = destinations
+    .filter((d) => d.kind === "COUNTRY" && d.countryCode)
+    .map((d) => ({ href: `/esims/${d.slug}`, name: d.name, code: d.countryCode! }));
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative border-b bg-linear-to-b from-accent/60 to-background">
-        <Container className="grid grid-cols-1 gap-12 pt-14 pb-24 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:pt-20">
-          <div>
-            <p className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
-              <span className="size-1.5 rounded-full bg-primary" aria-hidden /> Travel data · SMS verification · Number rentals
+      {/* Hero: ink canvas, search as the primary action, live departure board */}
+      <section className="relative isolate overflow-hidden bg-ink text-ink-foreground">
+        <div aria-hidden className="grid-lines absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_top,#000_30%,transparent_75%)]" />
+        <div aria-hidden className="absolute -top-40 left-1/2 -z-10 h-[36rem] w-[60rem] -translate-x-1/2 rounded-full bg-primary/35 blur-[120px]" />
+        <div aria-hidden className="absolute right-[-10rem] bottom-[-12rem] -z-10 size-[28rem] rounded-full bg-mint/15 blur-[110px]" />
+        <Container className="grid grid-cols-1 gap-12 pt-16 pb-14 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:pt-24 lg:pb-20">
+          <div className="stagger">
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/80">
+              <span className="size-1.5 animate-pulse-dot rounded-full bg-mint" aria-hidden /> Travel data · SMS verification · Number rentals
             </p>
-            <h1 className="mt-6 text-4xl leading-[1.08] font-bold tracking-tight sm:text-5xl lg:text-[3.5rem]">
-              Mobile data for wherever you land.
-              <span className="block text-primary">Verify without a SIM swap.</span>
+            <h1 className="mt-6 text-[2.75rem] leading-[1.02] font-bold tracking-[-0.035em] sm:text-6xl lg:text-7xl">
+              Land connected.
+              <span className="block bg-linear-to-r from-[#8fb0ff] via-white to-mint bg-clip-text text-transparent">Anywhere you fly.</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Prepaid travel eSIM data plans and temporary phone numbers for SMS verification — priced up front, paid securely and
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75">
+              Prepaid travel eSIM data and temporary numbers for SMS codes. Priced in full before you pay, verified on our server,
               delivered to your private dashboard.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild className="h-11 px-5">
-                <Link href="/esims">
-                  Explore travel eSIMs <ArrowRight />
-                </Link>
+            <form action="/esims" method="get" role="search" className="mt-8 flex max-w-xl flex-col gap-2 rounded-2xl border border-white/15 bg-white/10 p-2 shadow-glow backdrop-blur sm:flex-row">
+              <label htmlFor="hero-search" className="sr-only">
+                Where are you travelling?
+              </label>
+              <span className="relative flex-1">
+                <Search className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-white/60" aria-hidden />
+                <input
+                  id="hero-search"
+                  name="q"
+                  type="search"
+                  placeholder="Where are you travelling?"
+                  autoComplete="off"
+                  maxLength={80}
+                  className="h-12 w-full rounded-xl bg-transparent pr-4 pl-12 text-base text-white outline-none placeholder:text-white/55"
+                />
+              </span>
+              <Button type="submit" className="h-12 rounded-xl px-6 text-base">
+                Find plans <ArrowRight />
               </Button>
-              <Button asChild variant="outline" className="h-11 bg-card px-5">
-                <Link href="/verification">
-                  <MessageSquareText /> Get a verification number
-                </Link>
-              </Button>
-            </div>
-            <dl className="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t pt-6">
+            </form>
+            <dl className="mt-10 flex flex-wrap gap-x-10 gap-y-4">
               <div>
-                <dt className="text-xs text-muted-foreground">eSIM destinations</dt>
-                <dd className="mt-1 text-2xl font-bold tabular-nums">{destinations.length || "—"}</dd>
+                <dt className="text-xs tracking-wide text-white/60 uppercase">eSIM destinations</dt>
+                <dd className="mt-1 font-heading text-3xl font-bold tabular-nums">{destinations.length || "None yet"}</dd>
               </div>
               <div>
-                <dt className="text-xs text-muted-foreground">Verification countries</dt>
-                <dd className="mt-1 text-2xl font-bold tabular-nums">{verificationCountries.length || "—"}</dd>
+                <dt className="text-xs tracking-wide text-white/60 uppercase">SMS countries</dt>
+                <dd className="mt-1 font-heading text-3xl font-bold tabular-nums">{verificationCountries.length || "None yet"}</dd>
               </div>
               <div>
-                <dt className="text-xs text-muted-foreground">Hidden fees</dt>
-                <dd className="mt-1 text-2xl font-bold">None</dd>
+                <dt className="text-xs tracking-wide text-white/60 uppercase">Hidden fees</dt>
+                <dd className="mt-1 font-heading text-3xl font-bold">None</dd>
               </div>
             </dl>
           </div>
-
-          {/* What you get after checkout (illustration using live catalogue names) */}
-          <figure className="relative" aria-label="Example of your dashboard after checkout">
-            <div className="surface p-5 shadow-modal">
-              <div className="flex items-center justify-between border-b pb-4">
-                <div className="flex items-center gap-1.5" aria-hidden>
-                  <span className="size-2.5 rounded-full bg-[#f97066]" />
-                  <span className="size-2.5 rounded-full bg-[#fdb022]" />
-                  <span className="size-2.5 rounded-full bg-mint" />
-                </div>
-                <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">Example · your dashboard</span>
-              </div>
-              <div className="mt-4 rounded-xl border p-4">
-                <div className="flex items-center gap-3">
-                  <Flag code={preview?.countryCode ?? "ES"} kind={preview?.kind ?? "COUNTRY"} size="md" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold">{preview?.name ?? "Spain"} eSIM</p>
-                    <p className="text-xs text-muted-foreground">Data only · no phone number</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-success-soft px-2 py-0.5 text-xs font-medium whitespace-nowrap text-success">
-                    <span className="size-1.5 rounded-full bg-mint" aria-hidden /> Ready to install
-                  </span>
-                </div>
-                <div className="mt-4 flex items-center gap-4 rounded-lg bg-muted p-3">
-                  <span className="grid size-16 shrink-0 place-items-center rounded-md border bg-card">
-                    <QrCode className="size-10 text-foreground" aria-hidden />
-                  </span>
-                  <p className="text-xs leading-relaxed text-muted-foreground">
-                    Scan with your phone camera, or open the install link on the phone itself. Step-by-step guides for iPhone and Android.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center gap-3 rounded-xl border p-4">
-                <ServiceInitial name={previewService?.name ?? "Google"} />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold">{previewService?.name ?? "Google"} verification</p>
-                  <p className="font-mono text-xs text-muted-foreground">Code: ••• •••</p>
-                </div>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-warning-soft px-2 py-0.5 text-xs font-medium whitespace-nowrap text-warning">
-                  <span className="size-1.5 rounded-full bg-[#f59e0b]" aria-hidden /> Waiting for SMS
-                </span>
-              </div>
-            </div>
-          </figure>
+          {board.length > 0 && <DepartureBoard rows={board} />}
         </Container>
+        <div className="border-t border-white/10 pt-5 pb-20">
+          <FlagMarquee items={marquee} label="eSIM destinations" />
+        </div>
       </section>
 
       {/* Product finder overlapping the hero edge */}
-      <Container className="relative z-10 -mt-12">
+      <Container className="relative z-10 -mt-14">
         <ProductFinder
           destinations={featured.slice(0, 6).map((d) => ({ href: `/esims/${d.slug}`, name: d.name, code: d.countryCode, kind: d.kind }))}
           verificationCountries={verificationCountries.slice(0, 8).map((c) => ({ href: `/verification/${c.slug}`, name: c.name, code: c.code }))}
@@ -206,53 +189,106 @@ export default async function HomePage() {
         <Container>
           <p className="eyebrow">Three products</p>
           <h2 id="products" className="mt-2 max-w-2xl text-3xl font-bold tracking-[-0.02em] sm:text-4xl">
-            Three different products — know which one you need
+            Three different products. Know which one you need.
           </h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">
             A travel eSIM gives you mobile data. It cannot receive verification codes. For codes, use a verification number or a rental.
           </p>
-          <div className="mt-10 grid gap-5 lg:grid-cols-3">
-            {PRODUCTS.map((p) => (
-              <article key={p.title} className="surface flex flex-col p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <span className="grid size-11 place-items-center rounded-xl bg-accent text-primary">
-                    <p.icon className="size-5" aria-hidden />
-                  </span>
-                  <span className="rounded-full border bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">{p.tag}</span>
-                </div>
-                <h3 className="mt-5 text-xl font-semibold">{p.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
-                <ul className="mt-5 space-y-2.5 text-sm">
-                  {p.points.map((point) => (
-                    <li key={point} className="flex gap-2">
-                      <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-5 flex gap-2 rounded-lg bg-accent px-3 py-2.5 text-xs leading-relaxed text-accent-foreground">
-                  <Info className="mt-px size-3.5 shrink-0" aria-hidden />
-                  {p.notice}
-                </p>
-                {p.showServices && services.length > 0 && (
-                  <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Supported services">
-                    {services.slice(0, 6).map((s) => (
-                      <li key={s.id} className="flex items-center gap-1.5 rounded-full border py-0.5 pr-2.5 pl-0.5 text-xs">
-                        <ServiceInitial name={s.name} className="size-5 rounded-full text-[10px]" />
-                        {s.name}
+          <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-3 lg:grid-rows-2">
+            {PRODUCTS.map((p, i) => {
+              const featuredCard = i === 0;
+              return (
+                <article
+                  key={p.title}
+                  className={
+                    featuredCard
+                      ? "relative isolate flex flex-col overflow-hidden rounded-3xl bg-ink p-8 text-ink-foreground shadow-modal lg:col-span-2 lg:row-span-2"
+                      : "surface flex flex-col p-6"
+                  }
+                >
+                  {featuredCard && (
+                    <>
+                      <div aria-hidden className="grid-lines absolute inset-0 -z-10 opacity-70" />
+                      <div aria-hidden className="absolute -right-20 -bottom-24 -z-10 size-96 rounded-full bg-primary/40 blur-[100px]" />
+                    </>
+                  )}
+                  <div className="flex items-start justify-between gap-3">
+                    <span className={featuredCard ? "grid size-12 place-items-center rounded-2xl bg-primary text-white shadow-glow" : "grid size-11 place-items-center rounded-xl bg-accent text-primary"}>
+                      <p.icon className="size-5" aria-hidden />
+                    </span>
+                    <span
+                      className={
+                        featuredCard
+                          ? "rounded-full border border-white/15 bg-white/10 px-2.5 py-0.5 text-xs font-medium text-white/85"
+                          : "rounded-full border bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground"
+                      }
+                    >
+                      {p.tag}
+                    </span>
+                  </div>
+                  <h3 className={featuredCard ? "mt-8 text-4xl font-bold tracking-[-0.03em] sm:text-5xl" : "mt-5 text-xl font-semibold"}>{p.title}</h3>
+                  <p className={featuredCard ? "mt-3 max-w-lg text-lg leading-relaxed text-white/75" : "mt-2 text-sm leading-relaxed text-muted-foreground"}>{p.body}</p>
+                  <ul className={featuredCard ? "mt-6 grid gap-3 text-sm sm:grid-cols-3" : "mt-5 space-y-2.5 text-sm"}>
+                    {p.points.map((point) => (
+                      <li key={point} className={featuredCard ? "flex gap-2 rounded-xl border border-white/10 bg-white/5 p-3 text-white/85" : "flex gap-2"}>
+                        <Check className={featuredCard ? "mt-0.5 size-4 shrink-0 text-mint" : "mt-0.5 size-4 shrink-0 text-success"} aria-hidden />
+                        {point}
                       </li>
                     ))}
                   </ul>
-                )}
-                <div className="mt-auto pt-6">
-                  <Button asChild variant="outline" className="h-10 w-full bg-card">
-                    <Link href={p.cta.href}>
-                      {p.cta.label} <ArrowRight />
-                    </Link>
-                  </Button>
-                </div>
-              </article>
-            ))}
+                  {featuredCard && featured[0] && (
+                    <div className="mt-8 max-w-md">
+                      <p className="mb-2 text-xs font-semibold tracking-[0.14em] text-white/60 uppercase">Lowest country price right now</p>
+                      <DestinationCard d={featured[0]} />
+                    </div>
+                  )}
+                  {featuredCard && featured.length > 1 && (
+                    <ul className="mt-6 flex flex-wrap gap-2" aria-label="Popular destinations">
+                      {featured.slice(1, 7).map((d) => (
+                        <li key={d.id}>
+                          <Link
+                            href={`/esims/${d.slug}`}
+                            className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 py-1 pr-3 pl-1 text-sm text-white/90 transition-colors hover:bg-white/15"
+                          >
+                            <Flag code={d.countryCode} kind={d.kind} size="sm" className="size-5 rounded-full object-cover" />
+                            {d.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <p className={featuredCard ? "mt-6 flex gap-2 text-sm text-white/70" : "mt-5 flex gap-2 rounded-lg bg-accent px-3 py-2.5 text-xs leading-relaxed text-accent-foreground"}>
+                    <Info className="mt-px size-3.5 shrink-0" aria-hidden />
+                    {p.notice}
+                  </p>
+                  {p.showServices && services.length > 0 && (
+                    <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Supported services">
+                      {services.slice(0, 6).map((sv) => (
+                        <li key={sv.id} className="flex items-center gap-1.5 rounded-full border py-0.5 pr-2.5 pl-0.5 text-xs">
+                          <ServiceInitial name={sv.name} className="size-5 rounded-full text-[10px]" />
+                          {sv.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <div className="mt-auto pt-6">
+                    {featuredCard ? (
+                      <Button asChild className="h-11 px-5">
+                        <Link href={p.cta.href}>
+                          {p.cta.label} <ArrowRight />
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Button asChild variant="outline" className="h-10 w-full bg-card">
+                        <Link href={p.cta.href}>
+                          {p.cta.label} <ArrowRight />
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </Container>
       </section>
@@ -265,13 +301,13 @@ export default async function HomePage() {
               <div>
                 <p className="eyebrow">Popular eSIM destinations</p>
                 <h2 id="featured" className="mt-2 text-3xl font-bold tracking-[-0.02em]">Top travel destinations</h2>
-                <p className="mt-2 text-muted-foreground">Live plans and server-calculated prices.</p>
+                <p className="mt-2 text-muted-foreground">Live plans and prices calculated on our server.</p>
               </div>
               <Link href="/esims" className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
                 All destinations <ArrowRight className="size-4" aria-hidden />
               </Link>
             </div>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="stagger mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {featured.map((d) => (
                 <DestinationCard key={d.id} d={d} />
               ))}
@@ -316,7 +352,7 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* Trust — only implemented capabilities */}
+      {/* Trust: only implemented capabilities */}
       <section aria-labelledby="trust" className="border-y bg-card py-20">
         <Container>
           <p className="eyebrow">Trust & privacy</p>
@@ -377,14 +413,15 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* CTA band */}
-      <section className="bg-primary py-16 text-primary-foreground">
+      {/* Closing call to action */}
+      <section className="relative isolate -mb-24 overflow-hidden bg-ink py-20 text-ink-foreground">
+        <div aria-hidden className="grid-lines absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_center,#000_20%,transparent_70%)]" />
+        <div aria-hidden className="absolute top-1/2 left-1/2 -z-10 h-80 w-[48rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/40 blur-[110px]" />
         <Container className="text-center">
-          <h2 className="text-3xl font-bold tracking-[-0.02em]">Land connected</h2>
-          <p className="mx-auto mt-3 max-w-xl text-primary-foreground">
-            Find a data plan for your destination, see the full price, and install it before you fly.
-          </p>
-          <Button asChild variant="secondary" className="mt-8 h-11 bg-card px-6 text-foreground hover:bg-card/90">
+          <p className="text-xs font-semibold tracking-[0.18em] text-mint uppercase">Ready when you are</p>
+          <h2 className="mx-auto mt-3 max-w-2xl text-4xl font-bold tracking-[-0.03em] sm:text-5xl">Your data plan, installed before take off</h2>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-white/75">Find your destination, see the full price, scan one QR code.</p>
+          <Button asChild className="mt-8 h-12 px-7 text-base shadow-glow">
             <Link href="/esims">
               Find my destination plan <ArrowRight />
             </Link>

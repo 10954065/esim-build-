@@ -55,7 +55,8 @@ export function TwoFactorPanel({ enabled }: { enabled: boolean }) {
     return (
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">Scan this QR code with an authenticator app, then enter the 6-digit code to finish.</p>
-        {/* eslint-disable-next-line @next/next/no-img-element -- data URL generated locally */}
+        {/* Data URL generated locally. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={setup.qr} alt="Authenticator setup QR code" width={200} height={200} className="rounded-lg border bg-white p-2" />
         <div>
           <p className="text-sm font-medium">Backup codes</p>
@@ -73,7 +74,7 @@ export function TwoFactorPanel({ enabled }: { enabled: boolean }) {
             start(async () => {
               const { error } = await authClient.twoFactor.verifyTotp({ code });
               if (error) return void toast.error("That code is not valid.");
-              toast.success("Two-factor authentication is on.");
+              toast.success("Two factor authentication is on.");
               setSetup(null);
               router.refresh();
             });
@@ -97,7 +98,7 @@ export function TwoFactorPanel({ enabled }: { enabled: boolean }) {
           if (enabled) {
             const { error } = await authClient.twoFactor.disable({ password });
             if (error) return void toast.error("Password incorrect.");
-            toast.success("Two-factor authentication disabled.");
+            toast.success("Two factor authentication disabled.");
             setPassword("");
             router.refresh();
             return;
@@ -113,13 +114,13 @@ export function TwoFactorPanel({ enabled }: { enabled: boolean }) {
     >
       <p className="flex items-center gap-2 text-sm">
         {enabled ? <ShieldCheck className="size-4 text-success" aria-hidden /> : <ShieldOff className="size-4 text-muted-foreground" aria-hidden />}
-        Two-factor authentication is <strong>{enabled ? "on" : "off"}</strong>.
+        Two factor authentication is <strong>{enabled ? "on" : "off"}</strong>.
       </p>
       <Field id="2fa-password" label="Confirm with your password">
         <Input id="2fa-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required className="max-w-xs" />
       </Field>
       <Button type="submit" variant={enabled ? "outline" : "default"} disabled={pending}>
-        {pending && <Loader2 className="animate-spin" />} {enabled ? "Turn off two-factor" : "Set up two-factor"}
+        {pending && <Loader2 className="animate-spin" />} {enabled ? "Turn off two factor" : "Set up two factor"}
       </Button>
     </form>
   );

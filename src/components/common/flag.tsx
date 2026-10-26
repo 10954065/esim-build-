@@ -32,7 +32,8 @@ export function Flag({ code, size = "sm", kind = "COUNTRY", className }: FlagPro
     );
   }
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- tiny static SVG from /flags; next/image would need dangerouslyAllowSVG
+    // Tiny static SVG from /flags; next/image would need dangerouslyAllowSVG.
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={`/flags/${code.toLowerCase()}.svg`}
       alt=""

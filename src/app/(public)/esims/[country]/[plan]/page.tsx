@@ -1,4 +1,4 @@
-import { CalendarDays, Check, Database, Gauge, Globe2, Info, Lock, ShieldCheck } from "lucide-react";
+import { CalendarDays, Check, Database, Gauge, Globe2, Info, Lock, Plane, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -22,8 +22,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const result = await getEsimPlan(country, plan);
   if (!result) return { title: "Plan not found" };
   return {
-    title: `${result.plan.name} — ${result.destination.name} eSIM`,
-    description: `${result.plan.dataLabel ?? "Data"} for ${result.destination.name}, valid ${formatValidity(result.plan.validityDays)}. Data-only travel eSIM.`,
+    title: `${result.plan.name} · ${result.destination.name} eSIM`,
+    description: `${result.plan.dataLabel ?? "Data"} for ${result.destination.name}, valid ${formatValidity(result.plan.validityDays)}. Data only travel eSIM.`,
     alternates: { canonical: `/esims/${result.destination.slug}/${result.plan.slug}` },
   };
 }
@@ -53,7 +53,7 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
 
   const facts = [
     { icon: Database, label: "Data allowance", value: plan.dataLabel ?? formatBytes(plan.dataVolumeBytes ? BigInt(plan.dataVolumeBytes) : null) },
-    { icon: CalendarDays, label: "Validity", value: perDay ? "Per day, choose 1–365 days" : formatValidity(plan.validityDays) },
+    { icon: CalendarDays, label: "Validity", value: perDay ? "Per day, choose 1 to 365 days" : formatValidity(plan.validityDays) },
     { icon: Gauge, label: "Network", value: plan.speed ?? "Not specified by supplier" },
     { icon: Globe2, label: "Coverage", value: destination.name },
   ];
@@ -103,7 +103,7 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
             <ul className="mt-3 space-y-2.5 text-sm text-muted-foreground">
               <li className="flex gap-2">
                 <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
-                Your phone must support eSIM and be carrier-unlocked.
+                Your phone must support eSIM and be unlocked by your carrier.
               </li>
               <li className="flex gap-2">
                 <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
@@ -177,32 +177,51 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="surface p-6 shadow-float">
-            <p className="text-xs font-semibold tracking-[0.06em] text-muted-foreground uppercase">Order summary</p>
-            <div className="mt-3 flex items-center gap-3">
-              <Flag code={destination.country?.code} kind={destination.kind} size="md" />
-              <div className="min-w-0">
-                <p className="truncate font-semibold">{destination.name} eSIM</p>
-                <p className="truncate text-sm text-muted-foreground">{plan.dataLabel ?? plan.name}</p>
+          <div className="overflow-hidden rounded-3xl border bg-card shadow-float">
+            <div className="relative isolate overflow-hidden bg-ink px-6 pt-5 pb-6 text-ink-foreground">
+              <div aria-hidden className="grid-lines absolute inset-0 -z-10 opacity-80" />
+              <div aria-hidden className="absolute -top-16 -right-10 -z-10 size-48 rounded-full bg-primary/50 blur-3xl" />
+              <p className="flex items-center justify-between text-[11px] font-semibold tracking-[0.16em] text-white/60 uppercase">
+                <span>Order summary</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Plane className="size-3.5 text-mint" aria-hidden /> Travel eSIM
+                </span>
+              </p>
+              <div className="mt-4 flex items-end justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold tracking-[0.14em] text-white/55 uppercase">Destination</p>
+                  <p className="truncate font-heading text-2xl font-bold">{destination.name}</p>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Flag code={destination.country?.code} kind={destination.kind} size="md" />
+                  <span className="font-mono text-3xl font-semibold tracking-widest">
+                    {destination.kind === "COUNTRY" ? (destination.country?.code ?? "") : destination.kind === "REGION" ? "REG" : "GLB"}
+                  </span>
+                </div>
               </div>
             </div>
-            <dl className="mt-5 space-y-2 border-y py-4 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Validity</dt>
-                <dd className="font-medium">{perDay ? "Per day" : formatValidity(plan.validityDays)}</dd>
+            <dl className="grid grid-cols-3 gap-3 px-6 py-5 text-sm">
+              <div>
+                <dt className="text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">Data</dt>
+                <dd className="mt-1 truncate font-heading text-base font-semibold">{plan.dataLabel ?? plan.name}</dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Network</dt>
-                <dd className="font-medium">{plan.speed ?? "—"}</dd>
+              <div>
+                <dt className="text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">Validity</dt>
+                <dd className="mt-1 font-heading text-base font-semibold">{perDay ? "Per day" : formatValidity(plan.validityDays)}</dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Type</dt>
-                <dd className="font-medium">Mobile data</dd>
+              <div>
+                <dt className="text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">Network</dt>
+                <dd className="mt-1 font-heading text-base font-semibold">{plan.speed ?? "Not specified"}</dd>
               </div>
             </dl>
-            <div className="mt-4 flex items-end justify-between gap-3">
+            <div aria-hidden className="relative border-t-2 border-dashed">
+              <span className="absolute -top-3 -left-3 size-6 rounded-full border bg-background" />
+              <span className="absolute -top-3 -right-3 size-6 rounded-full border bg-background" />
+            </div>
+            <div className="px-6 pt-5 pb-6">
+            <div className="flex items-end justify-between gap-3">
               <p className="text-sm text-muted-foreground">{perDay ? "Price per day" : "Total price"}</p>
-              <Price value={plan.price} suffix={perDay ? "/day" : undefined} className="text-3xl tracking-tight" unavailableLabel="Not available" />
+              <Price value={plan.price} suffix={perDay ? "/day" : undefined} className="font-heading text-4xl tracking-tight" unavailableLabel="Not available" />
             </div>
             <p className="mt-1 text-right text-xs text-muted-foreground">
               Charged in {status.currency}. Updated {formatRelative(plan.lastSyncedAt)}.
@@ -228,6 +247,7 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
               <ShieldCheck className="mt-0.5 size-4 shrink-0" aria-hidden />
               Your eSIM is issued only after the payment is verified. Activation details are shown in your private dashboard and are never
               sent in email subject lines.
+            </div>
             </div>
           </div>
         </aside>

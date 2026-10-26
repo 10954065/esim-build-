@@ -111,7 +111,7 @@ export async function listVerificationsForStaff(params: ListParams) {
   const q = params.q?.trim();
   const where: Prisma.VerificationActivationWhereInput = q ? { OR: [{ supplierOrderRef: q }, { phoneNumber: { contains: q } }, { user: { email: { contains: q, mode: "insensitive" } } }] } : {};
   const { skip, take, page } = paging(params.page);
-  // Staff never see SMS content here — only counts (least privilege).
+  // Staff never see SMS content here, only counts (least privilege).
   const [items, total] = await Promise.all([
     db.verificationActivation.findMany({ where, orderBy: { createdAt: "desc" }, skip, take, include: { user: { select: { email: true } }, _count: { select: { messages: true } }, orderItem: { select: { order: { select: { id: true, number: true } } } } } }),
     db.verificationActivation.count({ where }),

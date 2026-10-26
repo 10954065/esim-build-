@@ -147,7 +147,7 @@ export function mapActivationState(status: string, hasMessages: boolean): Activa
     case "BLOCKED":
       return "BLOCKED";
     default:
-      // RENTED / PENDING / ACTIVE — still waiting unless a message has arrived.
+      // RENTED / PENDING / ACTIVE: still waiting unless a message has arrived.
       return hasMessages ? "RECEIVED" : "WAITING";
   }
 }

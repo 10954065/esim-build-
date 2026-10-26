@@ -11,8 +11,8 @@ export default function TermsPage() {
       <section>
         <h2>1. The service</h2>
         <p>
-          We resell digital telecommunications products supplied by third-party providers: data-only travel eSIM plans, temporary phone
-          numbers for receiving SMS verification codes, and longer-term number rentals. Product availability, coverage, speeds and number
+          We resell digital telecommunications products supplied by third party providers: data only travel eSIM plans, temporary phone
+          numbers for receiving SMS verification codes, and longer term number rentals. Product availability, coverage, speeds and number
           inventory are determined by our suppliers and the underlying networks and can change without notice.
         </p>
       </section>
@@ -50,7 +50,7 @@ export default function TermsPage() {
         <h2>7. Liability</h2>
         <p>
           To the extent permitted by law, our liability for any order is limited to the amount you paid for it. We are not liable for losses
-          caused by third-party services rejecting numbers, network outages, or devices that do not support eSIM. Nothing in these terms
+          caused by third party services rejecting numbers, network outages, or devices that do not support eSIM. Nothing in these terms
           limits rights you have under applicable consumer protection law.
         </p>
       </section>

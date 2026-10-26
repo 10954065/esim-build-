@@ -148,7 +148,7 @@ export interface CalculatePriceInput {
 export function calculatePrice(input: CalculatePriceInput): PriceBreakdown {
   const { supplierCurrency, currency, rule } = input;
   const cost = dec(input.supplierCost);
-  if (!cost.isFinite() || cost.isNegative()) throw new PricingError("INVALID_COST", "Supplier cost must be a non-negative number");
+  if (!cost.isFinite() || cost.isNegative()) throw new PricingError("INVALID_COST", "Supplier cost must be zero or more");
   if (!rule) throw new PricingError("NO_RULE", "No active pricing rule applies to this product");
   if (rule.currency.toUpperCase() !== currency.toUpperCase()) {
     throw new PricingError("RULE_CURRENCY_MISMATCH", `Pricing rule ${rule.id} is in ${rule.currency}, checkout is in ${currency}`);

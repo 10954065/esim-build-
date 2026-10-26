@@ -1,4 +1,5 @@
 import "server-only";
+import { fillDailySeries, type DailyPoint } from "@/lib/series";
 import { db } from "@/server/db";
 import { getEnv } from "@/server/env";
 import { dec } from "@/server/pricing/money";
@@ -128,5 +129,38 @@ export async function profitReport(from: Date, to: Date): Promise<ProfitReport> 
     byCountry: byCountry.map((r) => ({ country: r.country, orders: n(r.orders), sales: r.sales })),
     byDay: byDay.map((r) => ({ day: r.day, orders: n(r.orders), sales: r.sales })),
     byMonth: byMonth.map((r) => ({ month: r.month, orders: n(r.orders), sales: r.sales })),
+  };
+}
+
+export interface AdminTrends {
+  currency: string;
+  series: DailyPoint[];
+  totalOrders: number;
+  totalSales: number;
+  includesDemo: boolean;
+}
+
+/** Paid orders and sales per day for the admin overview charts, same demo rule as the profit report. */
+export async function adminTrends(days = 14, now = new Date()): Promise<AdminTrends> {
+  const env = getEnv();
+  const currency = env.PAYMENT_CURRENCY;
+  const sandbox = env.SUPPLIER_MODE === "sandbox";
+  const from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) - (days - 1) * 86_400_000);
+  const rows = await db.$queryRaw<Array<{ day: string; orders: bigint; sales: string }>>`
+    SELECT to_char(date_trunc('day', "paidAt" AT TIME ZONE 'UTC'), 'YYYY-MM-DD') AS day, COUNT(*) AS orders, COALESCE(SUM(total), 0)::text AS sales
+    FROM "Order" WHERE "paidAt" >= ${from} AND currency = ${currency} AND ("isSandbox" = false OR ${sandbox}::boolean)
+    GROUP BY 1 ORDER BY 1
+  `;
+  const series = fillDailySeries(
+    rows.map((r) => ({ day: r.day, orders: Number(r.orders), sales: r.sales })),
+    now,
+    days,
+  );
+  return {
+    currency,
+    series,
+    totalOrders: series.reduce((n, p) => n + p.orders, 0),
+    totalSales: series.reduce((n, p) => n + p.sales, 0),
+    includesDemo: sandbox,
   };
 }

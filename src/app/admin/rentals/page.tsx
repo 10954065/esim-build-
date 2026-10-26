@@ -16,7 +16,7 @@ export default async function AdminRentals({ searchParams }: { searchParams: Sea
   const data = await listRentalsForStaff({ q, page });
   return (
     <>
-      <AdminHeader title="Number rentals" description="Rentals are ordered with auto-renew disabled at the supplier." />
+      <AdminHeader title="Number rentals" description="Rentals are ordered with automatic renewal turned off at the supplier." />
       <Filters action="/admin/rentals" q={q} />
       <Table head={["Order", "Customer", "Number", "Type", "Term", "Messages", "Status", "Expires"]} empty={data.items.length === 0}>
         {data.items.map((r) => (

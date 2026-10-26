@@ -23,7 +23,7 @@ export default function RefundPolicyPage() {
       <section>
         <h2>Reviewed refunds</h2>
         <p>
-          Some situations need a person to look at them — for example when the supplier&apos;s response was unclear, or an eSIM could not be
+          Some situations need a person to look at them, for example when the supplier&apos;s response was unclear, or an eSIM could not be
           installed. Open a <Link href="/dashboard/support/new">support ticket</Link> linked to the order and we will review it.
         </p>
       </section>
@@ -32,7 +32,7 @@ export default function RefundPolicyPage() {
         <ul>
           <li>eSIMs that have been installed or activated, or whose activation details have been issued, unless the eSIM is faulty.</li>
           <li>Verification numbers that received an SMS, even if the service later rejected the code.</li>
-          <li>Purchases for devices that do not support eSIM or are carrier-locked.</li>
+          <li>Purchases for devices that do not support eSIM or are locked to a carrier.</li>
           <li>Orders cancelled because of a breach of our <Link href="/acceptable-use">acceptable use policy</Link>.</li>
         </ul>
       </section>

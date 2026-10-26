@@ -40,7 +40,7 @@ export function PlanCard({ plan, destinationSlug }: { plan: PlanCardData; destin
           <p className="text-xl font-bold tracking-tight">{plan.dataLabel ?? "Data plan"}</p>
           <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
             <CalendarDays className="size-3" aria-hidden />
-            {perDay ? "Day pass · 1–365 days" : formatValidity(plan.validityDays)}
+            {perDay ? "Day pass · 1 to 365 days" : formatValidity(plan.validityDays)}
           </span>
           {plan.speed && (
             <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">

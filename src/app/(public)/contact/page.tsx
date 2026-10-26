@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Contact", description: "How to reach
 export default function ContactPage() {
   return (
     <>
-      <ContentHeader width="wide" eyebrow="Contact" title="Get in touch" description="The fastest way to get help with an order is a support ticket from your dashboard — it is linked to your order history." />
+      <ContentHeader width="wide" eyebrow="Contact" title="Get in touch" description="The fastest way to get help with an order is a support ticket from your dashboard, because it is linked to your order history." />
       <Container className="py-10">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <section className="surface p-6">

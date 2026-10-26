@@ -21,8 +21,8 @@ const SCOPE = [
     icon: MessageSquareText,
     title: "Verification number",
     current: true,
-    body: "A single-use number for one SMS code from one service, within a short time limit.",
-    yes: ["Sign-ups and one-off checks", "Code shown in your dashboard"],
+    body: "A single use number for one SMS code from one service, within a short time limit.",
+    yes: ["Signups and one off checks", "Code shown in your dashboard"],
     no: ["Not for password resets later on"],
   },
   {
@@ -30,7 +30,7 @@ const SCOPE = [
     title: "Number rental",
     href: "/numbers/rentals",
     body: "A number you keep for days or months to receive SMS over a longer period.",
-    yes: ["Ongoing two-factor codes", "Reminder before the term ends"],
+    yes: ["Ongoing two factor codes", "Reminder before the term ends"],
     no: ["No voice calls"],
   },
   {
@@ -71,7 +71,7 @@ export default async function VerificationPage({ searchParams }: { searchParams:
                 <p className="font-semibold">Refund when no SMS arrives</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   If no code arrives before the number expires and the supplier refunds the activation, we refund you automatically to your
-                  original payment method. Not every service accepts temporary numbers — see the{" "}
+                  original payment method. Not every service accepts temporary numbers; see the{" "}
                   <Link href="/refund-policy" className="font-medium text-primary hover:underline">
                     refund policy
                   </Link>
@@ -82,8 +82,8 @@ export default async function VerificationPage({ searchParams }: { searchParams:
 
             <dl className="mt-6 grid grid-cols-3 gap-3">
               {[
-                { label: "Countries", value: String(countries.length || "—") },
-                { label: "Services", value: services.length >= 12 ? "12+" : String(services.length || "—") },
+                { label: "Countries", value: String(countries.length || "None yet") },
+                { label: "Services", value: services.length >= 12 ? "12+" : String(services.length || "None yet") },
                 { label: "Use", value: "One code" },
               ].map((s) => (
                 <div key={s.label} className="surface p-4">

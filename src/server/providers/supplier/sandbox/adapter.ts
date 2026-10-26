@@ -15,7 +15,7 @@ import {
 } from "./fixtures";
 
 /**
- * SANDBOX SUPPLIER — simulated fulfilment for development and tests.
+ * SANDBOX SUPPLIER: simulated fulfilment for development and tests.
  *
  * - Stateless: every supplier reference encodes its own parameters, so the adapter works
  *   across serverless invocations without hidden storage.

@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { adminOverview, getOrderForStaff, integrationsStatus, listAuditLogs, listOrders, listPayments, listProducts, listRefunds, listUsers, pages } from "@/server/admin/queries";
-import { profitReport } from "@/server/admin/reports";
+import { adminTrends, profitReport } from "@/server/admin/reports";
 import {
   getEsimDestination,
   getEsimPlan,
@@ -125,6 +125,19 @@ describe("profit report, staff and customer read models", () => {
     expect(r.byCountry[0]?.country).toBe("Spain");
     expect(r.byDay).toHaveLength(1);
     expect(r.byMonth).toHaveLength(1);
+  });
+
+  it("charts paid orders and sales per day for the admin overview, with empty days as zero", async () => {
+    const t = await adminTrends(14);
+    const [ok, failed] = await Promise.all([
+      db.order.findUniqueOrThrow({ where: { id: fulfilled.orderId } }),
+      db.order.findUniqueOrThrow({ where: { id: refunded.orderId } }),
+    ]);
+    expect(t.series).toHaveLength(14);
+    expect(t.series.at(-1)).toMatchObject({ orders: 2 });
+    expect(t.series.slice(0, -1).every((p) => p.orders === 0)).toBe(true);
+    expect(t.totalOrders).toBe(2);
+    expect(t.totalSales).toBeCloseTo(Number(ok.total) + Number(failed.total), 4);
   });
 
   it("reports nothing for a period without orders", async () => {

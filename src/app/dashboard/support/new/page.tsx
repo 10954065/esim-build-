@@ -14,7 +14,7 @@ export default async function NewTicketPage({ searchParams }: { searchParams: Pr
       <PageHeader eyebrow="Help & support" title="Open a support ticket" description="Tell us what happened. Pick the order if it is about a purchase." />
       <div className="surface p-6">
         <NewTicketForm
-          orders={orders.map((o) => ({ id: o.id, label: `${o.number} — ${o.items[0]?.description ?? "Order"}` }))}
+          orders={orders.map((o) => ({ id: o.id, label: `${o.number} · ${o.items[0]?.description ?? "Order"}` }))}
           defaultOrderId={typeof sp.order === "string" ? sp.order : undefined}
         />
       </div>

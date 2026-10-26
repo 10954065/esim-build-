@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-display), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
   --color-canvas: var(--canvas);
@@ -67,6 +67,55 @@
   --shadow-raised: 0 4px 6px -1px rgb(16 24 40 / 0.08), 0 2px 4px -2px rgb(16 24 40 / 0.04);
   --shadow-float: 0 10px 15px -3px rgb(16 24 40 / 0.08), 0 4px 6px -4px rgb(16 24 40 / 0.03);
   --shadow-modal: 0 20px 25px -5px rgb(16 24 40 / 0.1), 0 8px 10px -6px rgb(16 24 40 / 0.04);
+  --shadow-glow: 0 0 0 1px rgb(47 95 240 / 0.18), 0 12px 40px -8px rgb(47 95 240 / 0.45);
+
+  /* Motion: strong ease-out for entering UI, ease-in-out for movement on screen. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --animate-reveal: reveal 600ms var(--ease-out) both;
+  --animate-marquee: marquee 60s linear infinite;
+  --animate-flap: flap 500ms var(--ease-out) both;
+  --animate-pulse-dot: pulse-dot 2s ease-in-out infinite;
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  /* Departure board rows settle in like split-flap characters. */
+  @keyframes flap {
+    from {
+      opacity: 0;
+      transform: perspective(400px) rotateX(-70deg);
+    }
+    to {
+      opacity: 1;
+      transform: perspective(400px) rotateX(0);
+    }
+  }
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgb(52 211 153 / 0.55);
+    }
+    50% {
+      box-shadow: 0 0 0 5px rgb(52 211 153 / 0);
+    }
+  }
 }
 
 /*
@@ -184,7 +233,7 @@
   h1,
   h2,
   h3 {
-    @apply tracking-tight text-balance;
+    @apply font-heading tracking-tight text-balance;
   }
 }
 
@@ -203,11 +252,52 @@
   @apply rounded-2xl border bg-card shadow-card transition-[box-shadow,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-input hover:shadow-raised;
 }
 
+/* Stagger children of a revealed group: 60 ms apart, never blocking interaction. */
+@utility stagger {
+  & > * {
+    animation: var(--animate-reveal);
+  }
+  & > *:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  & > *:nth-child(3) {
+    animation-delay: 120ms;
+  }
+  & > *:nth-child(4) {
+    animation-delay: 180ms;
+  }
+  & > *:nth-child(5) {
+    animation-delay: 240ms;
+  }
+  & > *:nth-child(n + 6) {
+    animation-delay: 300ms;
+  }
+}
+
+/* Boarding pass: a card with notches cut where the stub's perforation meets the edge. */
+@utility ticket {
+  --notch: 10px;
+  --stub: 7.5rem;
+  @apply relative rounded-2xl border bg-card;
+  mask:
+    radial-gradient(circle var(--notch) at calc(100% - var(--stub)) 0, #0000 98%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle var(--notch) at calc(100% - var(--stub)) 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
+}
+
+/* Faint grid used on dark hero surfaces. */
+@utility grid-lines {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }

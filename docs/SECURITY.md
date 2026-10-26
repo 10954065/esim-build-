@@ -16,7 +16,7 @@ recorded manual check, which is noted next to it.
 ## Authentication (Better Auth 1.7)
 
 - Email + password with **mandatory email verification** (`requireEmailVerification`).
-  Passwords 10–128 characters, hashed by Better Auth.
+  Passwords 10 to 128 characters, hashed by Better Auth.
 - Password reset tokens expire after 1 hour, and a reset **revokes all sessions**.
 - Sessions: httpOnly cookies, `Secure` whenever the app URL is https, 14-day lifetime refreshed
   daily. `trustedOrigins` is limited to `APP_URL`; cross-origin auth requests get 403 (manually verified).

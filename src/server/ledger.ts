@@ -11,12 +11,12 @@ import { dec, toDbAmount, type DecimalInput } from "@/server/pricing/money";
  * UPDATE/DELETE on LedgerEntry is blocked by a database trigger.
  *
  * Accounts:
- *  GATEWAY_CLEARING — money held at the payment gateway (asset)
- *  SALES_REVENUE    — customer sales (income)
- *  CUSTOMER_REFUNDS — refunds returned to customers (contra-income)
- *  GATEWAY_FEES     — payment processing fees (expense)
- *  SUPPLIER_COST    — cost of goods from the supplier (expense)
- *  SUPPLIER_PREPAID — our prepaid balance with the supplier (asset)
+ *  GATEWAY_CLEARING: money held at the payment gateway (asset)
+ *  SALES_REVENUE: customer sales (income)
+ *  CUSTOMER_REFUNDS: refunds returned to customers (contra-income)
+ *  GATEWAY_FEES: payment processing fees (expense)
+ *  SUPPLIER_COST: cost of goods from the supplier (expense)
+ *  SUPPLIER_PREPAID: our prepaid balance with the supplier (asset)
  */
 
 export interface JournalLine {
@@ -45,7 +45,7 @@ export class UnbalancedJournalError extends Error {
 export function assertBalanced(input: JournalInput): void {
   const byCurrency = new Map<string, ReturnType<typeof dec>>();
   for (const line of input.lines) {
-    if (dec(line.amount).isNegative()) throw new Error("Ledger amounts must be non-negative");
+    if (dec(line.amount).isNegative()) throw new Error("Ledger amounts must be zero or more");
     const signed = line.direction === "DEBIT" ? dec(line.amount) : dec(line.amount).negated();
     byCurrency.set(line.currency, (byCurrency.get(line.currency) ?? dec(0)).plus(signed));
   }

@@ -38,7 +38,7 @@ export async function registerAction(input: RegisterInput): Promise<RegisterResu
     consumeRateLimit(`register:email:${email}`, 3, 3600),
   ]);
   if (!byIp.ok || !byEmail.ok) {
-    return { ok: false, error: "Too many sign-up attempts. Please try again later." };
+    return { ok: false, error: "Too many attempts to create an account. Please try again later." };
   }
 
   try {

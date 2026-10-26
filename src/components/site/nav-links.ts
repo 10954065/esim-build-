@@ -12,7 +12,7 @@ export const FOOTER_NAV = [
     links: [
       { href: "/esims", label: "Travel eSIMs" },
       { href: "/verification", label: "SMS verification numbers" },
-      { href: "/numbers/rentals", label: "Long-term number rentals" },
+      { href: "/numbers/rentals", label: "Long term number rentals" },
       { href: "/device-compatibility", label: "Device compatibility" },
     ],
   },

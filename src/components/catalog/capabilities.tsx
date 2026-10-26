@@ -8,7 +8,7 @@ interface CapabilityProps {
   includesVoice: boolean;
 }
 
-/** Truthful capability badges — data-only unless the supplier explicitly confirms more. */
+/** Truthful capability badges, data-only unless the supplier explicitly confirms more. */
 export function CapabilityBadges({ includesPhoneNumber, includesSms, includesVoice }: CapabilityProps) {
   const dataOnly = !includesPhoneNumber && !includesSms && !includesVoice;
   return (
@@ -36,7 +36,7 @@ export function DataOnlyNotice() {
     <div className="flex gap-3 rounded-2xl border border-primary/15 bg-accent p-5 text-sm">
       <MessageSquareOff className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
       <div className="space-y-1">
-        <p className="font-semibold text-foreground">These are data-only eSIMs</p>
+        <p className="font-semibold text-foreground">These are data only eSIMs</p>
         <p className="text-muted-foreground">
           They give you mobile internet abroad but do not include an ordinary phone number, so they cannot receive SMS
           verification codes. If you need a number for verification, use a{" "}

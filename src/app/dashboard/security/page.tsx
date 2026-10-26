@@ -11,10 +11,10 @@ export default async function SecurityPage({ searchParams }: { searchParams: Pro
   const sp = await searchParams;
   return (
     <div className="max-w-2xl space-y-8">
-      <PageHeader eyebrow="Account" title="Security" description="Password, two-factor authentication and signed-in devices." />
+      <PageHeader eyebrow="Account" title="Security" description="Password, two factor authentication and the devices you are signed in on." />
       {sp.require2fa === "1" && isStaffRole(user.role) && (
         <p role="alert" className="rounded-xl border border-warning/30 bg-warning-soft p-4 text-sm">
-          Staff accounts must turn on two-factor authentication before using the admin dashboard.
+          Staff accounts must turn on two factor authentication before using the admin dashboard.
         </p>
       )}
       <section className="surface p-6">
@@ -22,7 +22,7 @@ export default async function SecurityPage({ searchParams }: { searchParams: Pro
         <ChangePasswordForm />
       </section>
       <section className="surface p-6">
-        <h2 className="mb-1 font-semibold">Two-factor authentication</h2>
+        <h2 className="mb-1 font-semibold">Two factor authentication</h2>
         <p className="mb-4 text-sm text-muted-foreground">Protect your account with a code from an authenticator app when signing in.</p>
         <TwoFactorPanel enabled={user.twoFactorEnabled} />
       </section>

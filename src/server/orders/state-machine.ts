@@ -1,5 +1,5 @@
 /**
- * Order state machine. Pure — the single source of truth for which order status changes
+ * Order state machine. Pure, the single source of truth for which order status changes
  * are legal. All writes go through transitionOrder() in ./service.ts, which records every
  * change in OrderStatusHistory with actor, reason and timestamp.
  */

@@ -37,7 +37,7 @@ function statusToKind(status: number, mutating: boolean, message: string): Suppl
   if (status === 402) return "INSUFFICIENT_BALANCE";
   if (status === 404) return "NOT_FOUND";
   if (status === 429) return "RATE_LIMITED";
-  // Documented: "502 provider failed (charge refunded)" — a definite, retryable failure.
+  // Documented: "502 provider failed (charge refunded)", a definite, retryable failure.
   if (status === 502) return "PROVIDER_FAILED";
   if (status === 503) return "UNAVAILABLE";
   if (status >= 500) return mutating ? "UNCERTAIN" : "UNAVAILABLE";

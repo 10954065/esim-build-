@@ -18,7 +18,7 @@ const profileSchema = z.object({
     .string()
     .trim()
     .toUpperCase()
-    .regex(/^([A-Z]{2})?$/, "Use a 2-letter country code")
+    .regex(/^([A-Z]{2})?$/, "Use a two letter country code")
     .optional(),
 });
 

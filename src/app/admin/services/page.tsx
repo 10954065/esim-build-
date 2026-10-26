@@ -21,7 +21,7 @@ export default async function AdminServices({ searchParams }: { searchParams: Se
           <tr key={s.id}>
             <Td>{s.name}</Td>
             <Td mono>{s.slug}</Td>
-            <Td>{s.popular ? "Yes" : "—"}</Td>
+            <Td>{s.popular ? "Yes" : "No"}</Td>
             <Td>{s.isActive ? "Yes" : "No"}</Td>
             <Td>{s._count.products}</Td>
             <Td>

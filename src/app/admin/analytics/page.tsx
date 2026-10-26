@@ -1,6 +1,7 @@
 import { AdminHeader, Panel, Table, Td } from "@/components/admin/admin-ui";
 import { sp1, type SearchParams } from "@/components/admin/notice";
 import { formatMoney } from "@/lib/currency";
+import { formatDayKey, formatMonthKey } from "@/lib/format";
 import { requireStaff } from "@/server/auth/session";
 import { profitReport } from "@/server/admin/reports";
 
@@ -60,7 +61,7 @@ export default async function AdminAnalytics({ searchParams }: { searchParams: S
             <div><dt className="text-muted-foreground">Fulfilled</dt><dd className="text-xl font-semibold">{r.fulfilledOrders}</dd></div>
             <div><dt className="text-muted-foreground">Failed / refunded</dt><dd className="text-xl font-semibold">{r.failedOrders}</dd></div>
           </dl>
-          <p className="mt-3 text-sm">Success rate: {rate === null ? "—" : `${rate}%`}</p>
+          <p className="mt-3 text-sm">Success rate: {rate === null ? "Not enough data" : `${rate}%`}</p>
         </Panel>
         <Panel title="Sales by category">
           <Table head={["Category", "Orders", "Sales"]} empty={r.byCategory.length === 0}>
@@ -74,12 +75,12 @@ export default async function AdminAnalytics({ searchParams }: { searchParams: S
         </Panel>
         <Panel title="Sales by day">
           <Table head={["Day", "Orders", "Sales"]} empty={r.byDay.length === 0}>
-            {r.byDay.map((x) => <tr key={x.day}><Td>{x.day}</Td><Td>{x.orders}</Td><Td className="tabular-nums">{formatMoney(x.sales, r.currency)}</Td></tr>)}
+            {r.byDay.map((x) => <tr key={x.day}><Td>{formatDayKey(x.day)}</Td><Td>{x.orders}</Td><Td className="tabular-nums">{formatMoney(x.sales, r.currency)}</Td></tr>)}
           </Table>
         </Panel>
         <Panel title="Sales by month">
           <Table head={["Month", "Orders", "Sales"]} empty={r.byMonth.length === 0}>
-            {r.byMonth.map((x) => <tr key={x.month}><Td>{x.month}</Td><Td>{x.orders}</Td><Td className="tabular-nums">{formatMoney(x.sales, r.currency)}</Td></tr>)}
+            {r.byMonth.map((x) => <tr key={x.month}><Td>{formatMonthKey(x.month)}</Td><Td>{x.orders}</Td><Td className="tabular-nums">{formatMoney(x.sales, r.currency)}</Td></tr>)}
           </Table>
         </Panel>
       </div>

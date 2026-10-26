@@ -5,7 +5,7 @@ import { signPayload, verifySignedPayload } from "@/server/providers/supplier/si
 import { PaymentWebhookError, type GatewayRefund, type PaymentGateway, type PaymentWebhookEvent } from "./types";
 
 /**
- * SANDBOX PAYMENT GATEWAY — simulated payments for development and automated tests.
+ * SANDBOX PAYMENT GATEWAY: simulated payments for development and automated tests.
  * - Keeps its own charge/refund records (SandboxGatewayCharge/Refund) so verification and
  *   refunds follow the same server-side path as a real gateway.
  * - Webhooks are signed (HMAC-SHA256 over `t.rawBody`) with SANDBOX_SIGNING_SECRET and are

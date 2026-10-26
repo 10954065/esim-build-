@@ -63,8 +63,8 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               <p className="mt-5 flex gap-3 rounded-xl border border-primary/15 bg-accent p-4 text-sm text-muted-foreground">
                 <Info className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
                 <span>
-                  This is a <strong className="text-foreground">data-only</strong> eSIM: it does not include a phone number and cannot receive SMS codes.
-                  Make sure your phone supports eSIM and is unlocked —{" "}
+                  This is a <strong className="text-foreground">data only</strong> eSIM: it does not include a phone number and cannot receive SMS codes.
+                  Make sure your phone supports eSIM and is unlocked.{" "}
                   <Link href="/device-compatibility" className="font-medium text-primary underline underline-offset-2">
                     check compatibility
                   </Link>

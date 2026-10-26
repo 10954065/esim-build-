@@ -29,7 +29,7 @@ export interface VerificationOffer {
   countryCode: string;
   serviceSlug: string;
   serviceName: string;
-  providerTier: string; // e.g. EXTRA, MAIN — required by the order call
+  providerTier: string; // e.g. EXTRA, MAIN, required by the order call
   operator: string;
   cost: DecimalString;
   stock: number;
@@ -94,8 +94,8 @@ export type EsimLifecycle = "PREPARING" | "READY" | "ACTIVE" | "EXPIRED" | "FAIL
 export interface EsimProfileInfo {
   supplierProfileId: string;
   iccid: string | null;
-  activationCode: string | null; // LPA string — sensitive
-  qrCodeUrl: string | null; // supplier-hosted QR — sensitive
+  activationCode: string | null; // LPA string, sensitive
+  qrCodeUrl: string | null; // QR hosted by the supplier, sensitive
   apn: string | null;
   status: string | null;
   smdpStatus: string | null;

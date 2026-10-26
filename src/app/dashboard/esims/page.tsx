@@ -64,11 +64,11 @@ export default async function EsimsPage() {
                     </div>
                     <div>
                       <dt className="text-muted-foreground">Expires</dt>
-                      <dd className="mt-0.5 font-medium">{e.expiresAt ? formatDate(e.expiresAt) : "—"}</dd>
+                      <dd className="mt-0.5 font-medium">{e.expiresAt ? formatDate(e.expiresAt) : "Not yet"}</dd>
                     </div>
                     <div>
                       <dt className="text-muted-foreground">ICCID</dt>
-                      <dd className="mt-0.5 font-mono font-medium">{e.iccid ? `••••${e.iccid.slice(-4)}` : "—"}</dd>
+                      <dd className="mt-0.5 font-mono font-medium">{e.iccid ? `••••${e.iccid.slice(-4)}` : "Pending"}</dd>
                     </div>
                   </dl>
                   <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary">

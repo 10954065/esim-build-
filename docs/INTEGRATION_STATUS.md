@@ -5,13 +5,13 @@ blocked. It must be kept truthful: an integration is **not** "done" because a cl
 
 Legend: ✅ verified/tested · 🟡 implemented, untested against the live service · ⛔ blocked
 
-## Supplier — 1001SMS (primary)
+## Supplier: 1001SMS (primary)
 
 | Item | Status | Notes |
 |---|---|---|
 | API reference reviewed | ✅ | `https://www.1001sms.com/api-docs` read on 2026-10-22 (endpoints, fields, webhook signing). |
 | Adapter implemented (`src/server/providers/supplier/sms1001/`) | 🟡 | Built strictly from the documented request/response shapes. Every adapter method is unit-tested against those shapes with a stubbed HTTP layer (`adapter.test.ts`, 19 tests). Never called against the live API. |
-| Webhook signature verification | 🟡 | HMAC-SHA256 over `t.rawBody`, 5-minute tolerance, constant-time compare — unit-tested against the documented algorithm, not against a real delivery. |
+| Webhook signature verification | 🟡 | HMAC-SHA256 over `t.rawBody`, 5-minute tolerance, constant-time compare, unit-tested against the documented algorithm, not against a real delivery. |
 | Live API key | ⛔ | Not provided. Needs a key with scopes `read`, `activate`, `numbers`, `esim`. |
 | Webhook endpoint registration | ⛔ | After deploy: `PUT /webhooks/config` with `url=https://<domain>/api/webhooks/supplier/1001sms` and events `sms.received, esim.allocated, esim.updated, esim.failed, esim.refunded, number.expired, number.cancelled, number.expiring`. Store the returned `secret` in `SMS1001_WEBHOOK_SECRET`. |
 | Price currency | ⛔ | Not stated in docs. Confirm with 1001SMS and set `SUPPLIER_PRICE_CURRENCY`. |
@@ -20,7 +20,7 @@ Legend: ✅ verified/tested · 🟡 implemented, untested against the live servi
 | eSIM top-ups | Not implemented | Not documented by 1001SMS. UI never offers top-ups. |
 | Sandbox adapter | ✅ | `SUPPLIER_MODE=sandbox`: deterministic fixtures, every record flagged `isSandbox`, demo LPA strings use the reserved `.invalid` domain so they cannot install. Forbidden in production by env validation. |
 
-## Payments — Paystack (candidate) + Sandbox
+## Payments: Paystack (candidate) + Sandbox
 
 | Item | Status | Notes |
 |---|---|---|
@@ -31,7 +31,7 @@ Legend: ✅ verified/tested · 🟡 implemented, untested against the live servi
 | Live/test keys | ⛔ | Not provided. |
 | Sandbox gateway | ✅ | `PAYMENT_PROVIDER=sandbox`: a local test checkout page posts a signed webhook to the same processing path as real payments. Paired with the sandbox supplier only. |
 
-## Email — Resend
+## Email: Resend
 
 | Item | Status | Notes |
 |---|---|---|
@@ -39,12 +39,12 @@ Legend: ✅ verified/tested · 🟡 implemented, untested against the live servi
 | Dev "log" provider | ✅ | Stores rendered emails in `EmailDelivery.devPreview` and exposes them at `/dev/mailbox` (disabled outside development/test). |
 | Sender domain verification | ⛔ | Requires a verified domain at the provider. |
 
-## Authentication — Better Auth
+## Authentication: Better Auth
 
 | Item | Status |
 |---|---|
 | Email + password, verification, reset, sessions, 2FA (TOTP) for staff | ✅ (local) |
-| Google OAuth | Optional — enabled only when `GOOGLE_CLIENT_ID/SECRET` are set; not tested. |
+| Google OAuth | Optional, enabled only when `GOOGLE_CLIENT_ID/SECRET` are set; not tested. |
 
 ## Test evidence (2026-10-24)
 

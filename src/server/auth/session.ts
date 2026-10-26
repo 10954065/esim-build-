@@ -7,7 +7,7 @@ import { auth } from "./auth";
 import { can, isRole, type Permission, type Role } from "./permissions";
 
 /**
- * Server-side session access. These checks are the security boundary — the proxy and
+ * Server-side session access. These checks are the security boundary, the proxy and
  * hidden navigation are conveniences only.
  */
 
@@ -77,7 +77,7 @@ export async function assertPermission(permission: Permission): Promise<SessionU
   const user = await assertUser();
   if (!can(user.role, permission)) throw new AuthorizationError();
   if (getEnv().APP_ENV === "production" && !user.twoFactorEnabled) {
-    throw new AuthorizationError("Two-factor authentication is required for staff actions.");
+    throw new AuthorizationError("Two factor authentication is required for staff actions.");
   }
   return user;
 }

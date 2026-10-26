@@ -32,7 +32,7 @@ export default async function EsimDetailPage({ params }: { params: Promise<{ id:
   const specs = [
     { label: "Data", value: product.dataLabel ?? formatBytes(total), icon: Gauge },
     { label: "Validity", value: formatValidity(product.validityDays), icon: Calendar },
-    { label: "Network", value: product.speed ?? "—", icon: Signal },
+    { label: "Network", value: product.speed ?? "Not specified", icon: Signal },
     { label: "APN", value: esim.apn ?? "Automatic", icon: Wifi, mono: Boolean(esim.apn) },
   ];
 
@@ -64,7 +64,7 @@ export default async function EsimDetailPage({ params }: { params: Promise<{ id:
         <div role="note" className="flex gap-3 rounded-2xl border border-warning/30 bg-warning-soft p-4 text-sm">
           <AlertTriangle className="mt-0.5 size-5 shrink-0 text-warning" aria-hidden />
           <p>
-            This is a <strong>demo eSIM</strong> from the sandbox supplier. Its activation code points to a non-existent server and cannot be installed.
+            This is a <strong>demo eSIM</strong> from the sandbox supplier. Its activation code points to a server that does not exist and cannot be installed.
           </p>
         </div>
       )}
@@ -91,7 +91,7 @@ export default async function EsimDetailPage({ params }: { params: Promise<{ id:
                 <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Hash className="size-3.5" aria-hidden /> ICCID
                 </dt>
-                <dd className="font-mono text-xs break-all">{esim.iccid ?? "—"}</dd>
+                <dd className="font-mono text-xs break-all">{esim.iccid ?? "Pending"}</dd>
               </div>
             </dl>
             <p className="mt-4 rounded-xl bg-muted px-3 py-2 text-left text-xs text-muted-foreground">
@@ -154,7 +154,7 @@ export default async function EsimDetailPage({ params }: { params: Promise<{ id:
         )}
         {product.fupPolicy && <p className="mt-4 text-xs text-muted-foreground">Fair use after allowance: {product.fupPolicy}</p>}
         <p className="mt-4 text-xs text-muted-foreground">
-          Top-ups are not available for this plan. Need help?{" "}
+          Top ups are not available for this plan. Need help?{" "}
           <Link href={`/dashboard/support/new?order=${esim.orderItem.order.id}`} className="font-medium text-primary hover:underline">
             Open a support ticket
           </Link>

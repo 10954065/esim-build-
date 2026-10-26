@@ -52,7 +52,7 @@ export interface PaymentGateway {
   code: GatewayCode;
   isSandbox: boolean;
   initialize(input: InitializeInput): Promise<{ authorizationUrl: string }>;
-  /** Server-side verification — the only source of truth for whether a charge succeeded. */
+  /** Server-side verification, the only source of truth for whether a charge succeeded. */
   verify(reference: string): Promise<VerifiedCharge>;
   refund(input: RefundInput): Promise<GatewayRefund>;
   getRefund(gatewayRefundId: string): Promise<GatewayRefund>;

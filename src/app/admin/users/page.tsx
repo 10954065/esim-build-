@@ -17,7 +17,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Searc
   const manage = can(staff.role, "users.manage");
   return (
     <>
-      <AdminHeader title="Users" description="Role changes and suspensions sign the user out everywhere and are audit-logged." />
+      <AdminHeader title="Users" description="Role changes and suspensions sign the user out everywhere and are recorded in the audit log." />
       <ActionNotice sp={sp} />
       <Filters action="/admin/users" q={q} />
       <Table head={["Email", "Name", "Role", "Verified", "2FA", "Orders", "Joined", "Status", ...(manage ? ["Actions"] : [])]} empty={data.items.length === 0}>

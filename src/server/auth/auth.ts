@@ -16,7 +16,7 @@ import { logger } from "@/server/logger";
  * Better Auth configuration.
  * - Email + password with mandatory email verification and password reset.
  * - Database sessions (httpOnly, secure in production), 14-day lifetime, daily refresh.
- * - TOTP two-factor authentication (required for staff in production — see session.ts).
+ * - TOTP two-factor authentication (required for staff in production, see session.ts).
  * - Admin plugin for bans and role management (roles: user, support, finance, admin).
  * - Auth endpoints are rate limited with database storage.
  * - Google sign-in only when both credentials are configured.

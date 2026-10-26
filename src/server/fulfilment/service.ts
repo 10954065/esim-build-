@@ -219,7 +219,7 @@ export async function persistVerification(f: Fulfilment, item: ItemWithOrder, a:
       userId: item.order.userId,
       type: "verification.issued",
       title: "Your verification number is ready",
-      body: `Order ${item.order.number}: request your code now — the number has a time limit.`,
+      body: `Order ${item.order.number}: request your code now, because the number has a time limit.`,
       link: `/dashboard/verification/${v.id}`,
       dedupeKey: `verification-issued:${f.id}`,
     });
@@ -439,7 +439,7 @@ export async function retryFulfilment(fulfilmentId: string, actor: { id: string;
 /**
  * Admin, exceptional: link a fulfilment to an existing supplier order (e.g. after verifying an
  * uncertain submission with the supplier). The reference is fetched from the supplier and must
- * exist and match — an order can never be marked fulfilled without a real supplier result.
+ * exist and match, an order can never be marked fulfilled without a real supplier result.
  */
 export async function linkSupplierOrder(fulfilmentId: string, supplierRef: string, actor: { id: string; role: string }, reason: string): Promise<void> {
   const f = await db.fulfilment.findUniqueOrThrow({ where: { id: fulfilmentId } });

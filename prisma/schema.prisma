@@ -1,4 +1,4 @@
-// International eSIM & SMS verification marketplace — PostgreSQL schema.
+// International eSIM & SMS verification marketplace, PostgreSQL schema.
 // Conventions:
 // - Identifiers: UUID v4 (non-guessable) except Better Auth tables, which use its own random ids.
 // - Money: Decimal(18,4) with an explicit ISO-4217 currency column beside every amount.
@@ -311,7 +311,7 @@ model RateLimit {
   @@map("rateLimit")
 }
 
-/// Application rate limits (purchases, polling, support) — fixed window counters.
+/// Application rate limits (purchases, polling, support), fixed window counters.
 model RateLimitBucket {
   key         String   @id
   count       Int
@@ -873,7 +873,7 @@ model WebhookEvent {
   externalEventId String
   eventType       String
   status          WebhookStatus @default(RECEIVED)
-  /// Redacted payload — SMS text, codes and activation details are never stored here.
+  /// Redacted payload, SMS text, codes and activation details are never stored here.
   payload         Json
   error           String?
   attempts        Int           @default(0)

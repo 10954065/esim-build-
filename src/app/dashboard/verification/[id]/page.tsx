@@ -86,7 +86,7 @@ export default async function VerificationDetailPage({ params }: { params: Promi
               {live ? <Loader2 className="size-5 animate-spin" aria-hidden /> : <Inbox className="size-5" aria-hidden />}
             </span>
             <p className="max-w-sm">
-              {live ? "Waiting for an SMS. Request the code from the service now — this page updates automatically." : "No messages were received for this number."}
+              {live ? "Waiting for an SMS. Request the code from the service now. This page updates automatically." : "No messages were received for this number."}
             </p>
           </div>
         ) : (

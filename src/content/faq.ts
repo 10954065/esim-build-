@@ -1,6 +1,6 @@
 /**
  * FAQ content. Statements here must stay accurate to the implemented system and the
- * supplier's documented behaviour — never promise coverage, delivery or refunds that
+ * supplier's documented behaviour, never promise coverage, delivery or refunds that
  * the platform does not actually provide.
  */
 export interface FaqItem {
@@ -13,7 +13,7 @@ export const FAQ: FaqItem[] = [
   {
     category: "esim",
     q: "Does a travel eSIM give me a phone number?",
-    a: "No. The travel eSIMs we sell are data-only unless a plan explicitly says otherwise. They provide mobile internet but no ordinary phone number, so they cannot receive SMS verification codes or phone calls.",
+    a: "No. The travel eSIMs we sell are data only unless a plan explicitly says otherwise. They provide mobile internet but no ordinary phone number, so they cannot receive SMS verification codes or phone calls.",
   },
   {
     category: "esim",
@@ -43,22 +43,22 @@ export const FAQ: FaqItem[] = [
   {
     category: "verification",
     q: "Who can see my verification messages?",
-    a: "Only you, from your signed-in dashboard. Messages are encrypted in our database, are never shown on public pages, and are not included in email subject lines or previews.",
+    a: "Only you, from your dashboard after you sign in. Messages are encrypted in our database, are never shown on public pages, and are not included in email subject lines or previews.",
   },
   {
     category: "rentals",
     q: "What is the difference between a verification number and a rental?",
-    a: "A verification number is a one-time activation for receiving a code from a single service within a short time limit. A rental keeps a number assigned to you for a chosen term (for example 7 or 30 days) so you can receive SMS throughout that period.",
+    a: "A verification number is a single activation for receiving a code from a single service within a short time limit. A rental keeps a number assigned to you for a chosen term (for example 7 or 30 days) so you can receive SMS throughout that period.",
   },
   {
     category: "rentals",
     q: "Do rentals renew automatically?",
-    a: "No. We never auto-renew rentals. We remind you before a rental expires so you can decide whether to buy another term.",
+    a: "No. We never renew rentals automatically. We remind you before a rental expires so you can decide whether to buy another term.",
   },
   {
     category: "payments",
     q: "When am I charged, and in which currency?",
-    a: "You see the final amount and currency before you pay. Your order is fulfilled only after our server verifies the payment with the payment provider — a success message in your browser alone never triggers delivery.",
+    a: "You see the final amount and currency before you pay. Your order is fulfilled only after our server verifies the payment with the payment provider. A success message in your browser alone never triggers delivery.",
   },
   {
     category: "payments",
@@ -68,6 +68,6 @@ export const FAQ: FaqItem[] = [
   {
     category: "account",
     q: "Can I delete my account?",
-    a: "Yes. Request deletion from your profile. We delete or anonymise personal data except records we must keep for financial, legal and fraud-prevention obligations.",
+    a: "Yes. Request deletion from your profile. We delete or anonymise personal data except records we must keep for financial, legal and fraud prevention obligations.",
   },
 ];

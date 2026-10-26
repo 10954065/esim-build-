@@ -17,7 +17,7 @@ export default async function AdminPayments({ searchParams }: { searchParams: Se
   const data = await listPayments({ q, page });
   return (
     <>
-      <AdminHeader title="Payments" description="Only gateway references and amounts are stored — never card details." />
+      <AdminHeader title="Payments" description="Only gateway references and amounts are stored, never card details." />
       <Filters action="/admin/payments" q={q} />
       <Table head={["Reference", "Order", "Customer", "Gateway", "Gateway txn", "Amount", "Fee", "Status", "Verified"]} empty={data.items.length === 0}>
         {data.items.map((p) => (
@@ -26,9 +26,9 @@ export default async function AdminPayments({ searchParams }: { searchParams: Se
             <Td mono><Link href={`/admin/orders/${p.order.id}`} className="underline">{p.order.number}</Link></Td>
             <Td>{p.order.user.email}</Td>
             <Td>{p.provider}</Td>
-            <Td mono>{p.gatewayTransactionId ?? "—"}</Td>
+            <Td mono>{p.gatewayTransactionId ?? "None"}</Td>
             <Td className="tabular-nums">{formatMoney(p.amount.toString(), p.currency)}</Td>
-            <Td className="tabular-nums">{p.gatewayFee ? formatMoney(p.gatewayFee.toString(), p.currency) : "—"}</Td>
+            <Td className="tabular-nums">{p.gatewayFee ? formatMoney(p.gatewayFee.toString(), p.currency) : "None"}</Td>
             <Td><StatusBadge status={p.status} /></Td>
             <Td className="text-muted-foreground">{formatDateTime(p.verifiedAt)}</Td>
           </tr>

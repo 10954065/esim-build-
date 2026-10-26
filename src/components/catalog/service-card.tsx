@@ -50,7 +50,7 @@ export function ServiceRow({
       <span className="min-w-0">
         <span className="block truncate font-semibold text-foreground">{name}</span>
         <span className="text-xs text-muted-foreground sm:hidden">
-          from <Price value={fromPrice} unavailableLabel="—" className="text-foreground" />
+          from <Price value={fromPrice} unavailableLabel="Unavailable" className="text-foreground" />
         </span>
       </span>
       <span className="hidden sm:block">
@@ -58,7 +58,7 @@ export function ServiceRow({
       </span>
       <span className="hidden text-right sm:block">
         <span className="block text-xs text-muted-foreground">from</span>
-        <Price value={fromPrice} unavailableLabel="—" className="text-foreground" />
+        <Price value={fromPrice} unavailableLabel="Unavailable" className="text-foreground" />
       </span>
       <span className="inline-flex items-center gap-1 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
         Choose <ArrowRight className="size-3.5" aria-hidden />

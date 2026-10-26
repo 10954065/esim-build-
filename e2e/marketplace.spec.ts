@@ -6,7 +6,7 @@ test("customer buys a travel eSIM and sees its installation QR code", async ({ p
 
   await page.goto("/esims");
   await expect(page.getByRole("heading", { name: "Mobile data for wherever you land" })).toBeVisible();
-  await expect(page.getByText("These are data-only eSIMs")).toBeVisible();
+  await expect(page.getByText("These are data only eSIMs")).toBeVisible();
   await page.getByRole("link", { name: /Spain/ }).first().click();
   await expect(page.getByRole("link", { name: "View plan" }).first()).toBeVisible();
   // The cheapest Spain plan is the deliberate supplier-failure fixture; buy a normal plan.

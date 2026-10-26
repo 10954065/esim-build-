@@ -12,7 +12,7 @@ export default async function AdminSettings({ searchParams }: { searchParams: Se
   const values = await getAllSettings();
   return (
     <>
-      <AdminHeader title="Settings" description="Non-secret runtime settings. API keys and secrets are environment variables and cannot be viewed or edited here." />
+      <AdminHeader title="Settings" description="Runtime settings that are not secret. API keys and secrets are environment variables and cannot be viewed or edited here." />
       <ActionNotice sp={sp} />
       <Table head={["Setting", "Value", ""]}>
         {(Object.keys(SETTINGS) as SettingKey[]).map((key) => {

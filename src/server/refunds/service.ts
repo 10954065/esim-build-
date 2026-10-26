@@ -114,7 +114,7 @@ export async function submitRefund(refundId: string): Promise<void> {
     if (result.status !== "PENDING") await applyGatewayRefundStatus(refundId, result.status, "submit");
   } catch (err) {
     if (err instanceof PaymentGatewayError && err.opts.uncertain) {
-      // The gateway may have created the refund. Never resubmit blindly — reconcile first.
+      // The gateway may have created the refund. Never resubmit blindly, reconcile first.
       await db.refund.update({ where: { id: refundId }, data: { failureReason: "Submission outcome uncertain; reconciling with gateway" } });
       await enqueue(db, { type: "refund.reconcile", payload: { refundId }, runAt: new Date(Date.now() + 60 * 1000), dedupeKey: `refund-reconcile:${refundId}:uncertain` });
       return;

@@ -1,6 +1,6 @@
 /**
  * Normalized supplier errors. The fulfilment engine decides what to do based on
- * `kind`, `retryable` and `uncertain` — never on raw supplier messages.
+ * `kind`, `retryable` and `uncertain`, never on raw supplier messages.
  */
 
 export type SupplierErrorKind =

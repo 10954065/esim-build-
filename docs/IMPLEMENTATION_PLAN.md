@@ -26,10 +26,10 @@ Each phase is committed and pushed to `main` when its checks pass.
 
 ## Phase 2 notes
 
-- `src/server/providers/supplier/` — provider contracts, 1001SMS adapter (client, schemas, mappers,
+- `src/server/providers/supplier/`: provider contracts, 1001SMS adapter (client, schemas, mappers,
   webhook verifier) and a stateless sandbox adapter.
-- `src/server/pricing/` — decimal-safe money helpers, pure pricing engine, DB pricing session.
-- `src/server/catalog/` — sync (with `CatalogSyncLog`), TTL-based freshness, priced read models.
+- `src/server/pricing/`: decimal-safe money helpers, pure pricing engine, DB pricing session.
+- `src/server/catalog/`: sync (with `CatalogSyncLog`), TTL-based freshness, priced read models.
 - Public pages: `/`, `/esims`, `/esims/[country]`, `/esims/[country]/[plan]`, `/verification`,
   `/verification/[country]`, `/verification/[country]/[service]`, `/numbers/rentals`.
 - Checks: typecheck ✅, lint ✅, 68 unit tests ✅, production build ✅, smoke test of every public
@@ -73,7 +73,7 @@ Each phase is committed and pushed to `main` when its checks pass.
 
 - 18 admin routes behind `requireStaff` + per-page permissions; navigation filtered by role.
 - Order console: fulfilment state and supplier errors, retry, verified manual supplier linking
-  (the supplier order is fetched and matched — no "mark fulfilled" button), staff refunds with
+  (the supplier order is fetched and matched, no "mark fulfilled" button), staff refunds with
   idempotency nonce, status history, ledger entries.
 - Users: role changes and suspensions (sign-out everywhere, audited); CLI `pnpm admin:grant`.
 - Catalogue/pricing: visibility toggles, margin rules, staff-entered exchange rates with source,
@@ -142,7 +142,7 @@ segmented tabs, dark active filter chips, uppercase eyebrows, breadcrumbs and st
   and global destinations show a globe/map icon. Emoji flags (which Windows renders as letters) are gone.
 - **Pages:** home (hero, product finder with flag quick-picks, product lines, top destinations, how it works,
   trust, FAQ, CTA), eSIM catalogue, destination (plan list + before-you-buy), plan (spec tiles, install
-  walkthrough, order summary), verification steps 1–3 (country picker, service inventory, route table),
+  walkthrough, order summary), verification steps 1 to 3 (country picker, service inventory, route table),
   rentals, dashboard shell (sidebar), overview (stat cards, orders table with flags) and orders.
 - **Honesty:** the design's invented figures (latency, success rates, "200+ nations", wallet, top-ups,
   compliance badges) were not copied; stats shown are live catalogue counts, and delivery rates are labelled
@@ -193,6 +193,31 @@ Keyboard (`e2e/keyboard.spec.ts`): the first Tab stop on every page is a visible
 and a customer can buy an eSIM, open it and reveal the activation details with Tab, Space and Enter only;
 every focus stop on the way must show a focus indicator. This found that tab panels (install steps, product
 finder) took focus without any visible ring; they now show one. Checks: 10 E2E ✅.
+
+## Signature design and no dashes
+
+**Copy without dashes.** Em and en dashes, "--" and spaced hyphens are gone from everything the site shows,
+from emails, docs and comments. Empty values read as words ("Not yet", "Not specified", "None", "Unavailable")
+instead of a dash; ranges read "1 to 365"; hyphenated prose was rephrased ("data only", "two factor",
+"unlocked by your carrier"). Report days and months are shown as words, job types as words. Hyphens remain
+only where they are part of a real name or identifier: Wi-Fi, SM-DP+, order and payment references, UUIDs,
+supplier codes. A crawl of the visible text of every public, dashboard and admin page confirms this.
+
+**Design.** The Stitch palette stays; the look became distinctive:
+
+- Space Grotesk display face for headings beside Inter; strong ease-out motion tokens; buttons press to 0.97;
+  staggered reveals and a split-flap row entrance that stop under reduced motion.
+- Home: ink hero with grid texture and blue glow, search as the main action, live counts, and a departure
+  board of real destinations with plan counts and from prices; an endless flag strip of the countries sold
+  (pauses on hover and focus); bento product section with the eSIM as the ink feature card holding the
+  cheapest country as a boarding pass; ink closing band and ink footer.
+- Destination cards are boarding passes (code, plans, network on the pass; from price on a perforated stub).
+  The plan page order summary is a boarding pass with an ink header and a perforated price section.
+- Customer dashboard opens with an ink welcome banner.
+- Admin overview: system health strip (supplier, jobs, webhooks, emails), paid orders and sales over 14 days
+  with sparklines from `adminTrends` (same demo rule as the profit report), and an ink "needs attention" queue.
+
+Checks: 189 unit ✅, 54 integration ✅, 10 E2E including accessibility and keyboard ✅, coverage 85.7% lines.
 
 ## Next task
 

@@ -27,7 +27,7 @@ describe("formatMoney", () => {
 
 describe("formatBytes", () => {
   it.each([
-    [null, "—"],
+    [null, "Unknown"],
     [512 * 1024, "512 KB"],
     [300 * 1024 ** 2, "300 MB"],
     [1024 ** 3, "1 GB"],

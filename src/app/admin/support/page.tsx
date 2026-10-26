@@ -26,7 +26,7 @@ export default async function AdminSupport({ searchParams }: { searchParams: Sea
             <Td>{t.user.email}</Td>
             <Td>{t.category}</Td>
             <Td>{t.priority}</Td>
-            <Td mono>{t.order?.number ?? "—"}</Td>
+            <Td mono>{t.order?.number ?? "None"}</Td>
             <Td><StatusBadge status={t.status} /></Td>
             <Td className="text-muted-foreground">{formatRelative(t.updatedAt)}</Td>
           </tr>

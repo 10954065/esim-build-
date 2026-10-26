@@ -15,9 +15,9 @@ import { getEnv } from "../src/server/env";
 
 async function seedPricingRules(currency: string) {
   const defaults = [
-    { name: "Default margin — all products (seed)", productType: null, markupPercent: "25", markupFixed: "0", minProfit: "0.30" },
-    { name: "Default margin — verification numbers (seed)", productType: "VERIFICATION" as const, markupPercent: "45", markupFixed: "0.10", minProfit: "0.20" },
-    { name: "Default margin — number rentals (seed)", productType: "RENTAL" as const, markupPercent: "35", markupFixed: "0", minProfit: "0.50" },
+    { name: "Default margin: all products (seed)", productType: null, markupPercent: "25", markupFixed: "0", minProfit: "0.30" },
+    { name: "Default margin: verification numbers (seed)", productType: "VERIFICATION" as const, markupPercent: "45", markupFixed: "0.10", minProfit: "0.20" },
+    { name: "Default margin: number rentals (seed)", productType: "RENTAL" as const, markupPercent: "35", markupFixed: "0", minProfit: "0.50" },
   ];
   for (const rule of defaults) {
     const existing = await db.pricingRule.findFirst({ where: { name: rule.name } });
@@ -48,7 +48,7 @@ async function main() {
     }
     console.info("  DEMO catalogue synced from the sandbox supplier (not real inventory).");
   } else {
-    console.info("  Supplier is not in sandbox mode — no catalogue seeded. Use the admin 'Sync catalogue' action.");
+    console.info("  Supplier is not in sandbox mode, so no catalogue was seeded. Use the admin 'Sync catalogue' action.");
   }
 }
 

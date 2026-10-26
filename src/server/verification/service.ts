@@ -173,7 +173,7 @@ export async function cancelVerification(userId: string, verificationId: string)
 
 /**
  * Sweep: poll active sessions that have not been checked recently (webhooks are primary),
- * and settle expired sessions — refunding the customer when the supplier refunded us.
+ * and settle expired sessions, refunding the customer when the supplier refunded us.
  */
 export async function sweepVerifications(limit = 20): Promise<{ polled: number; settled: number }> {
   const now = Date.now();

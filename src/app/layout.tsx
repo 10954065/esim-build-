@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Inter } from "next/font/google";
+import { Geist_Mono, Inter, Space_Grotesk } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteConfig } from "@/lib/site";
@@ -7,11 +7,13 @@ import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
+// Display face for headings: geometric, signage-like, pairs with Inter for body text.
+const spaceGrotesk = Space_Grotesk({ variable: "--font-display", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} — Travel eSIMs & SMS verification numbers`,
+    default: `${siteConfig.name} · Travel eSIMs & SMS verification numbers`,
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -19,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: siteConfig.name,
-    title: `${siteConfig.name} — Travel eSIMs & SMS verification numbers`,
+    title: `${siteConfig.name} · Travel eSIMs & SMS verification numbers`,
     description: siteConfig.description,
     url: siteConfig.url,
   },
@@ -35,7 +37,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <a
           href="#main"

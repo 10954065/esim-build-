@@ -148,8 +148,8 @@ export default async function DestinationPage({
             <h2 className="font-semibold">Before you buy</h2>
             <ul className="mt-3 space-y-2.5 text-sm text-muted-foreground">
               {[
-                "Your phone must support eSIM and be carrier-unlocked.",
-                "Most eSIM profiles can be installed only once — keep it after installing.",
+                "Your phone must support eSIM and be unlocked by your carrier.",
+                "Most eSIM profiles can be installed only once, so keep it after installing.",
                 "Validity may start at installation or first use, depending on the network.",
               ].map((t) => (
                 <li key={t} className="flex gap-2">
@@ -159,7 +159,7 @@ export default async function DestinationPage({
               ))}
             </ul>
             <Link href="/device-compatibility" className="mt-4 inline-flex text-sm font-semibold text-primary hover:underline">
-              Check your device is eSIM-compatible
+              Check your phone supports eSIM
             </Link>
           </div>
           <div className="surface p-5">

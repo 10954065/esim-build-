@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const result = await getVerificationService(country, service);
   if (!result?.service) return { title: "Service not found" };
   return {
-    title: `${result.service.name} verification number — ${result.country.name}`,
+    title: `${result.service.name} verification number · ${result.country.name}`,
     description: `Temporary ${result.country.name} number to receive a ${result.service.name} SMS code. Live price and availability.`,
     alternates: { canonical: `/verification/${result.country.slug}/${result.service.slug}` },
   };
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 /** Supplier-reported delivery rate (a percentage) as a bar; a dash when none is reported. */
 function DeliveryRate({ value }: { value: number | null }) {
-  if (value === null) return <span className="text-muted-foreground">—</span>;
+  if (value === null) return <span className="text-muted-foreground">Not reported</span>;
   const pct = Math.max(0, Math.min(100, value));
   return (
     <span className="flex items-center gap-2">
@@ -150,7 +150,7 @@ export default async function VerificationServicePage({ params }: { params: Prom
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
             Delivery rates are reported by the supplier and are not a guarantee. Prices refreshed {formatRelative(result.country.offersSyncedAt)}; the
-            price is re-checked with the supplier at checkout.
+            price is checked again with the supplier at checkout.
           </p>
         </section>
 
@@ -164,7 +164,7 @@ export default async function VerificationServicePage({ params }: { params: Prom
             </p>
             <div className="mt-4 flex items-end justify-between border-t pt-4">
               <span className="text-muted-foreground">From</span>
-              <Price value={service.fromPrice} className="text-2xl text-foreground" unavailableLabel="—" />
+              <Price value={service.fromPrice} className="text-2xl text-foreground" unavailableLabel="Unavailable" />
             </div>
           </div>
           <div className="flex gap-3 rounded-2xl border bg-card p-4">

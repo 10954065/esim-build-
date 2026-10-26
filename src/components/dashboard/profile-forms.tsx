@@ -33,7 +33,7 @@ export function ProfileForm({ name, email, countryCode }: { name: string; email:
       <Field id="email" label="Email" hint="Contact support to change your email address.">
         <Input id="email" value={email} disabled readOnly />
       </Field>
-      <Field id="country" label="Country of residence (optional)" hint="2-letter code, e.g. GH, US, GB.">
+      <Field id="country" label="Country of residence (optional)" hint="Two letter code, e.g. GH, US, GB.">
         <Input id="country" value={values.countryCode} maxLength={2} onChange={(e) => setValues((v) => ({ ...v, countryCode: e.target.value.toUpperCase() }))} className="w-24 uppercase" />
       </Field>
       <Button type="submit" disabled={pending}>{pending && <Loader2 className="animate-spin" />} Save changes</Button>
@@ -62,7 +62,7 @@ export function DeletionRequest({ requestedAt }: { requestedAt: string | null })
       }}
     >
       <p className="text-sm text-muted-foreground">
-        We will delete or anonymise your personal data. Records we are legally required to keep (payments, refunds, fraud-prevention logs)
+        We will delete or anonymise your personal data. Records we are legally required to keep (payments, refunds, fraud prevention logs)
         are retained for the required period. Active eSIMs keep working; active numbers stop being visible to you.
       </p>
       <Field id="confirm-delete" label='Type "DELETE" to confirm'>

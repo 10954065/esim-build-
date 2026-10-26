@@ -4,20 +4,20 @@ import { db } from "@/server/db";
 
 /**
  * Typed, non-secret runtime settings stored in SystemSetting. Admins can change these
- * without a deploy. Secrets never live here — they stay in environment variables.
+ * without a deploy. Secrets never live here, they stay in environment variables.
  */
 
 export const SETTINGS = {
-  "pricing.fxMaxAgeHours": { schema: z.number().int().min(1).max(24 * 30), default: 24, label: "Max exchange-rate age (hours)" },
+  "pricing.fxMaxAgeHours": { schema: z.number().int().min(1).max(24 * 30), default: 24, label: "Max exchange rate age (hours)" },
   "catalog.esimPackagesTtlMinutes": { schema: z.number().int().min(5).max(10080), default: 360, label: "eSIM package refresh interval (minutes)" },
   "catalog.offersTtlMinutes": { schema: z.number().int().min(1).max(1440), default: 10, label: "Verification/rental offer refresh interval (minutes)" },
   "orders.paymentWindowMinutes": { schema: z.number().int().min(5).max(1440), default: 60, label: "Unpaid order expiry (minutes)" },
-  "verification.autoRefundOnExpiry": { schema: z.boolean(), default: true, label: "Auto-refund expired activations with no SMS (after supplier refund)" },
+  "verification.autoRefundOnExpiry": { schema: z.boolean(), default: true, label: "Refund expired activations with no SMS automatically (after supplier refund)" },
   "rentals.reminderHoursBefore": { schema: z.number().int().min(1).max(168), default: 24, label: "Rental expiry reminder (hours before)" },
   "limits.maxOrdersPerUserPerDay": { schema: z.number().int().min(1).max(1000), default: 20, label: "Max orders per customer per day" },
   "limits.maxActiveVerificationsPerUser": { schema: z.number().int().min(1).max(100), default: 5, label: "Max concurrent verification sessions per customer" },
   "store.purchasesEnabled": { schema: z.boolean(), default: true, label: "Accept new purchases" },
-  "store.announcement": { schema: z.string().max(280), default: "", label: "Site-wide announcement (empty to hide)" },
+  "store.announcement": { schema: z.string().max(280), default: "", label: "Announcement across the site (empty to hide)" },
 } as const;
 
 export type SettingKey = keyof typeof SETTINGS;

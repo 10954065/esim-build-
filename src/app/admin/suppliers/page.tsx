@@ -39,14 +39,14 @@ export default async function AdminSuppliers({ searchParams }: { searchParams: S
             <dl className="grid gap-3 text-sm md:grid-cols-4">
               <div><dt className="text-muted-foreground">API key</dt><dd className="font-mono">{s.mode === "LIVE" ? (env.SMS1001_API_KEY ? "configured ••••" : "missing") : "not required"}</dd></div>
               <div><dt className="text-muted-foreground">Webhook secret</dt><dd className="font-mono">{s.mode === "LIVE" ? (env.SMS1001_WEBHOOK_SECRET ? "configured ••••" : "missing") : "sandbox secret"}</dd></div>
-              <div><dt className="text-muted-foreground">Health</dt><dd>{s.lastHealthOk === null ? "Not checked" : s.lastHealthOk ? "OK" : `Failing — ${s.lastHealthError}`} ({formatDateTime(s.lastHealthAt)})</dd></div>
+              <div><dt className="text-muted-foreground">Health</dt><dd>{s.lastHealthOk === null ? "Not checked" : s.lastHealthOk ? "OK" : `Failing: ${s.lastHealthError}`} ({formatDateTime(s.lastHealthAt)})</dd></div>
               <div><dt className="text-muted-foreground">Products</dt><dd>{s._count.products}</dd></div>
             </dl>
             <p className="mt-3 text-sm">
               Balance history:{" "}
               {s.balances.length ? s.balances.map((b) => `${formatMoney(b.balance.toString(), b.currency)} (${formatDateTime(b.capturedAt)})`).join(" · ") : "none yet"}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">Supplier balance is our prepaid account with the supplier — never customer money.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Supplier balance is our prepaid account with the supplier, never customer money.</p>
           </Panel>
         ))}
         <Panel title="Recent catalogue syncs">
@@ -54,7 +54,7 @@ export default async function AdminSuppliers({ searchParams }: { searchParams: S
             {logs.map((l) => (
               <tr key={l.id}>
                 <Td>{l.kind}</Td>
-                <Td mono>{l.scope ?? "—"}</Td>
+                <Td mono>{l.scope ?? "All"}</Td>
                 <Td>{l.status}</Td>
                 <Td>{l.itemsUpserted}</Td>
                 <Td>{l.itemsDeactivated}</Td>

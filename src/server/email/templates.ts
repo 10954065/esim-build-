@@ -75,10 +75,10 @@ export const templates = {
   twoFactorChanged(input: { name: string; enabled: boolean }): RenderedEmail {
     return {
       template: "security-2fa-changed",
-      subject: `Security alert: two-factor authentication ${input.enabled ? "enabled" : "disabled"}`,
-      ...layout(`Two-factor authentication ${input.enabled ? "enabled" : "disabled"}`, [
+      subject: `Security alert: two factor authentication ${input.enabled ? "enabled" : "disabled"}`,
+      ...layout(`Two factor authentication ${input.enabled ? "enabled" : "disabled"}`, [
         `Hi ${input.name},`,
-        `Two-factor authentication was ${input.enabled ? "turned on" : "turned off"} for your account.`,
+        `Two factor authentication was ${input.enabled ? "turned on" : "turned off"} for your account.`,
         "If you did not make this change, secure your account and contact support.",
       ]),
     };

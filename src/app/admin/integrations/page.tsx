@@ -1,7 +1,7 @@
 import { retryDeadJobAction } from "@/app/admin/actions";
 import { AdminHeader, Panel, Table, Td } from "@/components/admin/admin-ui";
 import { ActionNotice, type SearchParams } from "@/components/admin/notice";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, humanizeKey } from "@/lib/format";
 import { can } from "@/server/auth/permissions";
 import { requireStaff } from "@/server/auth/session";
 import { integrationsStatus } from "@/server/admin/queries";
@@ -55,7 +55,7 @@ export default async function AdminIntegrations({ searchParams }: { searchParams
         </Panel>
         <Panel title="Jobs (24 hours)">
           <Table head={["Type", "Status", "Count"]} empty={status.jobStats.length === 0}>
-            {status.jobStats.map((j) => <tr key={`${j.type}${j.status}`}><Td mono>{j.type}</Td><Td>{j.status}</Td><Td>{j._count}</Td></tr>)}
+            {status.jobStats.map((j) => <tr key={`${j.type}${j.status}`}><Td>{humanizeKey(j.type)}</Td><Td>{j.status}</Td><Td>{j._count}</Td></tr>)}
           </Table>
         </Panel>
         <Panel title="Email delivery (7 days)">
@@ -67,7 +67,7 @@ export default async function AdminIntegrations({ searchParams }: { searchParams
           <Table head={["Type", "Error", "When", ""]} empty={deadJobs.length === 0}>
             {deadJobs.map((j) => (
               <tr key={j.id}>
-                <Td mono>{j.type}</Td>
+                <Td>{humanizeKey(j.type)}</Td>
                 <Td className="max-w-xs truncate text-destructive">{j.lastError}</Td>
                 <Td className="text-muted-foreground">{formatDateTime(j.updatedAt)}</Td>
                 <Td>

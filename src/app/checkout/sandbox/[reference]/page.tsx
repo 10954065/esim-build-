@@ -7,7 +7,7 @@ import { requireUser } from "@/server/auth/session";
 import { db } from "@/server/db";
 import { isSandboxEnabled } from "@/server/sandbox/ops";
 
-/** SANDBOX GATEWAY PAGE — simulates the hosted payment page. 404 unless sandbox mode is active. */
+/** SANDBOX GATEWAY PAGE: simulates the hosted payment page. 404 unless sandbox mode is active. */
 export default async function SandboxPaymentPage({ params }: { params: Promise<{ reference: string }> }) {
   if (!isSandboxEnabled()) notFound();
   const { reference } = await params;

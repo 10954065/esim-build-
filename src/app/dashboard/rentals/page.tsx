@@ -21,9 +21,9 @@ export default async function RentalsPage() {
   return (
     <div className="space-y-6">
       <AutoRefresh active={anyActive} seconds={15} />
-      <PageHeader eyebrow="Long-term numbers" title="Number rentals" description="Numbers you rent and every message they receive." actions={<Button asChild className="h-10 px-4"><Link href="/numbers/rentals">Rent a number</Link></Button>} />
+      <PageHeader eyebrow="Long term numbers" title="Number rentals" description="Numbers you rent and every message they receive." actions={<Button asChild className="h-10 px-4"><Link href="/numbers/rentals">Rent a number</Link></Button>} />
       {rentals.length === 0 ? (
-        <EmptyState icon={PhoneCall} title="No rentals yet" description="Long-term numbers you rent appear here with their messages." action={<Button asChild size="sm"><Link href="/numbers/rentals">Rent a number</Link></Button>} />
+        <EmptyState icon={PhoneCall} title="No rentals yet" description="Long term numbers you rent appear here with their messages." action={<Button asChild size="sm"><Link href="/numbers/rentals">Rent a number</Link></Button>} />
       ) : (
         <div className="space-y-4">
           {rentals.map((r) => (

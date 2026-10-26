@@ -11,21 +11,21 @@ export default function PrivacyPage() {
       <section>
         <h2>What we collect</h2>
         <ul>
-          <li><strong>Account:</strong> name, email address, password (stored as a secure hash), optional country, two-factor settings.</li>
+          <li><strong>Account:</strong> name, email address, password (stored as a secure hash), optional country, two factor settings.</li>
           <li><strong>Orders:</strong> products purchased, prices, supplier references and order status history.</li>
           <li><strong>Payments:</strong> payment provider references, amount, currency and status. We never receive or store full card details.</li>
           <li><strong>Issued products:</strong> eSIM activation details (encrypted), assigned phone numbers, and SMS received on your numbers (encrypted).</li>
-          <li><strong>Security logs:</strong> IP address and device information for sign-ins and sensitive actions.</li>
+          <li><strong>Security logs:</strong> IP address and device information when you sign in and for sensitive actions.</li>
         </ul>
       </section>
       <section>
         <h2>How we use it</h2>
-        <p>To provide and support your orders, verify payments, issue refunds, secure accounts, prevent fraud and abuse, and comply with law. We do not sell personal data and do not use it for third-party advertising.</p>
+        <p>To provide and support your orders, verify payments, issue refunds, secure accounts, prevent fraud and abuse, and comply with law. We do not sell personal data and do not use it for third party advertising.</p>
       </section>
       <section>
         <h2>Who we share it with</h2>
         <ul>
-          <li>Our telecommunications supplier, to fulfil orders (they receive the product details needed to issue eSIMs and numbers — not your name or email).</li>
+          <li>Our telecommunications supplier, to fulfil orders (they receive the product details needed to issue eSIMs and numbers, not your name or email).</li>
           <li>Our payment provider, to process payments and refunds.</li>
           <li>Our email provider, to send account and order emails. Emails never contain SMS content or eSIM activation codes.</li>
           <li>Authorities, when legally required.</li>
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
       </section>
       <section>
         <h2>Security</h2>
-        <p>Sensitive data is encrypted at rest, access is restricted by role, privileged actions are audit-logged, and all traffic uses HTTPS.</p>
+        <p>Sensitive data is encrypted at rest, access is restricted by role, privileged actions are recorded in an audit log, and all traffic uses HTTPS.</p>
       </section>
       <section>
         <h2>Your rights</h2>

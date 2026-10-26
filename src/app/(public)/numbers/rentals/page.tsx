@@ -13,21 +13,21 @@ import { getRentalOffers, listRentalCountries } from "@/server/catalog/queries";
 import { getStorefrontStatus } from "@/server/storefront";
 
 export const metadata: Metadata = {
-  title: "Long-term virtual number rentals",
+  title: "Long term virtual number rentals",
   description: "Rent a virtual phone number for days or months to receive SMS. Live terms, availability and prices from our supplier.",
   alternates: { canonical: "/numbers/rentals" },
 };
 
 const GROUPS = [
   { key: "unlimited", title: "Numbers for all services", hint: "Receives SMS from any sender for the whole term." },
-  { key: "service", title: "Service-specific numbers", hint: "Cheaper, but only receives SMS from the named service." },
+  { key: "service", title: "Numbers for one service", hint: "Cheaper, but only receives SMS from the named service." },
 ];
 
 const FACTS = [
   { icon: MessageSquareText, text: "Receive SMS for the whole term" },
   { icon: BellRing, text: "Reminder before the term ends" },
   { icon: RefreshCcwDot, text: "Never renewed automatically" },
-  { icon: PhoneOff, text: "SMS only — no voice calls" },
+  { icon: PhoneOff, text: "SMS only, no voice calls" },
 ];
 
 export default async function RentalsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -46,7 +46,7 @@ export default async function RentalsPage({ searchParams }: { searchParams: Prom
           <p className="eyebrow mt-6">Rentals</p>
           <h1 className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">Keep a number for days or months</h1>
           <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
-            Rentals are for receiving SMS over a longer period. Numbers are SMS-only (no voice calls) and are never renewed automatically —
+            Rentals are for receiving SMS over a longer period. Numbers are SMS only (no voice calls) and are never renewed automatically;
             you choose whether to buy another term.
           </p>
           <ul className="mt-6 flex flex-wrap gap-2 text-xs font-medium">

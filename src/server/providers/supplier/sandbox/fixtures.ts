@@ -1,5 +1,5 @@
 /**
- * SANDBOX FIXTURES — clearly fictional demo data for development and automated tests.
+ * SANDBOX FIXTURES: clearly fictional demo data for development and automated tests.
  * None of these records represent real supplier inventory or real prices.
  */
 

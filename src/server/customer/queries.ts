@@ -108,7 +108,7 @@ export async function listEsims(userId: string) {
   });
 }
 
-/** Full eSIM detail including decrypted activation data — owner only. */
+/** Full eSIM detail including decrypted activation data, owner only. */
 export async function getEsim(userId: string, id: string) {
   if (!isUuid(id)) return null;
   const esim = await db.esimActivation.findFirst({

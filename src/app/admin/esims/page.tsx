@@ -24,7 +24,7 @@ export default async function AdminEsims({ searchParams }: { searchParams: Searc
             <Td mono><Link href={`/admin/orders/${e.orderItem.order.id}`} className="underline">{e.orderItem.order.number}</Link> <DemoBadge show={e.isSandbox} /></Td>
             <Td>{e.user.email}</Td>
             <Td className="max-w-xs truncate">{e.orderItem.description}</Td>
-            <Td mono>{e.iccid ?? "—"}</Td>
+            <Td mono>{e.iccid ?? "Pending"}</Td>
             <Td mono>{e.supplierOrderRef}</Td>
             <Td><StatusBadge status={e.status} /></Td>
             <Td className="text-muted-foreground">{formatDateTime(e.createdAt)}</Td>

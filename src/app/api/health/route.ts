@@ -4,7 +4,7 @@ import { db } from "@/server/db";
 export const dynamic = "force-dynamic";
 
 /**
- * Public liveness/readiness check. Reveals only up/down status — never credentials,
+ * Public liveness/readiness check. Reveals only up/down status, never credentials,
  * supplier balances, versions or stack traces.
  */
 export async function GET() {

@@ -10,7 +10,7 @@ import { signPayload } from "@/server/providers/supplier/signature";
 import { handlePaymentWebhook, handleSupplierWebhook } from "@/server/webhooks/handlers";
 
 /**
- * SANDBOX OPERATIONS — simulate the outside world (customer paying at the gateway, gateway
+ * SANDBOX OPERATIONS: simulate the outside world (customer paying at the gateway, gateway
  * settling a refund, an SMS arriving) by producing correctly signed webhooks and feeding them
  * through the same handlers as real events. Every function refuses to run unless the sandbox
  * providers are active, and env validation forbids those in production.

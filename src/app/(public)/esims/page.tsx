@@ -143,7 +143,7 @@ export default async function EsimsPage({ searchParams }: { searchParams: Promis
                   <h2 id={`group-${g.kind}`} className="mb-4 text-xl font-semibold">
                     {g.title} <span className="text-base font-normal text-muted-foreground">({items.length})</span>
                   </h2>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  <div className="stagger grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {items.map((d) => (
                       <DestinationCard key={d.id} d={d} />
                     ))}

@@ -20,25 +20,29 @@ export default async function DashboardHome() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow">Account overview</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">Welcome back, {user.name.split(" ")[0]}</h1>
-          <p className="mt-1 text-muted-foreground">Your orders, eSIMs and numbers in one place.</p>
+      <section className="relative isolate overflow-hidden rounded-3xl bg-ink px-6 py-8 text-ink-foreground shadow-raised sm:px-8">
+        <div aria-hidden className="grid-lines absolute inset-0 -z-10 [mask-image:linear-gradient(to_left,#000,transparent)]" />
+        <div aria-hidden className="absolute -top-24 -right-16 -z-10 size-72 rounded-full bg-primary/45 blur-3xl" />
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.16em] text-mint uppercase">Account overview</p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Welcome back, {user.name.split(" ")[0]}</h1>
+            <p className="mt-2 text-white/70">Your orders, eSIMs and numbers in one place.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild className="h-10 px-4 shadow-glow">
+              <Link href="/esims">
+                <Plus /> Buy an eSIM
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="h-10 border-white/20 bg-white/10 px-4 text-white hover:bg-white/20 hover:text-white">
+              <Link href="/verification">
+                <MessageSquareText /> Get a number
+              </Link>
+            </Button>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button asChild className="h-10 px-4">
-            <Link href="/esims">
-              <Plus /> Buy an eSIM
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="h-10 bg-accent px-4 text-primary hover:bg-accent/70">
-            <Link href="/verification">
-              <MessageSquareText /> Get a number
-            </Link>
-          </Button>
-        </div>
-      </div>
+      </section>
 
       <ul aria-label="Account summary" className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {stats.map((st) => (

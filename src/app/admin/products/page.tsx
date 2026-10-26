@@ -44,7 +44,7 @@ export default async function AdminProducts({ searchParams }: { searchParams: Se
               <Td mono>{p.supplierProductCode.slice(0, 32)}</Td>
               <Td className="tabular-nums">{p.wholesaleCost.toString()} {p.wholesaleCurrency}</Td>
               <Td className="tabular-nums">{price ? formatMoney(price.unitPrice, price.currency) : <span className="text-destructive">No price</span>}</Td>
-              <Td className="tabular-nums">{price ? formatMoney(price.grossProfit, price.currency) : "—"}</Td>
+              <Td className="tabular-nums">{price ? formatMoney(price.grossProfit, price.currency) : "Unavailable"}</Td>
               <Td>{p.isActive ? "Available" : <span className="text-muted-foreground">Unavailable</span>}</Td>
               <Td>
                 {manage ? (

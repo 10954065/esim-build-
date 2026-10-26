@@ -9,20 +9,20 @@ export const metadata: Metadata = { title: "Help centre", description: "Guides f
 const TOPICS = [
   {
     icon: Smartphone,
-    title: "Data-only eSIM vs. a phone number",
+    title: "Data only eSIM vs. a phone number",
     body: "Travel eSIMs give you mobile data but no ordinary phone number. They cannot receive SMS codes. Only plans that explicitly list a phone number, SMS or voice include those features.",
     links: [{ href: "/device-compatibility", label: "Check device compatibility" }, { href: "/esims", label: "Browse eSIMs" }],
   },
   {
     icon: MessageSquareText,
     title: "Temporary verification numbers",
-    body: "A one-time number for receiving a code from one service within a time limit set by the supplier. Some services reject virtual numbers, so delivery is not guaranteed.",
+    body: "A single use number for receiving a code from one service within a time limit set by the supplier. Some services reject virtual numbers, so delivery is not guaranteed.",
     links: [{ href: "/verification", label: "Choose a country" }, { href: "/acceptable-use", label: "Acceptable use" }],
   },
   {
     icon: PhoneCall,
-    title: "Long-term rentals",
-    body: "Keep a number for days or months to receive SMS over time. Rentals are SMS-only, never auto-renew, and we remind you before they expire.",
+    title: "Long term rentals",
+    body: "Keep a number for days or months to receive SMS over time. Rentals are SMS only, never renew automatically, and we remind you before they expire.",
     links: [{ href: "/numbers/rentals", label: "See rental terms" }],
   },
   {
@@ -34,7 +34,7 @@ const TOPICS = [
   {
     icon: UserRound,
     title: "Your account",
-    body: "Manage your profile, password, two-factor authentication and active sessions from the dashboard. You can request account deletion from your profile.",
+    body: "Manage your profile, password, two factor authentication and active sessions from the dashboard. You can request account deletion from your profile.",
     links: [{ href: "/dashboard/security", label: "Security settings" }, { href: "/privacy", label: "Privacy policy" }],
   },
   {

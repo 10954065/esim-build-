@@ -7,7 +7,7 @@ import type { RenderedEmail } from "./templates";
 /**
  * Transactional email delivery with a durable record per message (EmailDelivery).
  * - resend: POST https://api.resend.com/emails (server-side key)
- * - log: development only — stores the rendered body for the /dev/mailbox page.
+ * - log: development only, stores the rendered body for the /dev/mailbox page.
  * Sends retry inline with backoff; final failures are recorded for staff review.
  */
 

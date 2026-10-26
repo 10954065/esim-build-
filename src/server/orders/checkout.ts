@@ -57,8 +57,8 @@ export type QuoteResult = { ok: true; quote: CheckoutQuote } | { ok: false; reas
 
 function describe(p: ProductRow): { title: string; subtitle: string } {
   if (p.type === "ESIM") return { title: p.name, subtitle: `${p.destination?.name ?? "Travel"} eSIM · data only` };
-  if (p.type === "VERIFICATION") return { title: `${p.service?.name ?? "Service"} verification number`, subtitle: `${p.country?.name ?? ""} · one-time activation` };
-  return { title: p.name, subtitle: `${p.country?.name ?? ""} · rental, never auto-renews` };
+  if (p.type === "VERIFICATION") return { title: `${p.service?.name ?? "Service"} verification number`, subtitle: `${p.country?.name ?? ""} · single activation` };
+  return { title: p.name, subtitle: `${p.country?.name ?? ""} · rental, never renews automatically` };
 }
 
 function flagOf(p: ProductRow): CheckoutQuote["flag"] {

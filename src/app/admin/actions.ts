@@ -54,7 +54,7 @@ export async function retryFulfilmentAction(fd: FormData) {
   return run(fd, "orders.manage", async (user) => {
     await retryFulfilment(z.uuid().parse(str(fd, "fulfilmentId")), user, reasonSchema.parse(str(fd, "reason")));
     kickJobs();
-    return "Fulfilment re-queued.";
+    return "Fulfilment queued again.";
   });
 }
 
@@ -201,7 +201,7 @@ export async function createPromotionAction(fd: FormData) {
     const amountOff = str(fd, "amountOff");
     if (!percentOff === !amountOff) throw new Error("Set either a percentage or a fixed amount.");
     const data = {
-      code: z.string().trim().toUpperCase().regex(/^[A-Z0-9_-]{3,40}$/, "Code: 3–40 letters, numbers, - or _").parse(str(fd, "code")),
+      code: z.string().trim().toUpperCase().regex(/^[A-Z0-9_-]{3,40}$/, "Code: 3 to 40 letters, numbers, hyphens or underscores").parse(str(fd, "code")),
       description: str(fd, "description").slice(0, 200) || null,
       percentOff: percentOff ? decimalField.parse(percentOff) : null,
       amountOff: amountOff ? toDbAmount(decimalField.parse(amountOff)) : null,
@@ -278,6 +278,6 @@ export async function retryDeadJobAction(fd: FormData) {
     await db.job.update({ where: { id }, data: { status: "PENDING", attempts: 0, runAt: new Date(), lastError: null, completedAt: null } });
     await writeAudit({ actorId: user.id, actorRole: user.role, action: "jobs.retried", entityType: "job", entityId: id, metadata: { type: job.type } });
     kickJobs(3);
-    return "Job re-queued.";
+    return "Job queued again.";
   });
 }

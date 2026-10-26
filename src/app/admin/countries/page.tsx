@@ -37,8 +37,8 @@ export default async function AdminCountries({ searchParams }: { searchParams: S
               <tr key={c.id}>
                 <Td>{c.name}</Td>
                 <Td mono>{c.code}</Td>
-                <Td>{c.hasVerification ? "Yes" : "—"}</Td>
-                <Td>{c.hasRentals ? "Yes" : "—"}</Td>
+                <Td>{c.hasVerification ? "Yes" : "No"}</Td>
+                <Td>{c.hasRentals ? "Yes" : "No"}</Td>
                 <Td>{manage ? <ToggleButton action={toggleCountryAction} id={c.id} enabled={c.isEnabled} /> : c.isEnabled ? "Yes" : "No"}</Td>
               </tr>
             ))}

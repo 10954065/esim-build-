@@ -18,12 +18,12 @@ export default function HowItWorksPage() {
       <section>
         <h2>2. Review and pay</h2>
         <p>
-          At checkout you see the exact amount and currency. We re-check the supplier price for numbers just before you pay. You then
-          pay on the payment provider&apos;s secure page — we never see or store your card details.
+          At checkout you see the exact amount and currency. We check the supplier price again for numbers just before you pay. You then
+          pay on the payment provider&apos;s secure page. We never see or store your card details.
         </p>
       </section>
       <section>
-        <h2>3. Server-side payment verification</h2>
+        <h2>3. Payment verification on our server</h2>
         <p>
           The payment provider notifies our server with a signed message, and our server independently confirms the payment amount and
           currency. A success screen in your browser alone never releases a product.

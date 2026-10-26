@@ -30,7 +30,7 @@ export function formatMoney(amount: string | number, currency: string, locale = 
 }
 
 export function formatBytes(bytes: bigint | number | null | undefined): string {
-  if (bytes === null || bytes === undefined) return "—";
+  if (bytes === null || bytes === undefined) return "Unknown";
   const n = Number(bytes);
   if (n >= 1024 ** 3) return `${(n / 1024 ** 3).toFixed(n % 1024 ** 3 === 0 ? 0 : 1)} GB`;
   if (n >= 1024 ** 2) return `${Math.round(n / 1024 ** 2)} MB`;

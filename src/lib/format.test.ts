@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDateTime, formatRelative, formatTerm, formatValidity, maskPhone } from "./format";
+import { formatDate, formatDateTime, formatDayKey, formatMonthKey, formatRelative, formatTerm, formatValidity, humanizeKey, maskPhone } from "./format";
 
 describe("date formatting", () => {
-  it("shows a dash for missing dates", () => {
-    expect(formatDateTime(null)).toBe("—");
-    expect(formatDate(undefined)).toBe("—");
+  it("shows words for missing dates", () => {
+    expect(formatDateTime(null)).toBe("Not yet");
+    expect(formatDate(undefined)).toBe("Not yet");
   });
 
   it("formats Date objects and ISO strings the same way", () => {
@@ -40,7 +40,7 @@ describe("formatTerm and formatValidity", () => {
     ["180d", "6 months"],
     ["365d", "1 year"],
     ["weekly", "weekly"],
-    [null, "—"],
+    [null, "Not specified"],
   ])("formats term %s as %s", (term, expected) => {
     expect(formatTerm(term)).toBe(expected);
   });
@@ -48,7 +48,7 @@ describe("formatTerm and formatValidity", () => {
   it("formats validity in days", () => {
     expect(formatValidity(1)).toBe("1 day");
     expect(formatValidity(30)).toBe("30 days");
-    expect(formatValidity(null)).toBe("—");
+    expect(formatValidity(null)).toBe("Not specified");
   });
 });
 
@@ -59,5 +59,17 @@ describe("maskPhone", () => {
 
   it("leaves very short values unchanged", () => {
     expect(maskPhone("12345")).toBe("12345");
+  });
+});
+
+describe("report keys", () => {
+  it("formats ISO day and month keys as words", () => {
+    expect(formatDayKey("2026-10-24")).toBe("24 Oct 2026");
+    expect(formatMonthKey("2026-10")).toBe("October 2026");
+  });
+
+  it("turns machine keys into words", () => {
+    expect(humanizeKey("fulfil-order-item")).toBe("fulfil order item");
+    expect(humanizeKey("verification.poll_messages")).toBe("verification poll messages");
   });
 });

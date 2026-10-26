@@ -7,8 +7,8 @@ export default function DeviceCompatibilityPage() {
   return (
     <ProsePage
       eyebrow="Before you buy"
-      title="Is my phone eSIM-compatible?"
-      intro="Your phone must support eSIM and be carrier-unlocked. Support depends on the exact model and the country it was sold in, so always check your own device."
+      title="Does my phone support eSIM?"
+      intro="Your phone must support eSIM and be unlocked by your carrier. Support depends on the exact model and the country it was sold in, so always check your own device."
     >
       <section>
         <h2>The quickest check</h2>
@@ -19,12 +19,12 @@ export default function DeviceCompatibilityPage() {
         </ol>
       </section>
       <section>
-        <h2>Commonly eSIM-capable families</h2>
-        <p>These families generally include eSIM, but regional variants and carrier-specific models can differ:</p>
+        <h2>Phone families that usually support eSIM</h2>
+        <p>These families generally include eSIM, but regional variants and models sold by carriers can differ:</p>
         <ul>
           <li>Apple iPhone XS, XR and later (models sold in mainland China, Hong Kong and Macau may lack eSIM).</li>
           <li>Google Pixel 3 and later (some regional and carrier variants excluded).</li>
-          <li>Samsung Galaxy S20 and later, Z Fold and Z Flip series, and selected A-series models.</li>
+          <li>Samsung Galaxy S20 and later, Z Fold and Z Flip series, and selected A series models.</li>
           <li>Selected recent models from Motorola, OnePlus, Oppo, Xiaomi, Huawei and Sony.</li>
           <li>Many recent iPads (cellular models) and some laptops with mobile broadband.</li>
         </ul>

@@ -25,9 +25,9 @@ export default async function AdminRefunds({ searchParams }: { searchParams: Sea
             <Td mono><Link href={`/admin/orders/${r.order.id}`} className="underline">{r.order.number}</Link></Td>
             <Td>{r.order.user.email}</Td>
             <Td className="tabular-nums">{formatMoney(r.amount.toString(), r.currency)}</Td>
-            <Td className="max-w-xs truncate">{r.reason}{r.failureReason ? ` — ${r.failureReason}` : ""}</Td>
+            <Td className="max-w-xs truncate">{r.reason}{r.failureReason ? `: ${r.failureReason}` : ""}</Td>
             <Td>{r.initiatedByType}</Td>
-            <Td mono>{r.gatewayRefundId ?? "—"}</Td>
+            <Td mono>{r.gatewayRefundId ?? "None"}</Td>
             <Td><StatusBadge status={r.status} /></Td>
             <Td className="text-muted-foreground">{formatDateTime(r.createdAt)}</Td>
             <Td className="text-muted-foreground">{formatDateTime(r.completedAt)}</Td>

@@ -77,7 +77,7 @@ recorded in `OrderStatusHistory` with actor, reason and timestamp.
 2. Gateway webhook → signature check → `WebhookEvent` insert (unique `(source, eventId)`;
    duplicates acknowledged and ignored) → server-side **verify** call to the gateway → exact
    amount/currency/reference match → `Payment.SUCCEEDED`, `Order.PAID`, ledger journal, and a
-   `fulfil-order-item` job enqueued with a unique dedupe key — all in one DB transaction.
+   `fulfil-order-item` job enqueued with a unique dedupe key, all in one DB transaction.
    The browser return URL also triggers verification, so a lost webhook still converges.
 3. Fulfilment job: claims the `Fulfilment` row with a conditional update
    (`PENDING → SUBMITTING`); only one worker can win. The supplier call happens **outside** any
@@ -89,7 +89,7 @@ recorded in `OrderStatusHistory` with actor, reason and timestamp.
      automatic refund.
    - Uncertain (timeout / network error / 5xx without body) → `UNCERTAIN`; a reconcile job
      lists recent supplier orders and links an unambiguous match. Zero or multiple matches →
-     `NEEDS_REVIEW`. **No blind resubmission** — 1001SMS has no idempotency key.
+     `NEEDS_REVIEW`. **No blind resubmission**, 1001SMS has no idempotency key.
 4. eSIM orders that return `ready: false` stay `AWAITING_SUPPLIER` until `esim.allocated`
    arrives or polling sees `ready: true`.
 
@@ -103,7 +103,7 @@ recorded in `OrderStatusHistory` with actor, reason and timestamp.
   created when the supplier confirms a refund (`refundAmount > 0`) and no SMS was received.
 - Expired activations with no SMS: the supplier auto-refunds us ~10 minutes after expiry;
   an expiry job confirms supplier status `REFUNDED` before creating the customer refund.
-- Rentals are always ordered with `autoRenew: false` — the supplier must never charge our
+- Rentals are always ordered with `autoRenew: false`: the supplier must never charge our
   balance for a renewal the customer has not paid for.
 
 ## Caching

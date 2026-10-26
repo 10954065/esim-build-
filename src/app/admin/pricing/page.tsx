@@ -41,7 +41,7 @@ export default async function AdminPricing({ searchParams }: { searchParams: Sea
                 <Td className="text-xs">{[r.productType, r.country?.name, r.destination?.name, r.service?.name, r.product?.name].filter(Boolean).join(" · ") || "Global"}</Td>
                 <Td>{r.markupPercent.toString()}</Td>
                 <Td>{r.markupFixed.toString()} {r.currency}</Td>
-                <Td>{r.minProfit?.toString() ?? "—"}</Td>
+                <Td>{r.minProfit?.toString() ?? "None"}</Td>
                 <Td>{r.priority}</Td>
                 <Td>{r.isActive ? "Active" : "Inactive"}</Td>
                 <Td>
@@ -82,7 +82,7 @@ export default async function AdminPricing({ searchParams }: { searchParams: Sea
 
         <Panel title="Exchange rates">
           <p className="mb-3 text-sm text-muted-foreground">
-            Only needed when the supplier currency differs from the checkout currency. Rates are never fetched or hardcoded automatically — enter the rate you have verified and its source.
+            Only needed when the supplier currency differs from the checkout currency. Rates are never fetched or hardcoded automatically. Enter the rate you have verified and its source.
           </p>
           <Table head={["Pair", "Rate", "Source", "Effective"]} empty={rates.length === 0}>
             {rates.map((r) => (

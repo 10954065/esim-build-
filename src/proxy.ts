@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 /**
  * Optimistic redirect only: if there is no session cookie at all, send the visitor to the
- * sign-in page. This is NOT the security boundary — every page, server action and route
+ * sign-in page. This is NOT the security boundary, every page, server action and route
  * handler re-validates the session and permissions on the server.
  */
 export function proxy(request: NextRequest) {

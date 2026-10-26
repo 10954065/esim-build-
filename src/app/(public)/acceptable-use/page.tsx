@@ -17,7 +17,7 @@ export default function AcceptableUsePage() {
         <ul>
           <li>Commit fraud, create fraudulent accounts, or engage in scams or phishing.</li>
           <li>Impersonate another person or organisation.</li>
-          <li>Take over or access accounts that do not belong to you, or bypass another person&apos;s two-factor authentication.</li>
+          <li>Take over or access accounts that do not belong to you, or bypass another person&apos;s two factor authentication.</li>
           <li>Evade identity verification, age checks, sanctions screening, bans or restrictions imposed by a service.</li>
           <li>Intercept or attempt to receive messages intended for someone else.</li>
           <li>Send spam or bulk unsolicited messages, or harass anyone.</li>
