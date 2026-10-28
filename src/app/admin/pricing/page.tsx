@@ -34,7 +34,7 @@ export default async function AdminPricing({ searchParams }: { searchParams: Sea
       <ActionNotice sp={sp} />
       <div className="space-y-6">
         <Panel title="Margin rules">
-          <Table head={["Name", "Scope", "Markup %", "Fixed", "Min profit", "Priority", "Status", ""]} empty={rules.length === 0}>
+          <Table head={["Name", "Scope", "Markup %", "Fixed", "Min profit", "Fixed price", "Priority", "Status", ""]} empty={rules.length === 0}>
             {rules.map((r) => (
               <tr key={r.id} className={r.isActive ? "" : "opacity-50"}>
                 <Td>{r.name}</Td>
@@ -42,6 +42,7 @@ export default async function AdminPricing({ searchParams }: { searchParams: Sea
                 <Td>{r.markupPercent.toString()}</Td>
                 <Td>{r.markupFixed.toString()} {r.currency}</Td>
                 <Td>{r.minProfit?.toString() ?? "None"}</Td>
+                <Td>{r.fixedPrice ? `${r.fixedPrice.toString()} ${r.currency}` : "None"}</Td>
                 <Td>{r.priority}</Td>
                 <Td>{r.isActive ? "Active" : "Inactive"}</Td>
                 <Td>
@@ -73,6 +74,12 @@ export default async function AdminPricing({ searchParams }: { searchParams: Sea
               <input name="markupPercent" placeholder="Markup % (e.g. 25)" aria-label="Markup % (e.g. 25)" className={input} />
               <input name="markupFixed" placeholder={`Fixed markup (${env.PAYMENT_CURRENCY})`} aria-label={`Fixed markup (${env.PAYMENT_CURRENCY})`} className={input} />
               <input name="minProfit" placeholder={`Min profit (${env.PAYMENT_CURRENCY})`} aria-label={`Min profit (${env.PAYMENT_CURRENCY})`} className={input} />
+              <input
+                name="fixedPrice"
+                placeholder={`Fixed price (${env.PAYMENT_CURRENCY}), optional`}
+                aria-label={`Fixed price (${env.PAYMENT_CURRENCY}), optional. Used only while it covers cost plus min profit`}
+                className={input}
+              />
               <input name="priority" placeholder="Priority (0)" aria-label="Priority (0)" className={input} />
               <input type="hidden" name="currency" value={env.PAYMENT_CURRENCY} />
               <button className="h-8 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground">Add rule</button>

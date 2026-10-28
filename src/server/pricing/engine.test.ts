@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculatePrice, checkPromotion, PricingError, selectRule, type PricingRuleInput, type PromotionInput } from "./engine";
+import { calculatePrice, checkPromotion, priceWithRules, PricingError, selectRule, type PricingContext, type PricingRuleInput, type PromotionInput } from "./engine";
 
 const baseRule: PricingRuleInput = {
   id: "global",
@@ -11,6 +11,7 @@ const baseRule: PricingRuleInput = {
   markupPercent: "25",
   markupFixed: "0",
   minProfit: null,
+  fixedPrice: null,
   currency: "USD",
   priority: 0,
   isActive: true,
@@ -175,5 +176,57 @@ describe("promotions", () => {
     expect(checkPromotion({ ...promo, productType: "RENTAL" }, input)).toBe("wrong_product");
     expect(checkPromotion({ ...promo, minOrderAmount: "10", currency: "USD" }, input)).toBe("below_minimum");
     expect(checkPromotion({ ...promo, amountOff: "1", percentOff: null, currency: "EUR" }, input)).toBe("currency_mismatch");
+  });
+});
+
+describe("fixed price rules", () => {
+  const RATE = "11.643541"; // GHS per USD
+  const defaultGhs: PricingRuleInput = { ...baseRule, id: "default", markupPercent: "50", minProfit: "20", currency: "GHS" };
+  const flatCodes: PricingRuleInput = {
+    ...baseRule,
+    id: "flat-codes",
+    productType: "VERIFICATION",
+    markupPercent: "0",
+    minProfit: "2",
+    fixedPrice: "14",
+    currency: "GHS",
+  };
+  const codeCtx = { productType: "VERIFICATION" as const, productId: "v1", countryId: "c1", destinationId: null, serviceId: "s1" };
+  const priced = (supplierCost: string, context: PricingContext = codeCtx) =>
+    priceWithRules([defaultGhs, flatCodes], context, { supplierCost, supplierCurrency: "USD", currency: "GHS", exchangeRate: RATE });
+
+  it("sells at exactly the fixed price and records it in the breakdown", () => {
+    const b = calculatePrice({ supplierCost: "0.50", supplierCurrency: "USD", currency: "GHS", exchangeRate: RATE, rule: flatCodes });
+    expect(b.unitPrice).toBe("14");
+    expect(b.fixedPrice).toBe("14");
+    expect(b.minProfitApplied).toBe(false);
+    expect(b.grossProfit).toBe("8.1782295");
+  });
+
+  it("refuses a fixed price that would not leave the rule's minimum profit", () => {
+    // $1.10 = GHS 12.81; 12.81 + 2 > 14
+    expect(() => calculatePrice({ supplierCost: "1.10", supplierCurrency: "USD", currency: "GHS", exchangeRate: RATE, rule: flatCodes })).toThrow(
+      expect.objectContaining({ code: "FIXED_PRICE_TOO_LOW" }),
+    );
+  });
+
+  it("uses the flat price for cheap codes", () => {
+    expect(priced("0.50")).toMatchObject({ ruleId: "flat-codes", unitPrice: "14" });
+    expect(priced("1.03")).toMatchObject({ ruleId: "flat-codes", unitPrice: "14" });
+  });
+
+  it("falls back to the next matching rule when a code costs too much for the flat price", () => {
+    // $1.10 = GHS 12.81 → default rule: max(12.81 × 1.5, 12.81 + 20) = 32.81
+    expect(priced("1.10")).toMatchObject({ ruleId: "default", unitPrice: "32.81", fixedPrice: null });
+  });
+
+  it("never applies a verification flat price to eSIMs", () => {
+    expect(priced("0.50", ctx)).toMatchObject({ ruleId: "default" });
+  });
+
+  it("reports NO_RULE when only an unaffordable fixed price rule matches", () => {
+    expect(() =>
+      priceWithRules([flatCodes], codeCtx, { supplierCost: "5", supplierCurrency: "USD", currency: "GHS", exchangeRate: RATE }),
+    ).toThrow(expect.objectContaining({ code: "NO_RULE" }));
   });
 });

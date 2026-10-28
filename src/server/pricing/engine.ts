@@ -20,6 +20,8 @@ export interface PricingRuleInput {
   markupPercent: DecimalInput;
   markupFixed: DecimalInput;
   minProfit: DecimalInput | null;
+  /** Sell at exactly this price; the rule steps aside when it would not leave minProfit. */
+  fixedPrice: DecimalInput | null;
   currency: string;
   priority: number;
   isActive: boolean;
@@ -48,7 +50,7 @@ export interface PromotionInput {
   isActive: boolean;
 }
 
-export type PricingErrorCode = "NO_RULE" | "NO_RATE" | "RULE_CURRENCY_MISMATCH" | "INVALID_COST";
+export type PricingErrorCode = "NO_RULE" | "NO_RATE" | "RULE_CURRENCY_MISMATCH" | "INVALID_COST" | "FIXED_PRICE_TOO_LOW";
 
 export class PricingError extends Error {
   constructor(
@@ -71,6 +73,7 @@ export interface PriceBreakdown {
   markupFixed: string;
   minProfit: string | null;
   minProfitApplied: boolean;
+  fixedPrice: string | null;
   listPrice: string;
   promotionId: string | null;
   discount: string;
@@ -96,18 +99,37 @@ export function ruleSpecificity(rule: PricingRuleInput, ctx: PricingContext): nu
   return 0;
 }
 
+/** Matching rules, best first: most specific, then highest priority, then list order. */
+export function rankRules(rules: readonly PricingRuleInput[], ctx: PricingContext): PricingRuleInput[] {
+  return rules
+    .map((rule, index) => ({ rule, index, score: ruleSpecificity(rule, ctx) }))
+    .filter((r) => r.score >= 0)
+    .sort((a, b) => b.score - a.score || b.rule.priority - a.rule.priority || a.index - b.index)
+    .map((r) => r.rule);
+}
+
 export function selectRule(rules: readonly PricingRuleInput[], ctx: PricingContext): PricingRuleInput | null {
-  let best: PricingRuleInput | null = null;
-  let bestScore = -1;
-  for (const rule of rules) {
-    const score = ruleSpecificity(rule, ctx);
-    if (score < 0) continue;
-    if (score > bestScore || (score === bestScore && best && rule.priority > best.priority)) {
-      best = rule;
-      bestScore = score;
+  return rankRules(rules, ctx)[0] ?? null;
+}
+
+/**
+ * Prices with the best matching rule. A fixed price rule that would not cover cost plus its
+ * minimum profit steps aside for the next matching rule, so a flat price never sells at a loss.
+ */
+export function priceWithRules(
+  rules: readonly PricingRuleInput[],
+  ctx: PricingContext,
+  input: Omit<CalculatePriceInput, "rule">,
+): PriceBreakdown {
+  for (const rule of rankRules(rules, ctx)) {
+    try {
+      return calculatePrice({ ...input, rule });
+    } catch (err) {
+      if (err instanceof PricingError && err.code === "FIXED_PRICE_TOO_LOW") continue;
+      throw err;
     }
   }
-  return best;
+  throw new PricingError("NO_RULE", "No active pricing rule applies to this product");
 }
 
 export type PromotionRejection =
@@ -166,7 +188,12 @@ export function calculatePrice(input: CalculatePriceInput): PriceBreakdown {
   let price = convertedCost.times(dec(1).plus(pct.div(100))).plus(fixed);
 
   let minProfitApplied = false;
-  if (rule.minProfit !== null) {
+  if (rule.fixedPrice !== null) {
+    price = dec(rule.fixedPrice);
+    if (price.lt(convertedCost.plus(dec(rule.minProfit ?? 0)))) {
+      throw new PricingError("FIXED_PRICE_TOO_LOW", `Fixed price ${price} ${currency} does not cover cost plus minimum profit`);
+    }
+  } else if (rule.minProfit !== null) {
     const floor = convertedCost.plus(dec(rule.minProfit));
     if (price.lt(floor)) {
       price = floor;
@@ -204,6 +231,7 @@ export function calculatePrice(input: CalculatePriceInput): PriceBreakdown {
     markupFixed: fixed.toString(),
     minProfit: rule.minProfit === null ? null : dec(rule.minProfit).toString(),
     minProfitApplied,
+    fixedPrice: rule.fixedPrice === null ? null : dec(rule.fixedPrice).toString(),
     listPrice: listPrice.toString(),
     promotionId,
     discount: discount.toString(),

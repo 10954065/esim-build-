@@ -160,11 +160,13 @@ export async function createPricingRuleAction(fd: FormData) {
       markupPercent: decimalField.parse(str(fd, "markupPercent") || "0"),
       markupFixed: decimalField.parse(str(fd, "markupFixed") || "0"),
       minProfit: str(fd, "minProfit") ? decimalField.parse(str(fd, "minProfit")) : null,
+      fixedPrice: str(fd, "fixedPrice") ? decimalField.parse(str(fd, "fixedPrice")) : null,
       currency: z.string().length(3).toUpperCase().parse(str(fd, "currency")),
       priority: z.coerce.number().int().min(-100).max(100).parse(str(fd, "priority") || "0"),
       createdById: user.id,
     };
     if (dec(data.markupPercent).lt(-50) || dec(data.markupPercent).gt(1000)) throw new Error("Markup percent must be between -50 and 1000.");
+    if (data.fixedPrice !== null && dec(data.fixedPrice).lte(0)) throw new Error("A fixed price must be more than zero.");
     const rule = await db.pricingRule.create({ data });
     await writeAudit({ actorId: user.id, actorRole: user.role, action: "pricing.rule_created", entityType: "pricingRule", entityId: rule.id, ipAddress: ip, metadata: { ...data } });
     return "Pricing rule created.";

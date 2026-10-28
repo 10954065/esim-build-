@@ -4,10 +4,9 @@ import { db } from "@/server/db";
 import { getEnv } from "@/server/env";
 import { getSetting } from "@/server/settings";
 import {
-  calculatePrice,
   checkPromotion,
+  priceWithRules,
   PricingError,
-  selectRule,
   type PriceBreakdown,
   type PricingRuleInput,
   type PromotionInput,
@@ -77,6 +76,7 @@ export async function createPricingSession(supplierCurrencies: string[] = [getEn
     markupPercent: r.markupPercent.toString(),
     markupFixed: r.markupFixed.toString(),
     minProfit: r.minProfit ? r.minProfit.toString() : null,
+    fixedPrice: r.fixedPrice ? r.fixedPrice.toString() : null,
     currency: r.currency,
     priority: r.priority,
     isActive: r.isActive,
@@ -86,20 +86,19 @@ export async function createPricingSession(supplierCurrencies: string[] = [getEn
   supplierCurrencies.forEach((c, i) => rates.set(c, rateRows[i] ?? null));
 
   const price = (product: PriceableProduct, promotion?: PromotionInput | null): PriceBreakdown => {
-    const rule = selectRule(rules, {
+    const ctx = {
       productType: product.type,
       productId: product.id,
       countryId: product.countryId,
       destinationId: product.destinationId,
       serviceId: product.serviceId,
-    });
+    };
     const rate = product.wholesaleCurrency === currency ? null : (rates.get(product.wholesaleCurrency) ?? null);
-    return calculatePrice({
+    return priceWithRules(rules, ctx, {
       supplierCost: product.wholesaleCost.toString(),
       supplierCurrency: product.wholesaleCurrency,
       currency,
       exchangeRate: rate ? rate.rate : null,
-      rule,
       promotion,
     });
   };

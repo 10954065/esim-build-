@@ -529,7 +529,9 @@ model PricingRule {
   markupPercent Decimal          @default(0) @db.Decimal(9, 4)
   markupFixed   Decimal          @default(0) @db.Decimal(18, 4)
   minProfit     Decimal?         @db.Decimal(18, 4)
-  /// Currency of markupFixed / minProfit (the customer-facing currency).
+  /// Sell at exactly this price; the rule steps aside when it would not leave minProfit.
+  fixedPrice    Decimal?         @db.Decimal(18, 4)
+  /// Currency of markupFixed / minProfit / fixedPrice (the customer-facing currency).
   currency      String           @db.Char(3)
   priority      Int              @default(0)
   isActive      Boolean          @default(true)
