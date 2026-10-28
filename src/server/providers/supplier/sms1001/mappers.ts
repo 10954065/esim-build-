@@ -27,6 +27,9 @@ import {
 
 /** Pure mapping functions from documented 1001SMS shapes to normalized models. */
 
+/** Largest Postgres INTEGER. Some pooled services report stock in the billions; the exact figure past this is meaningless. */
+export const MAX_STOCK_COUNT = 2_147_483_647;
+
 export function mapDestinationKind(kind: string): DestinationKind {
   const k = kind.toLowerCase();
   if (k === "country") return "COUNTRY";
@@ -117,7 +120,7 @@ export function mapOffer(
     providerTier: op.provider,
     operator: op.operator,
     cost: op.price,
-    stock: op.count,
+    stock: Math.min(op.count, MAX_STOCK_COUNT),
     deliverability: op.deliverability ?? null,
   };
 }

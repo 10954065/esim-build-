@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { signPayload } from "../signature";
-import { mapActivation, mapActivationState, mapDestinationKind, mapEsimOrder, mapPackage, mapUnknownTerms } from "./mappers";
-import { activationOrderSchema, esimOrderSchema, packageSchema } from "./schemas";
+import { MAX_STOCK_COUNT, mapActivation, mapActivationState, mapDestinationKind, mapEsimOrder, mapOffer, mapPackage, mapUnknownTerms } from "./mappers";
+import { activationOrderSchema, esimOrderSchema, operatorSchema, packageSchema } from "./schemas";
 import { createSignedWebhookVerifier, parseSupplierWebhookBody } from "./webhook";
 
 // Fixtures copied from the documented examples at https://www.1001sms.com/api-docs.
@@ -112,6 +112,12 @@ describe("1001SMS mappers", () => {
     expect(mapUnknownTerms([{ term: "7d", days: 7, hours: 168, price: 3 }, { nope: true }])).toEqual([
       { term: "7d", days: 7, hours: 168, cost: "3" },
     ]);
+  });
+
+  it("caps pooled stock counts that exceed a database integer", () => {
+    const op = operatorSchema.parse({ operator: "any", price: 0.5, count: 8_412_962_267, provider: "STANDARD" });
+    expect(mapOffer("al", "whatsapp", "WhatsApp", op).stock).toBe(MAX_STOCK_COUNT);
+    expect(mapOffer("al", "whatsapp", "WhatsApp", { ...op, count: 42 }).stock).toBe(42);
   });
 });
 
