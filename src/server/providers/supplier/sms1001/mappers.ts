@@ -121,7 +121,8 @@ export function mapOffer(
     operator: op.operator,
     cost: op.price,
     stock: Math.min(op.count, MAX_STOCK_COUNT),
-    deliverability: op.deliverability ?? null,
+    // Reported as a percentage with decimals; stored as a whole percent.
+    deliverability: op.deliverability == null ? null : Math.round(op.deliverability),
   };
 }
 

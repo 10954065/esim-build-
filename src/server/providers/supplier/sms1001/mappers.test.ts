@@ -119,6 +119,13 @@ describe("1001SMS mappers", () => {
     expect(mapOffer("al", "whatsapp", "WhatsApp", op).stock).toBe(MAX_STOCK_COUNT);
     expect(mapOffer("al", "whatsapp", "WhatsApp", { ...op, count: 42 }).stock).toBe(42);
   });
+
+  it("rounds fractional deliverability percentages to whole numbers", () => {
+    const op = operatorSchema.parse({ operator: "any", price: 0.5, count: 3, provider: "STANDARD", deliverability: 33.33 });
+    expect(mapOffer("lt", "whatsapp", "WhatsApp", op).deliverability).toBe(33);
+    expect(mapOffer("lt", "whatsapp", "WhatsApp", { ...op, deliverability: 38.5 }).deliverability).toBe(39);
+    expect(mapOffer("lt", "whatsapp", "WhatsApp", { ...op, deliverability: null }).deliverability).toBeNull();
+  });
 });
 
 describe("1001SMS webhook parsing", () => {

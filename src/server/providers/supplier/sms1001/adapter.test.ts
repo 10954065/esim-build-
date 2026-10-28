@@ -121,11 +121,11 @@ describe("1001SMS adapter: verification numbers", () => {
   });
 
   it("gets offers for one service and for a whole country", async () => {
-    const operator = { operator: "virtual9", price: "0.35", count: 120, deliverability: 0.92, provider: "STANDARD" };
+    const operator = { operator: "virtual9", price: "0.35", count: 120, deliverability: 92.4, provider: "STANDARD" };
     const { adapter, calls } = adapterWith({ "GET /informative/pricing": { services: [{ service: "google", serviceName: "Google", operators: [operator] }], operators: [operator] } });
     const one = await adapter.verification.getOffers({ countryCode: "us", serviceSlug: "google" });
     expect(calls[0]!.query.get("service")).toBe("google");
-    expect(one).toEqual([{ countryCode: "US", serviceSlug: "google", serviceName: "google", providerTier: "STANDARD", operator: "virtual9", cost: "0.35", stock: 120, deliverability: 0.92 }]);
+    expect(one).toEqual([{ countryCode: "US", serviceSlug: "google", serviceName: "google", providerTier: "STANDARD", operator: "virtual9", cost: "0.35", stock: 120, deliverability: 92 }]);
     const all = await adapter.verification.getOffers({ countryCode: "us" });
     expect(calls[1]!.query.has("service")).toBe(false);
     expect(all[0]).toMatchObject({ serviceSlug: "google", serviceName: "Google" });
