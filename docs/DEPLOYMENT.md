@@ -85,9 +85,15 @@ Download the certificate from **Database Settings → SSL Configuration**, paste
 (The `pg` driver treats `sslmode=require` as `verify-full`, which fails against Supabase without the CA.)
 Then switch on **Enforce SSL on incoming connections** in the same settings section.
 
+Prisma's migration engine accepts any server certificate unless told otherwise, so point it at the
+same CA saved as a file (`sslcert` is Prisma's name for the server CA) and make it strict:
+
 ```bash
-DATABASE_URL="postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres?sslmode=require" pnpm db:deploy
+DATABASE_URL="postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres?sslmode=require&sslcert=/path/to/supabase-ca.crt&sslaccept=strict" pnpm db:deploy
 ```
+
+Percent-encode special characters in the password (`,` → `%2C`, `*` → `%2A`, `!` → `%21`, `@` → `%40`).
+A first connection can fail with `EAUTHQUERY ... database not available` while a paused project wakes up; retry after a few seconds.
 
 **Data API.** Supabase also serves the `public` schema over HTTP to anyone holding the project's anon key.
 The `enable_row_level_security` migration turns on RLS with no policies on every table, which denies those
