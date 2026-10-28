@@ -116,7 +116,9 @@ vercel deploy --prod
 
 Or connect the GitHub repository in the Vercel dashboard; every push to `main` deploys.
 Build command: `pnpm build` (runs `prisma generate && next build`). Install: `pnpm install`.
-`vercel.json` registers the cron (`* * * * *` → `/api/cron/jobs`).
+`vercel.json` registers a daily backup cron (`0 3 * * *` → `/api/cron/jobs`), because Hobby plans allow
+crons at most once a day. The every-minute run comes from an external scheduler (§6). On Vercel Pro,
+change the schedule to `* * * * *` and the external scheduler becomes optional.
 
 ## 5. After the first deploy
 
@@ -139,7 +141,9 @@ Build command: `pnpm build` (runs `prisma generate && next build`). Install: `pn
 
 ## 6. Without Vercel Pro
 
-Keep the endpoint and call it from any scheduler every minute, for example GitHub Actions (5-minute minimum), cron-job.org, or a small VM:
+Keep the endpoint and call it from any scheduler every minute, for example GitHub Actions (5-minute minimum), cron-job.org, or a small VM.
+With cron-job.org: create a job for `https://your-domain/api/cron/jobs`, schedule every minute, method GET,
+and under Advanced add the header `Authorization` with the value `Bearer <CRON_SECRET>`. Its run history should show `200`.
 
 ```bash
 curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://your-domain/api/cron/jobs
