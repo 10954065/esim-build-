@@ -6,9 +6,11 @@ import { Breadcrumbs } from "@/components/common/breadcrumbs";
 import { EmptyState } from "@/components/common/empty-state";
 import { Flag } from "@/components/common/flag";
 import { Container } from "@/components/common/page-header";
+import { SearchCombobox } from "@/components/common/search-combobox";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { listPopularServices, listVerificationCountries } from "@/server/catalog/queries";
+import { verificationCountrySuggestions } from "@/server/catalog/suggestions";
 
 export const metadata: Metadata = {
   title: "Temporary numbers for SMS verification",
@@ -46,7 +48,11 @@ const SCOPE = [
 export default async function VerificationPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q.trim().slice(0, 80) : undefined;
-  const [countries, services] = await Promise.all([listVerificationCountries(q), listPopularServices(12)]);
+  const [countries, services, countryOptions] = await Promise.all([
+    listVerificationCountries(q),
+    listPopularServices(12),
+    verificationCountrySuggestions(),
+  ]);
 
   return (
     <>
@@ -106,14 +112,12 @@ export default async function VerificationPage({ searchParams }: { searchParams:
                 </label>
                 <span className="relative flex-1">
                   <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-                  <input
+                  <SearchCombobox
                     id="country-search"
-                    name="q"
-                    type="search"
+                    options={countryOptions}
+                    listLabel="Countries"
                     defaultValue={q}
                     placeholder="Search countries"
-                    autoComplete="off"
-                    maxLength={80}
                     className="h-10 w-full rounded-lg border border-input bg-card pr-3 pl-9 text-base outline-none placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/12 sm:text-sm"
                   />
                 </span>

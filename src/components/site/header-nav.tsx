@@ -9,7 +9,7 @@ import { PRIMARY_NAV } from "./nav-links";
 export function HeaderNav() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Main" className="hidden h-full items-stretch gap-1 md:flex">
+    <nav aria-label="Main" className="hidden h-full items-stretch gap-1 lg:flex">
       {PRIMARY_NAV.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (
@@ -18,7 +18,8 @@ export function HeaderNav() {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "relative inline-flex items-center px-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground",
+              "relative inline-flex items-center px-3 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground",
+              "wideOnly" in item && "hidden xl:inline-flex",
               "after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-primary after:opacity-0 after:transition-opacity",
               active && "text-primary after:opacity-100 hover:text-primary",
             )}

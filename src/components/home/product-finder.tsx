@@ -1,8 +1,10 @@
 import { ArrowRight, MessageSquareText, PhoneCall, Search, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { Flag } from "@/components/common/flag";
+import { SearchCombobox } from "@/components/common/search-combobox";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { SuggestOption } from "@/lib/suggest";
 
 export interface FinderCountry {
   href: string;
@@ -35,10 +37,12 @@ const TAB_TRIGGER =
 
 /** Segmented product finder from the design: one tab per product line, quick picks with flags. */
 export function ProductFinder({
+  esimOptions,
   destinations,
   verificationCountries,
   rentalCountries,
 }: {
+  esimOptions: SuggestOption[];
   destinations: FinderCountry[];
   verificationCountries: FinderCountry[];
   rentalCountries: FinderCountry[];
@@ -64,12 +68,11 @@ export function ProductFinder({
               <span className="text-xs font-medium text-muted-foreground">Destination country or region</span>
               <span className="relative block">
                 <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-                <input
-                  name="q"
-                  type="search"
+                <SearchCombobox
+                  id="finder-esim-search"
+                  options={esimOptions}
+                  listLabel="Destinations"
                   placeholder="Country or region, e.g. Spain"
-                  autoComplete="off"
-                  maxLength={80}
                   className="h-11 w-full rounded-lg border border-input bg-card pr-3.5 pl-10 text-base outline-none placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/12 sm:text-sm"
                 />
               </span>

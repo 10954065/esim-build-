@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DashboardNav, SignOutButton } from "@/components/dashboard/dashboard-nav";
+import { HomeLink } from "@/components/site/home-link";
 import { Logo } from "@/components/site/logo";
 import { StatusBanner } from "@/components/site/status-banner";
 import { isStaffRole } from "@/server/auth/permissions";
@@ -59,6 +60,7 @@ export default async function DashboardLayout({ children }: Readonly<{ children:
             </div>
             <span className="hidden rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground lg:inline">Customer dashboard</span>
             <div className="ml-auto flex items-center gap-3 text-sm">
+              <HomeLink />
               {isStaffRole(user.role) && (
                 <Link href="/admin" className="rounded-lg border px-2.5 py-1 text-xs font-medium hover:bg-muted">
                   Admin

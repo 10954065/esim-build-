@@ -1,6 +1,7 @@
 import { ChevronDown, LogOut, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { AdminNav } from "@/components/admin/admin-nav";
+import { HomeLink } from "@/components/site/home-link";
 import { Logo } from "@/components/site/logo";
 import { permissionsFor } from "@/server/auth/permissions";
 import { requireStaff } from "@/server/auth/session";
@@ -45,7 +46,8 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
                 <ShieldAlert className="size-3.5" aria-hidden /> Enable 2FA (required in production)
               </Link>
             )}
-            <Link href="/dashboard" className="ml-auto inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium hover:bg-muted">
+            <HomeLink className="ml-auto" />
+            <Link href="/dashboard" className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium hover:bg-muted">
               <LogOut className="size-3.5" aria-hidden /> Exit admin
             </Link>
           </div>

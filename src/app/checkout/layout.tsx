@@ -1,5 +1,6 @@
 import { Lock } from "lucide-react";
 import Link from "next/link";
+import { HomeLink } from "@/components/site/home-link";
 import { Logo } from "@/components/site/logo";
 import { StatusBanner } from "@/components/site/status-banner";
 import { getStorefrontStatus } from "@/server/storefront";
@@ -16,6 +17,7 @@ export default async function CheckoutLayout({ children }: Readonly<{ children: 
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-8">
           <Logo />
           <div className="flex items-center gap-4 text-sm">
+            <HomeLink />
             <Link href="/help" className="hidden font-medium text-muted-foreground hover:text-primary sm:inline">
               Need help?
             </Link>

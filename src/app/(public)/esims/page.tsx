@@ -5,10 +5,12 @@ import { DataOnlyNotice } from "@/components/catalog/capabilities";
 import { DestinationCard } from "@/components/catalog/destination-card";
 import { Breadcrumbs } from "@/components/common/breadcrumbs";
 import { EmptyState } from "@/components/common/empty-state";
+import { SearchCombobox } from "@/components/common/search-combobox";
 import { Container } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { listEsimDestinations } from "@/server/catalog/queries";
+import { destinationSuggestions } from "@/server/catalog/suggestions";
 
 export const metadata: Metadata = {
   title: "Travel eSIM data plans",
@@ -42,7 +44,7 @@ export default async function EsimsPage({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q.trim().slice(0, 80) : undefined;
   const kind = typeof sp.kind === "string" && ["COUNTRY", "REGION", "GLOBAL"].includes(sp.kind) ? (sp.kind as Kind) : undefined;
-  const all = await listEsimDestinations({ q });
+  const [all, options] = await Promise.all([listEsimDestinations({ q }), destinationSuggestions()]);
   const destinations = kind ? all.filter((d) => d.kind === kind) : all;
   const countOf = (k: Kind | undefined) => (k ? all.filter((d) => d.kind === k).length : all.length);
 
@@ -65,14 +67,12 @@ export default async function EsimsPage({ searchParams }: { searchParams: Promis
             </label>
             <span className="relative flex-1">
               <Search className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
-              <input
+              <SearchCombobox
                 id="esim-search"
-                name="q"
-                type="search"
+                options={options}
+                listLabel="Destinations"
                 defaultValue={q}
                 placeholder="Search by country or region, e.g. Spain, Japan, Europe…"
-                autoComplete="off"
-                maxLength={80}
                 className="h-12 w-full rounded-lg bg-transparent pr-4 pl-12 text-base outline-none placeholder:text-muted-foreground"
               />
             </span>

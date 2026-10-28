@@ -15,6 +15,7 @@ import Link from "next/link";
 import { DestinationCard } from "@/components/catalog/destination-card";
 import { ServiceInitial } from "@/components/catalog/service-card";
 import { Flag } from "@/components/common/flag";
+import { SearchCombobox } from "@/components/common/search-combobox";
 import { Container } from "@/components/common/page-header";
 import { DepartureBoard } from "@/components/home/departure-board";
 import { FlagMarquee } from "@/components/home/flag-marquee";
@@ -23,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FAQ } from "@/content/faq";
 import { listEsimDestinations, listPopularServices, listRentalCountries, listVerificationCountries } from "@/server/catalog/queries";
+import { destinationSuggestions } from "@/server/catalog/suggestions";
 import { dec } from "@/server/pricing/money";
 
 const PRODUCTS = [
@@ -90,11 +92,12 @@ const TRUST = [
 ];
 
 export default async function HomePage() {
-  const [destinations, services, verificationCountries, rentalCountries] = await Promise.all([
+  const [destinations, services, verificationCountries, rentalCountries, destinationOptions] = await Promise.all([
     listEsimDestinations(),
     listPopularServices(12),
     listVerificationCountries(),
     listRentalCountries(),
+    destinationSuggestions(),
   ]);
   const featured = destinations
     .filter((d) => d.fromPrice)
@@ -133,19 +136,17 @@ export default async function HomePage() {
               Prepaid travel eSIM data and temporary numbers for SMS codes. Priced in full before you pay, verified on our server,
               delivered to your private dashboard.
             </p>
-            <form action="/esims" method="get" role="search" className="mt-8 flex max-w-xl flex-col gap-2 rounded-2xl border border-white/15 bg-white/10 p-2 shadow-glow backdrop-blur sm:flex-row">
+            <form action="/esims" method="get" role="search" className="relative z-20 mt-8 flex max-w-xl flex-col gap-2 rounded-2xl border border-white/15 bg-white/10 p-2 shadow-glow backdrop-blur sm:flex-row">
               <label htmlFor="hero-search" className="sr-only">
                 Where are you travelling?
               </label>
               <span className="relative flex-1">
                 <Search className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-white/60" aria-hidden />
-                <input
+                <SearchCombobox
                   id="hero-search"
-                  name="q"
-                  type="search"
+                  options={destinationOptions}
+                  listLabel="Destinations"
                   placeholder="Where are you travelling?"
-                  autoComplete="off"
-                  maxLength={80}
                   className="h-12 w-full rounded-xl bg-transparent pr-4 pl-12 text-base text-white outline-none placeholder:text-white/55"
                 />
               </span>
@@ -178,6 +179,7 @@ export default async function HomePage() {
       {/* Product finder overlapping the hero edge */}
       <Container className="relative z-10 -mt-14">
         <ProductFinder
+          esimOptions={destinationOptions}
           destinations={featured.slice(0, 6).map((d) => ({ href: `/esims/${d.slug}`, name: d.name, code: d.countryCode, kind: d.kind }))}
           verificationCountries={verificationCountries.slice(0, 8).map((c) => ({ href: `/verification/${c.slug}`, name: c.name, code: c.code }))}
           rentalCountries={rentalCountries.slice(0, 8).map((c) => ({ href: `/numbers/rentals?country=${c.code}`, name: c.name, code: c.code }))}

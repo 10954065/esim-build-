@@ -1,9 +1,11 @@
 export const PRIMARY_NAV = [
+  { href: "/", label: "Home" },
   { href: "/esims", label: "Travel eSIMs" },
   { href: "/verification", label: "Verification numbers" },
   { href: "/numbers/rentals", label: "Number rentals" },
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/help", label: "Help & support" },
+  // The desktop header shows these from xl up only, so 1024px fits; the footer and the menu sheet always list them.
+  { href: "/how-it-works", label: "How it works", wideOnly: true },
+  { href: "/help", label: "Help & support", wideOnly: true },
 ] as const;
 
 export const FOOTER_NAV = [

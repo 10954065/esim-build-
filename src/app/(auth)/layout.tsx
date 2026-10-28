@@ -1,6 +1,7 @@
 import { BadgeCheck, LockKeyhole, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { Flag } from "@/components/common/flag";
+import { HomeLink } from "@/components/site/home-link";
 import { Logo } from "@/components/site/logo";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +18,10 @@ export default function AuthLayout({ children }: Readonly<{ children: React.Reac
   return (
     <div className="grid min-h-dvh bg-background lg:grid-cols-[1fr_1fr]">
       <div className="flex flex-col px-4 py-8 sm:px-10">
-        <Logo />
+        <div className="flex items-center justify-between gap-4">
+          <Logo />
+          <HomeLink />
+        </div>
         <main id="main" className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10">
           <div className="surface p-6 shadow-raised sm:p-8">{children}</div>
         </main>

@@ -7,6 +7,7 @@ import { Breadcrumbs } from "@/components/common/breadcrumbs";
 import { EmptyState } from "@/components/common/empty-state";
 import { Flag } from "@/components/common/flag";
 import { Container } from "@/components/common/page-header";
+import { SearchCombobox } from "@/components/common/search-combobox";
 import { Button } from "@/components/ui/button";
 import { formatRelative } from "@/lib/format";
 import { getVerificationCountry } from "@/server/catalog/queries";
@@ -37,6 +38,11 @@ export default async function VerificationCountryPage({
   const q = typeof sp.q === "string" ? sp.q.trim().toLowerCase().slice(0, 80) : "";
   const services = q ? result.services.filter((s) => s.name.toLowerCase().includes(q) || s.slug.includes(q)) : result.services;
   const available = result.services.filter((s) => s.totalStock > 0).length;
+  const serviceOptions = result.services.map((s) => ({
+    label: s.name,
+    href: `/verification/${result.country.slug}/${s.slug}`,
+    ...(s.totalStock > 0 ? {} : { hint: "Out of stock" }),
+  }));
 
   return (
     <>
@@ -79,14 +85,12 @@ export default async function VerificationCountryPage({
               </label>
               <span className="relative flex-1">
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-                <input
+                <SearchCombobox
                   id="service-search"
-                  name="q"
-                  type="search"
+                  options={serviceOptions}
+                  listLabel="Services"
                   defaultValue={q}
                   placeholder="Search a service"
-                  autoComplete="off"
-                  maxLength={80}
                   className="h-10 w-full rounded-lg border border-input bg-card pr-3 pl-9 text-base outline-none placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/12 sm:text-sm"
                 />
               </span>

@@ -84,3 +84,24 @@ test("@mobile homepage and navigation work on a phone without horizontal scrolli
   await page.getByRole("link", { name: "Verification numbers" }).last().click();
   await expect(page).toHaveURL(/\/verification/);
 });
+
+test("typing a destination suggests it, and picking a suggestion opens its page", async ({ page }) => {
+  await page.goto("/");
+  const search = page.getByRole("combobox", { name: "Where are you travelling?" });
+  await search.fill("spa");
+  const suggestions = page.getByRole("listbox", { name: "Destinations" });
+  await expect(suggestions.getByRole("option", { name: /Spain/ })).toBeVisible();
+  await search.press("ArrowDown");
+  await search.press("Enter");
+  await expect(page).toHaveURL(/\/esims\/spain$/);
+
+  await page.getByRole("link", { name: "Home" }).first().click();
+  await expect(page).toHaveURL(/\/$/);
+});
+
+test("verification search suggests countries by short name", async ({ page }) => {
+  await page.goto("/verification");
+  await page.getByRole("combobox", { name: "Search countries" }).fill("usa");
+  await page.getByRole("option", { name: /United States/ }).click();
+  await expect(page).toHaveURL(/\/verification\/united-states$/);
+});
