@@ -6,6 +6,7 @@ import { logger } from "@/server/logger";
 import { ensureSupplierRecord, getSupplierAdapter, type SupplierAdapter } from "@/server/providers/supplier";
 import type { EsimPackageInfo, RentalTermPrice, VerificationOffer } from "@/server/providers/supplier/types";
 import { toDbAmount } from "@/server/pricing/money";
+import { bulkUpsertProducts, ensureServices, type CatalogProductRow } from "./bulk-upsert";
 
 /**
  * Catalogue synchronisation: supplier → database. Every run writes a CatalogSyncLog.
@@ -120,18 +121,13 @@ export async function refreshVerificationOffers(countryCode: string, adapter?: S
     const country = await db.country.findUnique({ where: { code } });
     if (!country) throw new Error(`Unknown country ${code}`);
     const offers = await a.verification.getOffers({ countryCode: code });
-    const seen: string[] = [];
     const now = new Date();
-
-    for (const o of offers) {
-      const service = await db.service.upsert({
-        where: { supplierId_slug: { supplierId, slug: o.serviceSlug } },
-        update: {},
-        create: { supplierId, slug: o.serviceSlug, name: o.serviceName },
-      });
-      const supplierProductCode = offerCode(o);
-      seen.push(supplierProductCode);
-      const data = {
+    const services = await ensureServices(supplierId, offers.map((o) => ({ slug: o.serviceSlug, name: o.serviceName })));
+    const rows: CatalogProductRow[] = offers.map((o) => {
+      const service = services.get(o.serviceSlug);
+      if (!service) throw new Error(`Service ${o.serviceSlug} was not saved`);
+      return {
+        supplierProductCode: offerCode(o),
         name: `${service.name} verification · ${country.name}`,
         slug: slugify(`${o.serviceSlug}-${o.providerTier}-${o.operator}`),
         countryId: country.id,
@@ -143,14 +139,10 @@ export async function refreshVerificationOffers(countryCode: string, adapter?: S
         wholesaleCost: toDbAmount(o.cost),
         wholesaleCurrency: a.priceCurrency,
         isActive: o.stock > 0,
-        lastSyncedAt: now,
       };
-      await db.product.upsert({
-        where: { supplierId_type_supplierProductCode: { supplierId, type: "VERIFICATION", supplierProductCode } },
-        update: data,
-        create: { ...data, type: "VERIFICATION", supplierId, supplierProductCode },
-      });
-    }
+    });
+    await bulkUpsertProducts(supplierId, "VERIFICATION", rows, now);
+    const seen = rows.map((r) => r.supplierProductCode);
 
     const off = await db.product.updateMany({
       where: { supplierId, type: "VERIFICATION", countryId: country.id, supplierProductCode: { notIn: seen }, isActive: true },
@@ -189,41 +181,32 @@ export async function refreshRentalOffers(countryCode: string, adapter?: Supplie
     if (!country) throw new Error(`Unknown country ${code}`);
     const pricing = await a.rentals.getRentalPricing(code);
     const now = new Date();
-    const seen: string[] = [];
+    const services = await ensureServices(supplierId, pricing.services.map((s) => ({ slug: s.serviceSlug, name: s.serviceName })));
 
-    const upsertTerm = async (rentalType: string, term: RentalTermPrice, service: { id: string; slug: string; name: string } | null) => {
-      const supplierProductCode = `${code}:${rentalType}:${service?.slug ?? "-"}:${term.term}`;
-      seen.push(supplierProductCode);
-      const label = service ? `${service.name} number` : "Number for all services";
-      const data = {
-        name: `${label} · ${country.name} · ${term.term}`,
-        slug: slugify(`${rentalType}-${service?.slug ?? "all"}-${term.term}`),
-        countryId: country.id,
-        serviceId: service?.id ?? null,
-        rentalTerm: term.term,
-        rentalType,
-        durationHours: term.hours ?? (term.days ? term.days * 24 : null),
-        wholesaleCost: toDbAmount(term.cost),
-        wholesaleCurrency: a.priceCurrency,
-        isActive: true,
-        lastSyncedAt: now,
-      };
-      await db.product.upsert({
-        where: { supplierId_type_supplierProductCode: { supplierId, type: "RENTAL", supplierProductCode } },
-        update: data,
-        create: { ...data, type: "RENTAL", supplierId, supplierProductCode },
-      });
-    };
+    const termRow = (rentalType: string, term: RentalTermPrice, service: { id: string; slug: string; name: string } | null): CatalogProductRow => ({
+      supplierProductCode: `${code}:${rentalType}:${service?.slug ?? "-"}:${term.term}`,
+      name: `${service ? `${service.name} number` : "Number for all services"} · ${country.name} · ${term.term}`,
+      slug: slugify(`${rentalType}-${service?.slug ?? "all"}-${term.term}`),
+      countryId: country.id,
+      serviceId: service?.id ?? null,
+      rentalTerm: term.term,
+      rentalType,
+      durationHours: term.hours ?? (term.days ? term.days * 24 : null),
+      wholesaleCost: toDbAmount(term.cost),
+      wholesaleCurrency: a.priceCurrency,
+      isActive: true,
+    });
 
-    for (const term of pricing.unlimited) await upsertTerm("unlimited", term, null);
-    for (const s of pricing.services) {
-      const service = await db.service.upsert({
-        where: { supplierId_slug: { supplierId, slug: s.serviceSlug } },
-        update: {},
-        create: { supplierId, slug: s.serviceSlug, name: s.serviceName },
-      });
-      for (const term of s.terms) await upsertTerm("service", term, service);
-    }
+    const rows = [
+      ...pricing.unlimited.map((term) => termRow("unlimited", term, null)),
+      ...pricing.services.flatMap((s) => {
+        const service = services.get(s.serviceSlug);
+        if (!service) throw new Error(`Service ${s.serviceSlug} was not saved`);
+        return s.terms.map((term) => termRow("service", term, service));
+      }),
+    ];
+    await bulkUpsertProducts(supplierId, "RENTAL", rows, now);
+    const seen = rows.map((r) => r.supplierProductCode);
 
     const off = await db.product.updateMany({
       where: { supplierId, type: "RENTAL", countryId: country.id, supplierProductCode: { notIn: seen }, isActive: true },
