@@ -14,6 +14,7 @@ const RECURRING: Array<{ type: JobType; everyMinutes: number }> = [
   { type: "rental.sweep", everyMinutes: 15 },
   { type: "supplier.balance", everyMinutes: 30 },
   { type: "catalog.sync", everyMinutes: 60 },
+  { type: "fx.refresh", everyMinutes: 6 * 60 },
   { type: "maintenance.retention", everyMinutes: 24 * 60 },
 ];
 

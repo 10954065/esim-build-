@@ -36,7 +36,11 @@ export function SiteFooter() {
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-xs text-white/60 sm:px-8 md:flex-row md:items-center md:justify-between">
           <p>
             © {new Date().getFullYear()} {siteConfig.name}. Availability depends on supplier inventory and each network&apos;s rules.
-            Verification numbers must not be used to bypass security or identity checks.
+            Verification numbers must not be used to bypass security or identity checks.{" "}
+            <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-white hover:underline">
+              Rates by Exchange Rate API
+            </a>
+            .
           </p>
           <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-1">
             {LEGAL_NAV.map((link) => (

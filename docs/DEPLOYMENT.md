@@ -135,7 +135,10 @@ change the schedule to `* * * * *` and the external scheduler becomes optional.
    `https://your-domain/api/webhooks/payments/paystack`. The callback URL is sent per transaction by the app (`/checkout/return?reference=…`).
 6. **Catalogue:** `/admin/suppliers` → *Sync catalogue & balance now*. After that, `catalog.sync` runs hourly.
 7. **Pricing:** create margin rules in `/admin/pricing`, in `PAYMENT_CURRENCY`. Production has no seeded rules,
-   and a product with no active matching rule cannot be priced or sold (`NO_RULE`). Add an exchange rate if `SUPPLIER_PRICE_CURRENCY` ≠ `PAYMENT_CURRENCY`.
+   and a product with no active matching rule cannot be priced or sold (`NO_RULE`). When `SUPPLIER_PRICE_CURRENCY` ≠ `PAYMENT_CURRENCY`,
+   the `fx.refresh` job fetches the rate from ExchangeRate-API's free daily feed every 6 hours (credited in the storefront footer).
+   It rejects a move of more than 20% against the last week's rate, and a rate entered by staff in `/admin/pricing` wins until it is
+   older than `pricing.fxMaxAgeHours`. If no fresh rate exists, products show no price rather than a wrong one (`NO_RATE`).
 8. **Smoke test with real money:** buy the cheapest eSIM and a verification number with a real card, then refund one of them from
    `/admin/orders/[id]`. Confirm that the ledger entries, emails and the refund status all reach their final state.
 

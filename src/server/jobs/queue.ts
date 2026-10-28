@@ -23,6 +23,7 @@ export type JobType =
   | "rental.sweep"
   | "catalog.sync"
   | "supplier.balance"
+  | "fx.refresh"
   | "maintenance.retention";
 
 export interface EnqueueInput {

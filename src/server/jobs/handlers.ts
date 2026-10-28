@@ -2,8 +2,10 @@ import "server-only";
 import { syncAll } from "@/server/catalog/sync";
 import { db } from "@/server/db";
 import { reconcileFulfilment, sweepPreparingEsims, fulfilOrderItem } from "@/server/fulfilment/service";
+import { getEnv } from "@/server/env";
 import { runRetention } from "@/server/maintenance";
 import { expireUnpaidOrders } from "@/server/payments/confirm";
+import { refreshExchangeRate } from "@/server/pricing/fx-refresh";
 import { ensureSupplierRecord, getSupplierAdapter } from "@/server/providers/supplier";
 import { reconcileRefund, submitRefund } from "@/server/refunds/service";
 import { processSandboxRefund } from "@/server/sandbox/ops";
@@ -65,5 +67,9 @@ export const HANDLERS: Record<JobType, Handler> = {
   "rental.sweep": () => sweepRentals(),
   "catalog.sync": () => syncAll({ maxDestinations: 15 }),
   "supplier.balance": () => snapshotSupplierBalance(),
+  "fx.refresh": () => {
+    const env = getEnv();
+    return refreshExchangeRate({ base: env.SUPPLIER_PRICE_CURRENCY, quote: env.PAYMENT_CURRENCY });
+  },
   "maintenance.retention": () => runRetention(),
 };
