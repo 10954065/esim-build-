@@ -57,4 +57,11 @@ describe("environment guards", () => {
     expect(issues({ DATA_ENCRYPTION_KEYS_PREVIOUS: "" })).toEqual([]);
     expect(issues({ DATA_ENCRYPTION_KEYS_PREVIOUS: `${k()},abc` })).toContain("DATA_ENCRYPTION_KEYS_PREVIOUS");
   });
+
+  it("accepts a database CA only as a PEM certificate", () => {
+    const pem = "-----BEGIN CERTIFICATE-----\nMIID\n-----END CERTIFICATE-----";
+    expect(issues({ DATABASE_SSL_CA: pem })).toEqual([]);
+    expect(issues({ DATABASE_SSL_CA: "" })).toEqual([]);
+    expect(issues({ DATABASE_SSL_CA: "prod-ca-2021.crt" })).toContain("DATABASE_SSL_CA");
+  });
 });

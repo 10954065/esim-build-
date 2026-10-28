@@ -27,6 +27,11 @@ export const envSchema = z
     SUPPORT_EMAIL: z.email().default("support@example.com"),
 
     DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+    // PEM certificate the database server is verified against (Supabase's root CA).
+    DATABASE_SSL_CA: optionalString.refine(
+      (v) => !v || v.includes("-----BEGIN CERTIFICATE-----"),
+      "DATABASE_SSL_CA must be the certificate's PEM contents, not a file name",
+    ),
 
     BETTER_AUTH_SECRET: z.string().min(32, "BETTER_AUTH_SECRET must be at least 32 characters"),
     DATA_ENCRYPTION_KEY: z

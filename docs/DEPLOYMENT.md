@@ -24,8 +24,9 @@ Set these in Vercel → Project → Settings → Environment Variables, per envi
 | `APP_ENV` | `production` (`staging` for previews; `staging` still requires `CRON_SECRET`) |
 | `APP_URL`, `BETTER_AUTH_URL` | `https://your-domain` (must be https) |
 | `APP_NAME`, `SUPPORT_EMAIL` | Your brand and support inbox |
-| `DATABASE_URL` | Pooled connection string, `?sslmode=require` |
+| `DATABASE_URL` | Pooled connection string. Supabase: see "Supabase" in §3 |
 | `DATABASE_POOL_MAX` | `5` on serverless (connections are per instance) |
+| `DATABASE_SSL_CA` | PEM contents of your database's CA certificate when it is not publicly trusted (Supabase) |
 | `BETTER_AUTH_SECRET` | 32 random bytes, base64url |
 | `DATA_ENCRYPTION_KEY` | 32 random bytes, base64. **Back it up offline**: losing it makes activation codes and SMS unreadable |
 | `DATA_ENCRYPTION_KEYS_PREVIOUS` | Empty, except during a key rotation (SECURITY.md, "Rotating the data encryption key") |
@@ -64,6 +65,39 @@ SELECT tgname FROM pg_trigger WHERE tgname = 'LedgerEntry_no_update';
 ```
 
 Do **not** run `pnpm db:seed` against production. It refuses when `APP_ENV=production` and only creates demo data.
+
+### Supabase
+
+Supabase is plain PostgreSQL to the app; only the connection strings and TLS need care.
+Take both strings from **Connect** at the top of the project dashboard.
+
+| Use | String | Port |
+|---|---|---|
+| App (`DATABASE_URL`) | **Transaction pooler** | 6543 |
+| Migrations (inline `DATABASE_URL` for `pnpm db:deploy`) | **Session pooler**, with `?sslmode=require` | 5432 |
+
+The direct `db.<ref>.supabase.co` host is IPv6 only unless you buy the IPv4 add-on, so use the session pooler for migrations.
+The app uses no session features (advisory locks, LISTEN), so the transaction pooler is safe.
+
+**TLS.** Supabase signs its certificates with its own root CA, so Node cannot verify them by default.
+Download the certificate from **Database Settings → SSL Configuration**, paste its contents into
+`DATABASE_SSL_CA`, and leave `sslmode` off `DATABASE_URL`: the app then verifies the server against that CA.
+(The `pg` driver treats `sslmode=require` as `verify-full`, which fails against Supabase without the CA.)
+Then switch on **Enforce SSL on incoming connections** in the same settings section.
+
+```bash
+DATABASE_URL="postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres?sslmode=require" pnpm db:deploy
+```
+
+**Data API.** Supabase also serves the `public` schema over HTTP to anyone holding the project's anon key.
+The `enable_row_level_security` migration turns on RLS with no policies on every table, which denies those
+requests; the app connects as the table owner and is unaffected. Also turn the Data API off
+(**Project Settings → Data API**), because this app never uses it, and do not put the anon or service role key in the app.
+After adding tables in a later migration, enable RLS on them too:
+
+```sql
+SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND NOT rowsecurity;  -- must return no rows
+```
 
 ## 4. Deploy
 

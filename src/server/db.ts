@@ -1,5 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
+import { poolConfig } from "./db-config";
 
 /**
  * Single PrismaClient per process (connection pool). In development the instance is
@@ -7,13 +8,7 @@ import { PrismaClient } from "@/generated/prisma/client";
  */
 
 function createClient(): PrismaClient {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) throw new Error("DATABASE_URL is not configured");
-  const adapter = new PrismaPg({
-    connectionString,
-    max: Number(process.env.DATABASE_POOL_MAX ?? 10),
-  });
-  return new PrismaClient({ adapter });
+  return new PrismaClient({ adapter: new PrismaPg(poolConfig(process.env)) });
 }
 
 const globalForPrisma = globalThis as unknown as { __prisma?: PrismaClient };
