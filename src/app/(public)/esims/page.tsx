@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { listEsimDestinations } from "@/server/catalog/queries";
 import { destinationSuggestions } from "@/server/catalog/suggestions";
+import { HeaderBand } from "@/components/common/header-band";
 
 export const metadata: Metadata = {
   title: "Travel eSIM data plans",
@@ -50,7 +51,7 @@ export default async function EsimsPage({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      <section className="border-b bg-linear-to-b from-accent/70 to-background">
+      <HeaderBand>
         <Container className="py-10">
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Travel eSIMs" }]} />
           <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-card px-3 py-1 text-xs font-medium text-accent-foreground shadow-card">
@@ -86,7 +87,7 @@ export default async function EsimsPage({ searchParams }: { searchParams: Promis
             </Button>
           </form>
         </Container>
-      </section>
+      </HeaderBand>
 
       <div className="border-b bg-card">
         <Container>

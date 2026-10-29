@@ -25,7 +25,8 @@ export function DestinationCard({ d }: { d: DestinationCardData }) {
       href={`/esims/${d.slug}`}
       className="group block rounded-2xl outline-none drop-shadow-[0_1px_2px_rgb(16_24_40/0.06)] transition-[transform,filter] duration-200 ease-(--ease-out) hover:-translate-y-0.5 hover:drop-shadow-[0_10px_18px_rgb(16_24_40/0.12)] focus-visible:ring-3 focus-visible:ring-ring/50"
     >
-      <span className="ticket flex min-h-36 overflow-hidden text-foreground">
+      {/* The stub is wide enough for a full cedi price such as "GHS 385.04". */}
+      <span className="ticket flex min-h-36 overflow-hidden text-foreground [--ticket-stub:9rem]">
         <span className="flex min-w-0 flex-1 flex-col p-5">
           <span className="flex items-center gap-3">
             <Flag code={d.countryCode} kind={d.kind} size="md" />
@@ -52,7 +53,7 @@ export function DestinationCard({ d }: { d: DestinationCardData }) {
           <Plane className="size-4 text-primary transition-colors group-hover:text-primary-foreground" aria-hidden />
           <span>
             <span className="block text-[10px] font-semibold tracking-[0.14em] uppercase opacity-80">From</span>
-            <Price value={d.fromPrice} className="font-heading text-xl text-inherit" unavailableLabel="Unavailable" />
+            <Price value={d.fromPrice} className="font-heading text-lg whitespace-nowrap text-inherit" unavailableLabel="Unavailable" />
           </span>
           <span className="inline-flex items-center gap-1 text-xs font-semibold">
             View plans <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />

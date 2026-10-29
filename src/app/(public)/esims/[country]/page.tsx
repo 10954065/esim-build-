@@ -12,6 +12,7 @@ import { formatRelative } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { getEsimDestination } from "@/server/catalog/queries";
 import { dec } from "@/server/pricing/money";
+import { HeaderBand } from "@/components/common/header-band";
 
 type Params = { country: string };
 
@@ -65,7 +66,7 @@ export default async function DestinationPage({
 
   return (
     <>
-      <section className="border-b bg-linear-to-b from-accent/70 to-background">
+      <HeaderBand>
         <Container className="py-10">
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Travel eSIMs", href: "/esims" }, { label: destination.name }]} />
           <div className="mt-6 flex items-center gap-3">
@@ -94,7 +95,7 @@ export default async function DestinationPage({
             </li>
           </ul>
         </Container>
-      </section>
+      </HeaderBand>
 
       <Container className="grid grid-cols-1 gap-8 py-10 lg:grid-cols-[1fr_360px]">
         <section aria-labelledby="plans" className="surface p-5 sm:p-6">

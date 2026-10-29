@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Breadcrumbs } from "./breadcrumbs";
 import { Container } from "./page-header";
+import { HeaderBand } from "./header-band";
 
 const PROSE =
   "space-y-10 text-[15px] leading-relaxed [&_a]:font-medium [&_a]:text-primary [&_a]:underline-offset-2 [&_a:hover]:underline [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:font-semibold [&_li]:mt-1.5 [&_li]:marker:text-primary [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:text-muted-foreground [&_p]:mt-3 [&_p]:text-muted-foreground [&_section>p:first-of-type]:mt-3 [&_strong]:text-foreground [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:text-muted-foreground";
@@ -18,7 +19,7 @@ interface ContentHeaderProps {
 /** Tinted header band with breadcrumbs used by guides, policies and help pages. */
 export function ContentHeader({ eyebrow, title, description, updated, width = "narrow" }: ContentHeaderProps) {
   return (
-    <section className="border-b bg-linear-to-b from-accent/70 to-background">
+    <HeaderBand>
       <Container className="py-10">
         <div className={cn(width === "narrow" && "mx-auto max-w-3xl")}>
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: title }]} />
@@ -28,7 +29,7 @@ export function ContentHeader({ eyebrow, title, description, updated, width = "n
           {description && <div className="mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">{description}</div>}
         </div>
       </Container>
-    </section>
+    </HeaderBand>
   );
 }
 

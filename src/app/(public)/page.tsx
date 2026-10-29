@@ -52,7 +52,9 @@ const ACCENT = "font-accent font-normal tracking-[-0.01em]";
 function SectionLabel({ index, children, className }: { index: string; children: React.ReactNode; className?: string }) {
   return (
     <p className={cn(LABEL, "flex items-center gap-3 text-muted-foreground", className)}>
-      <span className="text-primary">{index}</span>
+      <span data-tone="accent" className="text-primary">
+        {index}
+      </span>
       <span aria-hidden className="h-px w-8 bg-current opacity-40" />
       {children}
     </p>
@@ -96,7 +98,7 @@ export default async function HomePage() {
       {board.length > 0 && (
         <section aria-labelledby="departures" className="py-24 lg:py-32">
           <Container className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-            <div className="reveal">
+            <div>
               <SectionLabel index="01">Live departures</SectionLabel>
               <h2 id="departures" className={cn(H2, "mt-6")}>
                 Prices you can <em className={cn(ACCENT, "text-foreground/60")}>land on.</em>
@@ -109,7 +111,7 @@ export default async function HomePage() {
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden />
               </Link>
             </div>
-            <div className="reveal">
+            <div>
               <DepartureBoard rows={board} />
             </div>
           </Container>
@@ -119,7 +121,7 @@ export default async function HomePage() {
       {/* 02: three tools, bento */}
       <section aria-labelledby="tools" className="pb-24 lg:pb-32">
         <Container>
-          <div className="reveal max-w-3xl">
+          <div className="max-w-3xl">
             <SectionLabel index="02">One trip, three tools</SectionLabel>
             <h2 id="tools" className={cn(H2, "mt-6")}>
               Data to arrive. <em className={cn(ACCENT, "text-foreground/60")}>Codes</em> to sign in.
@@ -132,7 +134,7 @@ export default async function HomePage() {
 
           <div className="mt-14 grid gap-4 lg:grid-cols-12">
             {/* Travel eSIM */}
-            <article className="reveal relative isolate flex flex-col overflow-hidden rounded-3xl bg-dusk p-8 text-white lg:col-span-7 lg:p-10">
+            <article className="relative isolate flex flex-col overflow-hidden rounded-3xl bg-dusk p-8 text-white lg:col-span-7 lg:p-10">
               <div aria-hidden className="absolute -top-32 -right-24 -z-10 size-96 rounded-full bg-primary/30 blur-[110px]" />
               <p className={cn(LABEL, "text-white/60")}>Travel eSIM · Instant QR code</p>
               <h3 className="mt-5 font-heading text-4xl leading-none font-medium tracking-[-0.035em] sm:text-5xl">
@@ -174,7 +176,7 @@ export default async function HomePage() {
             </article>
 
             {/* SMS verification */}
-            <article className="reveal surface flex flex-col rounded-3xl p-8 lg:col-span-5 lg:p-10">
+            <article className="surface flex flex-col rounded-3xl p-8 lg:col-span-5 lg:p-10">
               <p className={cn(LABEL, "text-muted-foreground")}>Verification number · Single code</p>
               <h3 className="mt-5 font-heading text-3xl leading-none font-medium tracking-[-0.03em] sm:text-4xl">
                 A number for <em className={cn(ACCENT, "text-foreground/60")}>one</em> code.
@@ -202,7 +204,7 @@ export default async function HomePage() {
             </article>
 
             {/* Rentals */}
-            <article className="reveal surface flex flex-col rounded-3xl p-8 lg:col-span-5 lg:p-10">
+            <article className="surface flex flex-col rounded-3xl p-8 lg:col-span-5 lg:p-10">
               <p className={cn(LABEL, "text-muted-foreground")}>Number rental · Days to months</p>
               <h3 className="mt-5 font-heading text-3xl leading-none font-medium tracking-[-0.03em] sm:text-4xl">
                 Keep a number <em className={cn(ACCENT, "text-foreground/60")}>longer.</em>
@@ -222,7 +224,7 @@ export default async function HomePage() {
             </article>
 
             {/* Trust */}
-            <article aria-labelledby="trust" className="reveal flex flex-col rounded-3xl border bg-card p-8 lg:col-span-7 lg:p-10">
+            <article aria-labelledby="trust" className="flex flex-col rounded-3xl border bg-card p-8 lg:col-span-7 lg:p-10">
               <p className={cn(LABEL, "text-muted-foreground")}>Trust and privacy</p>
               <h3 id="trust" className="mt-5 font-heading text-3xl leading-none font-medium tracking-[-0.03em] sm:text-4xl">
                 Built to protect your data <em className={cn(ACCENT, "text-foreground/60")}>and</em> your money.
@@ -245,33 +247,39 @@ export default async function HomePage() {
 
       {/* 03: popular destinations */}
       {featured.length > 0 && (
-        <section aria-labelledby="featured" className="border-y bg-card py-24 lg:py-32">
+        <section aria-labelledby="featured" className="p-3 sm:p-4 lg:p-5">
+          <div className="on-dusk grain relative isolate overflow-hidden rounded-3xl bg-dusk py-20 sm:rounded-[2rem] lg:py-28">
+          <div aria-hidden className="absolute inset-0 -z-10 bg-[url(/media/dusk-field-poster.jpg)] bg-cover bg-position-[50%_30%] opacity-45" />
+          <div aria-hidden className="absolute inset-0 -z-10 bg-linear-to-b from-dusk/80 via-dusk/55 to-dusk/90" />
           <Container>
-            <div className="reveal flex flex-wrap items-end justify-between gap-6">
+            <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
                 <SectionLabel index="03">Popular right now</SectionLabel>
                 <h2 id="featured" className={cn(H2, "mt-6")}>
-                  Where Roamwell <em className={cn(ACCENT, "text-foreground/60")}>travels.</em>
+                  Where Roamwell <em className={cn(ACCENT, "text-foreground/70")}>travels.</em>
                 </h2>
               </div>
-              <PillLink href="/esims">All destinations</PillLink>
+              <PillLink href="/esims" tone="light">
+                All destinations
+              </PillLink>
             </div>
             <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {featured.slice(0, 6).map((d, i) => (
                 // Phones show four; the full list is one tap away.
-                <div key={d.id} className={cn("reveal", i >= 4 && "hidden sm:block")}>
+                <div key={d.id} className={cn(i >= 4 && "hidden sm:block")}>
                   <DestinationCard d={d} />
                 </div>
               ))}
             </div>
           </Container>
+          </div>
         </section>
       )}
 
       {/* 04: how it works */}
       <section aria-labelledby="how" className="py-24 lg:py-32">
         <Container>
-          <div className="reveal">
+          <div>
             <SectionLabel index="04">How it works</SectionLabel>
             <h2 id="how" className={cn(H2, "mt-6 max-w-2xl")}>
               Three steps, <em className={cn(ACCENT, "text-foreground/60")}>whichever</em> you choose.
@@ -313,7 +321,7 @@ export default async function HomePage() {
       {/* 05: FAQ */}
       <section aria-labelledby="faq" className="pb-24 lg:pb-32">
         <Container className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="reveal">
+          <div>
             <SectionLabel index="05">Questions</SectionLabel>
             <h2 id="faq" className={cn(H2, "mt-6")}>
               Answered <em className={cn(ACCENT, "text-foreground/60")}>before</em> you ask.
@@ -334,7 +342,7 @@ export default async function HomePage() {
               .
             </p>
           </div>
-          <div className="reveal divide-y border-y">
+          <div className="divide-y border-y">
             {FAQ.slice(0, 5).map((item) => (
               <details key={item.q} className="group py-5 [&_summary::-webkit-details-marker]:hidden">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-medium">
@@ -358,7 +366,7 @@ export default async function HomePage() {
             <div className="absolute inset-0 bg-dusk/40" />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgb(11_16_36/0.55),transparent_70%)]" />
           </div>
-          <div className="reveal max-w-3xl">
+          <div className="max-w-3xl">
             <p className={cn(LABEL, "text-white/70")}>Ready when you are</p>
             <h2 id="closing" className="mt-6 font-heading text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] font-medium tracking-[-0.04em] [text-shadow:0_16px_38px_rgb(0_0_0/0.3)]">
               Your data plan, <em className={cn(ACCENT, "text-white/80")}>ready</em> before take off.

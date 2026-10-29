@@ -14,6 +14,8 @@
   --font-accent: var(--font-instrument), Georgia, serif;
   /* Night sky behind the cinematic media frames. */
   --color-dusk: #0b1024;
+  /* Cool tinted canvas for public pages, so white cards read as cards. */
+  --color-mist: #eef1f7;
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
   --color-canvas: var(--canvas);
@@ -363,23 +365,26 @@
 }
 
 /*
- * Scroll reveal driven by the element's own view timeline. Browsers without scroll-driven
- * animations simply show the content, so nothing can stay hidden.
+ * Dark scope for dusk bands: page text flips to white, while light surfaces placed inside
+ * (search boxes, cards, tickets, suggestion lists) get the light-page tokens back.
  */
-@utility reveal {
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      animation: reveal-in linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 40%;
-    }
+@utility on-dusk {
+  --foreground: #ffffff;
+  --muted-foreground: rgb(255 255 255 / 0.76);
+  --border: rgb(255 255 255 / 0.16);
+  color: var(--foreground);
+  & .eyebrow,
+  & [data-tone="accent"] {
+    color: #b4c6ff;
   }
-}
-
-@keyframes reveal-in {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
+  & :where(.surface, .ticket, .bg-card, .bg-background, .bg-muted, .bg-popover, [role="listbox"]) {
+    --foreground: #101828;
+    --muted-foreground: #5f6b7f;
+    --border: #eaecf0;
+    color: var(--foreground);
+  }
+  & :where(.surface, .ticket, .bg-card, .bg-background, .bg-muted, .bg-popover) :is(.eyebrow, [data-tone="accent"]) {
+    color: var(--color-primary);
   }
 }
 

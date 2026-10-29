@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { listPopularServices, listVerificationCountries } from "@/server/catalog/queries";
 import { verificationCountrySuggestions } from "@/server/catalog/suggestions";
+import { HeaderBand } from "@/components/common/header-band";
 
 export const metadata: Metadata = {
   title: "Temporary numbers for SMS verification",
@@ -56,7 +57,7 @@ export default async function VerificationPage({ searchParams }: { searchParams:
 
   return (
     <>
-      <section className="border-b bg-linear-to-b from-accent/70 to-background">
+      <HeaderBand>
         <Container className="grid grid-cols-1 gap-10 py-10 lg:grid-cols-[1fr_1.05fr] lg:items-start">
           <div>
             <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Verification numbers" }]} />
@@ -156,7 +157,7 @@ export default async function VerificationPage({ searchParams }: { searchParams:
             )}
           </section>
         </Container>
-      </section>
+      </HeaderBand>
 
       {services.length > 0 && (
         <Container className="pt-12">

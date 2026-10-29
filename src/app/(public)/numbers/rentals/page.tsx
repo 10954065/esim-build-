@@ -11,6 +11,7 @@ import { formatTerm } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { getRentalOffers, listRentalCountries } from "@/server/catalog/queries";
 import { getStorefrontStatus } from "@/server/storefront";
+import { HeaderBand } from "@/components/common/header-band";
 
 export const metadata: Metadata = {
   title: "Long term virtual number rentals",
@@ -40,7 +41,7 @@ export default async function RentalsPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <section className="border-b bg-linear-to-b from-accent/70 to-background">
+      <HeaderBand>
         <Container className="py-10">
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Number rentals" }]} />
           <p className="eyebrow mt-6">Rentals</p>
@@ -57,7 +58,7 @@ export default async function RentalsPage({ searchParams }: { searchParams: Prom
             ))}
           </ul>
         </Container>
-      </section>
+      </HeaderBand>
 
       <Container className="py-10">
         {countries.length === 0 ? (

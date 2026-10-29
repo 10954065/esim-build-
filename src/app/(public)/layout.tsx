@@ -19,7 +19,7 @@ export default async function PublicLayout({ children }: Readonly<{ children: Re
       </a>
       <StatusBanner status={status} />
       <SiteHeader user={user} currency={status.currency} />
-      <main id="main" className="flex-1">
+      <main id="main" className="flex-1 bg-mist">
         {children}
       </main>
       <SiteFooter />

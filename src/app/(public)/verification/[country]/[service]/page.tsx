@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { formatRelative } from "@/lib/format";
 import { getVerificationService } from "@/server/catalog/queries";
 import { getStorefrontStatus } from "@/server/storefront";
+import { HeaderBand } from "@/components/common/header-band";
 
 type Params = { country: string; service: string };
 
@@ -49,7 +50,7 @@ export default async function VerificationServicePage({ params }: { params: Prom
 
   return (
     <>
-      <section className="border-b bg-linear-to-b from-accent/70 to-background">
+      <HeaderBand>
         <Container className="py-10">
           <Breadcrumbs
             items={[
@@ -74,7 +75,7 @@ export default async function VerificationServicePage({ params }: { params: Prom
             </div>
           </div>
         </Container>
-      </section>
+      </HeaderBand>
 
       <Container className="grid grid-cols-1 gap-8 py-10 lg:grid-cols-[1fr_340px]">
         <section aria-labelledby="routes">

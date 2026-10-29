@@ -11,6 +11,7 @@ import { SearchCombobox } from "@/components/common/search-combobox";
 import { Button } from "@/components/ui/button";
 import { formatRelative } from "@/lib/format";
 import { getVerificationCountry } from "@/server/catalog/queries";
+import { HeaderBand } from "@/components/common/header-band";
 
 type Params = { country: string };
 
@@ -46,7 +47,7 @@ export default async function VerificationCountryPage({
 
   return (
     <>
-      <section className="border-b bg-linear-to-b from-accent/70 to-background">
+      <HeaderBand>
         <Container className="py-10">
           <Breadcrumbs
             items={[{ label: "Home", href: "/" }, { label: "Verification numbers", href: "/verification" }, { label: result.country.name }]}
@@ -68,7 +69,7 @@ export default async function VerificationCountryPage({
             </span>
           </p>
         </Container>
-      </section>
+      </HeaderBand>
 
       <Container className="py-10">
         <section aria-labelledby="inventory" className="surface overflow-hidden">

@@ -14,6 +14,7 @@ import { formatBytes } from "@/lib/currency";
 import { formatRelative, formatValidity } from "@/lib/format";
 import { getEsimPlan } from "@/server/catalog/queries";
 import { getStorefrontStatus } from "@/server/storefront";
+import { HeaderBand } from "@/components/common/header-band";
 
 type Params = { country: string; plan: string };
 
@@ -60,7 +61,7 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
 
   return (
     <>
-      <section className="border-b bg-linear-to-b from-accent/70 to-background">
+      <HeaderBand>
         <Container className="py-10">
           <Breadcrumbs
             items={[
@@ -79,7 +80,7 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
             <CapabilityBadges includesPhoneNumber={plan.includesPhoneNumber} includesSms={plan.includesSms} includesVoice={plan.includesVoice} />
           </div>
         </Container>
-      </section>
+      </HeaderBand>
 
       <Container className="grid grid-cols-1 gap-8 py-10 lg:grid-cols-[1fr_380px]">
         <div className="space-y-8">
