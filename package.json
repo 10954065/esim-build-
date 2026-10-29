@@ -19,6 +19,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "admin:grant": "tsx scripts/grant-role.ts",
+    "db:keepalive": "tsx scripts/db-keepalive.ts",
     "data:reencrypt": "tsx --conditions=react-server scripts/reencrypt-data.ts"
   },
   "dependencies": {
