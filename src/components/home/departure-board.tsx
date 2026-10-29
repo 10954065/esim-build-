@@ -19,7 +19,7 @@ const ROW_STAGGER_MS = 70;
 /** Airport departure board listing live destinations from the catalogue. Every value is real. */
 export function DepartureBoard({ rows }: { rows: BoardRow[] }) {
   return (
-    <figure className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1220]/80 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.6)] ring-1 ring-white/5 backdrop-blur-sm">
+    <figure className="overflow-hidden rounded-3xl border border-white/10 bg-dusk shadow-[0_30px_80px_-20px_rgb(11_16_36/0.55)] ring-1 ring-white/5">
       <figcaption className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-3.5">
         <span className="font-heading text-sm font-semibold tracking-[0.18em] text-white uppercase">Departures</span>
         <span className="inline-flex items-center gap-2 text-[11px] font-medium tracking-wide text-white/70 uppercase">
